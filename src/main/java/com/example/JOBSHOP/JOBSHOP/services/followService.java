@@ -3,10 +3,9 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.example.JOBSHOP.JOBSHOP.Base.BaseService;
 import com.example.JOBSHOP.JOBSHOP.models.Follow;
 import com.example.JOBSHOP.JOBSHOP.models.User;
 import com.example.JOBSHOP.JOBSHOP.repositories.followRepository;
@@ -15,21 +14,23 @@ import com.example.JOBSHOP.JOBSHOP.repositories.userRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
-public class followService extends BaseService{
+public class followService{
 
 	@Autowired
-	private followRepository followRepository;
+	private followRepository followRepository; 
+
 	@Autowired
-	private userRepository userRepository;
+	private userService userService;
 	
-	public List<Follow> getAll()
+	
+	public List<Follow> findAll()
 	{
 		return followRepository.findAll();
 	}
 	public Follow createFollow(Long followerId,Long followingId)
 	{
-		User follower=userRepository.findById(followerId).orElseThrow(()->new EntityNotFoundException("follower not found!"));
-		User following=userRepository.findById(followingId).orElseThrow(()->new EntityNotFoundException("following not found!"));
+		User follower=userService.findById(followerId);
+		User following=userService.findById(followingId);
 		Follow follow=new Follow();
 		follow.setFollower(follower);
 		follow.setFollowing(following);
@@ -49,6 +50,7 @@ public class followService extends BaseService{
 		}
 		return userList;
 	}
+	
 	public List<User>getFollowersById(User user)
 	{
 		ArrayList<User> userList=new ArrayList<User>();
@@ -61,6 +63,7 @@ public class followService extends BaseService{
 		}
 		return userList;
 	}
+	
 	public List<User>getFollowingById(User user)
 	{
 		ArrayList<User> userList=new ArrayList<User>();

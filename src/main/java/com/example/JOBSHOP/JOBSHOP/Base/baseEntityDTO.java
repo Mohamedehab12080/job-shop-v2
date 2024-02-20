@@ -1,42 +1,25 @@
-package com.example.JOBSHOP.JOBSHOP.models;
+package com.example.JOBSHOP.JOBSHOP.Base;
 
 import java.time.LocalDateTime;
 
+public class baseEntityDTO <ID>{
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.SequenceGenerator;
-
-@MappedSuperclass //not entity
-@EntityListeners({AuditingEntityListener.class}) //to use auditing annotations
-public class baseEntity <ID>{
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	private ID id;
-	private Integer statuseCode;
-	@CreatedBy
+	private String statuseCode;
+	
 	private String createdBy;
-	@CreatedDate
+	
 	private LocalDateTime createdDate;
-	@LastModifiedBy
+	
 	private String lastModifiedBy;
-	@LastModifiedDate
+	
 	private LocalDateTime lastModifiedDate;
 	
-	public Integer getStatuseCode() {
+	public String getStatuseCode() {
 		return statuseCode;
 	}
-	public void setStatuseCode(Integer statuseCode) {
+	public void setStatuseCode(String statuseCode) {
 		this.statuseCode = statuseCode;
 	}
 	
@@ -72,3 +55,4 @@ public class baseEntity <ID>{
 	}
 	
 }
+

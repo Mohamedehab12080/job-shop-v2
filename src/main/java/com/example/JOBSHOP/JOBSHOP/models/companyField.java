@@ -2,22 +2,29 @@ package com.example.JOBSHOP.JOBSHOP.models;
 
 import java.util.List;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class companyField extends baseEntity<Long>{
 
+	//@NotBlank
+	@Column(unique = true)
 	private String fieldName;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference
 	@JoinColumn(name="companyAdministrator_id")
+	@NotNull
 	private companyAdministrator companyAdministrator;
 	
 	private List<String> requiredQualifications;

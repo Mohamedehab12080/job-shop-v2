@@ -1,13 +1,16 @@
 package com.example.JOBSHOP.JOBSHOP.models;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class employerField extends baseEntity<Long>{
@@ -15,10 +18,12 @@ public class employerField extends baseEntity<Long>{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference
     @JoinColumn(name="employer_id")
+	//@NotNull
 	private Employer employer;
 	
 	@OneToOne
 	@JoinColumn(name="companyField_id")
+	//@NotNull
 	private companyField companyField;
 	
 	public Employer getEmployer() {

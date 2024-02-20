@@ -2,6 +2,7 @@ package com.example.JOBSHOP.JOBSHOP.DTOs;
 
 import java.util.List;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.models.companyAdministrator;
 
 

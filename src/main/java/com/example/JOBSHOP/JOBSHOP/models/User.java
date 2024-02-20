@@ -1,15 +1,10 @@
 package com.example.JOBSHOP.JOBSHOP.models;
 
-import java.sql.Blob;
 import java.util.List;
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import com.example.JOBSHOP.JOBSHOP.security.PasswordConverter;
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
@@ -23,7 +18,8 @@ public class User extends baseEntity<Long>{
 	
 	// Use @Lob annotation for large objects like images
     @Lob
-    private Blob picture;
+    @Column(columnDefinition = "MEDIUMBLOB") 
+    private byte[] picture;
     
 	@Column(nullable=false)
 //	@Convert(converter=PasswordConverter.class)
@@ -44,11 +40,11 @@ public class User extends baseEntity<Long>{
 		super();
 	}
 	
-	public Blob getPicture() {
+	public byte[] getPicture() {
 		return picture;
 	}
 
-	public void setPicture(Blob picture) {
+	public void setPicture(byte[] picture) {
 		this.picture = picture;
 	}
 

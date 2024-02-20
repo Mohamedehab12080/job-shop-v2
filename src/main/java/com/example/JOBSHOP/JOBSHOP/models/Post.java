@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.annotations.Formula;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -27,7 +28,6 @@ public class Post extends baseEntity<Long>{
 	private String Title;
 	private String description;
 	private String jobRequirments;
-	private String postState;
 	private String location;
 	private String employmentType;
 	 
@@ -74,12 +74,6 @@ public class Post extends baseEntity<Long>{
 	}
 	public void setJobRequirments(String jobRequirments) {
 		this.jobRequirments = jobRequirments;
-	}
-	public String getPostState() {
-		return postState;
-	}
-	public void setPostState(String postState) {
-		this.postState = postState;
 	}
 	public String getLocation() {
 		return location;

@@ -1,12 +1,10 @@
 package com.example.JOBSHOP.JOBSHOP.controllers;
 
 import java.io.IOException;
-import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.sql.rowset.serial.SerialBlob;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,17 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.JOBSHOP.JOBSHOP.DTOImpl.entityToDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.DTOs.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Application;
 import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
-import com.example.JOBSHOP.JOBSHOP.requests.jobSeekerRequest;
 import com.example.JOBSHOP.JOBSHOP.services.jobSeekerService;
 
 @RestController
@@ -56,11 +52,28 @@ public class jobSeekerController {
 		return entityToDTOMapper.mapApplicationToDTO(app);
 	}
 	
-	@PostMapping("/insertPicture")
-	public ResponseEntity<?> uploadFile(@RequestBody jobSeeker jobSeeker,@RequestPart("file")MultipartFile file) throws SQLException, IOException
+	@PutMapping("/insertPicture/{id}")
+	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody byte[] file) throws SQLException, IOException
 	{	
-		jobSeeker.setPicture(createBlob(file.getBytes()));
+		try {
+			return ResponseEntity.ok(jobSeekerService.insertPicture(id,file));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	
+	@PostMapping("/insert")
+	public ResponseEntity<?> insertJobSeeker(@RequestBody jobSeeker jobSeeker)
+	{
 		return ResponseEntity.ok(jobSeekerService.insert(jobSeeker));
+	}
+	
+	@GetMapping("/find/{id}")
+	public ResponseEntity<?> findById(@PathVariable Long id)
+	{
+		return ResponseEntity.ok(jobSeekerService.findById(id));
 	}
 	
 //	public jobSeeker mapJobSeekerRequestToJobSeeker(jobSeekerRequest jobSeeker) throws SQLException, IOException
@@ -90,17 +103,9 @@ public class jobSeekerController {
 //		jobSeeker.setPicture(createBlob((MultipartFile)jobSeeker.getPicture()));
 //		return ResponseEntity.ok(jobSeeker);
 //	}
-	private Blob createBlob(byte[] data) throws SQLException, IOException {
-        return new SerialBlob(data);
-    } 
-	@PostMapping("/insert")
-	public ResponseEntity<?> insertJobSeeker(@RequestBody jobSeeker jobSeeker)
-	{
-		return ResponseEntity.ok(jobSeekerService.insert(jobSeeker));
-	}
-	@GetMapping("/find/{id}")
-	public ResponseEntity<?> findById(@PathVariable Long id)
-	{
-		return ResponseEntity.ok(jobSeekerService.getJobSeekerWithID(id));
-	}
+//	private Blob createBlob(byte[] data) throws SQLException, IOException {
+//        return new SerialBlob(data);
+//    } 
+	
+
 }

@@ -1,6 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.config;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -85,63 +86,48 @@ public class startUp implements CommandLineRunner{
 				employer.setContacts(contacts);
 				employer.setCompanyAdmin(companyD);
 				employer.setUserType("Employer");
-				employerService.insertEmployer(employer);
+				companyAdminService.createEmployer(employer);
  			}
- 			if(followService.getAll().isEmpty())
+ 			if(followService.findAll().isEmpty())
  			{
  				for(int i=1;i<20;i++)
  	 			{
  	 				followService.createFollow(Long.valueOf(i),Long.valueOf(i+1));
  	 			}
  			}
- 			if(jobSeekerService.findAllProfiles().isEmpty())
- 			{
- 				List<jobSeeker> list=jobSeekerService.findAll();
- 	 			Iterator<jobSeeker> itr=list.iterator();
- 	 			while(itr.hasNext())
- 	 			{
- 	 				jobSeeker seeker=itr.next();
- 	 				jobSeekerProfile jobSeekerProfile=new jobSeekerProfile(jobSeekerService.getJobSeekerWithID(seeker.getId()),followService);
- 	 				jobSeekerProfile.setCreatedBy("Mohamed Ehab");
- 	 				jobSeekerProfile.setCreatedDate(LocalDateTime.now());
- 	 				jobSeekerService.insertProfile(jobSeekerProfile);
- 	 			}
- 	 			
- 			}
+// 			if(jobSeekerService.findAllProfiles().isEmpty())
+// 			{
+// 				List<jobSeeker> list=jobSeekerService.findAll();
+// 	 			Iterator<jobSeeker> itr=list.iterator();
+// 	 			while(itr.hasNext())
+// 	 			{
+// 	 				jobSeeker seeker=itr.next();
+// 	 				jobSeekerProfile jobSeekerProfile=new jobSeekerProfile(jobSeekerService.getJobSeekersByReference(seeker.getId()),followService);
+// 	 				jobSeekerProfile.setCreatedBy("Mohamed Ehab");
+// 	 				jobSeekerProfile.setCreatedDate(LocalDateTime.now());
+// 	 				jobSeekerService.insertProfile(jobSeekerProfile);
+// 	 			}
+// 	 			
+// 			}
  			List<companyAdministrator> companyList=companyAdminService.findAll();
 	 			Iterator<companyAdministrator> itr2=companyList.iterator();
-	 			while(itr2.hasNext())
-	 			{
-	 				companyAdministrator companyAdmin=itr2.next();
-	 				companyProfile companyProfile=new companyProfile(companyAdminService.getCompanyAdminById(companyAdmin.getId()),followService);
-	 				companyProfile.setCreatedBy("Mohamed Ehab");
-	 				companyProfile.setCreatedDate(LocalDateTime.now()); 
-	 				companyAdminService.insertcompanyProfile(companyProfile);
-	 				for(int i=0;i<companyProfile.getFollowers().size();i++)
-	 				{
-	 					System.out.print("company Profile followers: "+companyProfile.getFollowers().get(i).getId());
-	 				}
-	 			}
-			
-			
- 		
- 		
-  		if(postService.findAll().isEmpty())
-  		{
-  			Post post=new Post();
-  			companyProfile comp=new companyProfile(companyAdminService.getCompanyAdminById(Long.valueOf(50)),followService);
-  			comp.setId(Long.valueOf(2));
-//  	 		post.setCompany(comp);
-  	 		post.setCreatedBy("Mohamed Ehab 2");
-  	 		post.setCreatedDate(LocalDateTime.now()); 
-  	 		post.setEmployer(employerService.findById(Long.valueOf(99)));
-  	 		post.setDescription("This post is a test post for test the api");
-  	 		post.setEmploymentType("Full Time");
-  	 		post.setPostState("Opened");
-  	 		postService.insertPost(post);
-  		} 
- 		
- 		}
- 		}
+	 			
+	 			
+	 				if(postService.findAll().isEmpty())
+	 		  		{
+	 		  			Post post=new Post();
+	 		  			companyProfile comp=new companyProfile(companyAdminService.findById(Long.valueOf(50)),followService);
+	 		  			comp.setId(Long.valueOf(2));
+	 		  	 		post.setCompanyProfile(comp);
+	 		  	 		post.setCreatedBy("Mohamed Ehab 2");
+	 		  	 		post.setCreatedDate(LocalDateTime.now()); 
+	 		  	 		post.setEmployer(employerService.findById(Long.valueOf(99)));
+	 		  	 		post.setDescription("This post is a test post for test the api");
+	 		  	 		post.setEmploymentType("Full Time");
+	 		  	 		post.setStatusCode("Opened");
+	 		  	 		postService.insert(post);
+	 		  		} 
+ 		}			
 
-}
+	}
+	}

@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.example.JOBSHOP.JOBSHOP.services.followService;
 
 

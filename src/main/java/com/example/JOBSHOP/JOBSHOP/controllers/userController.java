@@ -40,7 +40,7 @@ public class userController {
 	@GetMapping("/getAll")
 	public ResponseEntity<?> getAllFollow()
 	{
-		return ResponseEntity.ok(followService.getAll());
+		return ResponseEntity.ok(followService.findAll());
 	}
 	
 	@GetMapping("/getFollowersName/{follwingId}")

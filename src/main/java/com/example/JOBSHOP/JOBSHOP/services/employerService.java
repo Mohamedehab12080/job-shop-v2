@@ -1,51 +1,117 @@
 package com.example.JOBSHOP.JOBSHOP.services;
 
-import java.util.ArrayList;
-import com.example.JOBSHOP.JOBSHOP.repositories.postRepository;
+
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.JOBSHOP.JOBSHOP.DTOImpl.entityToDTOMapper;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
+import com.example.JOBSHOP.JOBSHOP.Base.BaseService;
+import com.example.JOBSHOP.JOBSHOP.models.Application;
 import com.example.JOBSHOP.JOBSHOP.models.Employer;
 import com.example.JOBSHOP.JOBSHOP.models.Post;
 import com.example.JOBSHOP.JOBSHOP.repositories.employerRepository;
 
 @Service
-public class employerService {
+public class employerService{
 
 	@Autowired
 	private employerRepository employerRepository;
+	
 	@Autowired
-	private postRepository postRepository;
+	private postService postService;
 	
-	private List<employerDTO> employerDTOList;
-	
-	public List<Post> findByEmpId(Long id)
+
+	public Employer insert(Employer employer)
 	{
-		return postRepository.findByEmployerId(id);
+		return employerRepository.save(employer);
 	}
 	
-	public Post createAPost(Post post)
+	public Employer getReferenceById(Long id)
 	{
-		return postRepository.save(post);
+		return employerRepository.getReferenceById(id);
 	}
+   
 	public List<Employer> findAll()
 	{
 		return employerRepository.findAll();
 	}
+	
+	
+	public Employer findById(Long id)
+	{
+		Optional<Employer> finded=employerRepository.findById(id);
+		if(finded.isPresent())
+		{
+			return finded.get();
+		}else 
+		{
+			return null;
+		}
+		
+	}
+	
+//	public void updateEntityStatus(Application t)
+//	{
+//		applicationRepository.updateEntity(t.getId(),t.getStatusCode()); 
+//	}
+	
+	public Employer update(Employer t)
+	{
+		if(getReferenceById(t.getId())!=null)
+		{
+//			logInfo("Employer Updated Successfully");
+			return employerRepository.save(t);
+		}else 
+		{
+//			logError("EmployerNotFound");
+			return null;
+			
+		}
+	}
+	
+	public void deleteById(Long id)
+	{
+		Employer t=getReferenceById(id);
+		if(t!=null)
+		{
+			employerRepository.deleteById(id);
+		}
+	}
+	
+	public Post createAPost(Post post)
+	{
+		return postService.insert(post);
+	}
+
+	public List<Post> findPostsByEmployerId(Long id)
+	{
+		return postService.findByEmployerId(id);
+	}
+	
 	public List<Employer> findAllWithCompanyAdministrator(Long id)
 	{
 		return employerRepository.findByCompanyAdministratorId(id);
 	}
-	public Employer insertEmployer(Employer employer)
-	{
-		return employerRepository.save(employer);
+	
+
+	 public Employer insertPicture(Long id,byte[] picture)
+	 {
+	try {
+		Optional<Employer> employerUpdate=employerRepository.findById(id);
+		 if(employerUpdate.isPresent())
+		 {
+			 System.out.println("Job Seeker :" +employerUpdate.get().getEmail());
+			 Employer employerForUpdate=employerUpdate.get();
+			 employerForUpdate.setPicture(picture);
+			 return employerRepository.save(employerForUpdate);
+		 }else  
+		 {
+			 return null;
+		 }
+	} catch (Exception e) {
+		return null;
 	}
-	public Employer findById(Long id)
-	{
-		return employerRepository.findById(id).get();
-	}
+	 }
 }

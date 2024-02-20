@@ -10,6 +10,7 @@ import com.example.JOBSHOP.JOBSHOP.services.followService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -23,7 +24,7 @@ public class companyProfile extends userProfile{
 	@JoinColumn(name="companyAdministrator_id")
 	private companyAdministrator companyAdmin;
 	
-	@OneToMany(mappedBy = "companyProfile")
+	@OneToMany(mappedBy = "companyProfile",cascade = CascadeType.ALL)
 	@JsonIgnore
 	private List<Post> posts=new ArrayList<Post>();
 	

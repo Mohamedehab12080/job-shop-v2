@@ -1,11 +1,15 @@
 package com.example.JOBSHOP.JOBSHOP.DTOImpl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.JOBSHOP.JOBSHOP.DTOs.UserDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.companyAdministratorDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.companyFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.DTOs.employerProfileDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.jobSeekerDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.postDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Application;
@@ -15,6 +19,7 @@ import com.example.JOBSHOP.JOBSHOP.models.User;
 import com.example.JOBSHOP.JOBSHOP.models.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.models.companyField;
 import com.example.JOBSHOP.JOBSHOP.models.employerField;
+import com.example.JOBSHOP.JOBSHOP.models.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
 
 public class entityToDTOMapper {
@@ -27,15 +32,30 @@ public class entityToDTOMapper {
 		dto.setCreatedDate(app.getCreatedDate());
 		dto.setLastModifiedBy(app.getLastModifiedBy());
 		dto.setLastModifiedDate(app.getLastModifiedDate());
-		dto.setStatuseCode(app.getStatuseCode());
+		dto.setStatuseCode(app.getStatusCode());
 		dto.setAdditionalExperience(app.getAdditionalExperience());
 		dto.setAdditionalSkills(app.getAdditionalSkills());
-		dto.setApprovalState(app.getApprovalState());
 		dto.setJobSeeker(app.getJobSeeker());
 		dto.setPost(app.getPost());
 		return dto;
 	}
 	
+	public static employerProfileDTO mapEmployerProfileToDTO(employerProfile employerProfile)
+	{
+		List<String> employerFields=new ArrayList<String>();
+		employerProfileDTO dto=new employerProfileDTO();
+		dto.setProfileId(employerProfile.getId());
+		dto.setEmployerUserName(employerProfile.getEmployer().getUserName());
+		dto.setEmployerEmail(employerProfile.getEmployer().getEmail());
+		dto.setEmployerPicture(employerProfile.getEmployer().getPicture());
+		for(int i=0;i<employerProfile.getEmployer().getEmployerFields().size();i++)
+		{
+			employerFields.add(employerProfile.getEmployer().getEmployerFields().get(i).getCompanyField().getFieldName());
+		}
+		dto.setEmployerFields(employerFields);
+		dto.setCompanyName(employerProfile.getEmployer().getCompanyAdmin().getCompanyName());
+		return dto;
+	}
 	
 	public static employerFieldDTO mapEmployerFieldToDTO(employerField employerField)
 	{
@@ -45,7 +65,7 @@ public class entityToDTOMapper {
 		dto.setCreatedDate(employerField.getCreatedDate());
 		dto.setLastModifiedBy(employerField.getLastModifiedBy());
 		dto.setLastModifiedDate(employerField.getLastModifiedDate());
-		dto.setStatuseCode(employerField.getStatuseCode());
+		dto.setStatuseCode(employerField.getStatusCode());
 		dto.setEmployer(employerField.getEmployer());
 		dto.setCompanyField(employerField.getCompanyField());
 		return dto;
@@ -58,7 +78,7 @@ public class entityToDTOMapper {
 		dto.setCreatedDate(companyField.getCreatedDate());
 		dto.setLastModifiedBy(companyField.getLastModifiedBy());
 		dto.setLastModifiedDate(companyField.getLastModifiedDate());
-		dto.setStatuseCode(companyField.getStatuseCode());
+		dto.setStatuseCode(companyField.getStatusCode());
 		dto.setCompanyAdmin(companyField.getCompanyAdmin());
 		dto.setFieldName(companyField.getFieldName());
 		dto.setRequiredQualifications(companyField.getRequiredQualifications());
@@ -73,15 +93,19 @@ public class entityToDTOMapper {
 		dto.setCreatedDate(post.getCreatedDate());
 		dto.setLastModifiedBy(post.getLastModifiedBy());
 		dto.setLastModifiedDate(post.getLastModifiedDate());
-		dto.setStatuseCode(post.getStatuseCode());
+		dto.setStatuseCode(post.getStatusCode());
 		dto.setTitle(post.getTitle());
 		dto.setDescription(post.getDescription());
 		dto.setJobRequirments(post.getJobRequirments());
-		dto.setPostState(post.getPostState());
 		dto.setLocation(post.getLocation());
 		dto.setEmploymentType(post.getEmploymentType());
-		dto.setCompanyProfile(post.getCompanyProfile());
-		dto.setEmployer(post.getEmployer());
+		dto.setCompanyName(post.getCompanyProfile().getCompanyAdmin().getCompanyName());
+		dto.setProfileId(post.getCompanyProfile().getId());
+		dto.setAdminUserName(post.getCompanyProfile().getCompanyAdmin().getUserName());
+//		dto.setCompanyProfile(post.getCompanyProfile());
+		dto.setEmployerpicture(post.getEmployer().getPicture());
+//		dto.setEmployer(post.getEmployer());
+		dto.setEmployerUserName(post.getEmployer().getUserName());
 		dto.setPostFields(post.getPostFields());
 		dto.setFieldCount(post.getFieldCount());
 		dto.setApplications(post.getApplications());
@@ -97,13 +121,14 @@ public class entityToDTOMapper {
 		dto.setCreatedDate(user.getCreatedDate());
 		dto.setLastModifiedBy(user.getLastModifiedBy());
 		dto.setLastModifiedDate(user.getLastModifiedDate());
-		dto.setStatuseCode(user.getStatuseCode());
+		dto.setStatuseCode(user.getStatusCode());
 		dto.setAddress(user.getAddress());
 		dto.setContacts(user.getContacts());
 		dto.setEmail(user.getEmail());
 		dto.setPassword(user.getPassword());
 		dto.setUserName(user.getUserName());
 		dto.setUserType(user.getUserType());
+		dto.setPicture(user.getPicture());
 		return dto;
 	}
 	
@@ -122,10 +147,11 @@ public class entityToDTOMapper {
 		dto.setPassword(employer.getPassword());
 		dto.setUserName(employer.getUserName());
 		dto.setEmployerFields(employer.getEmployerFields());
-		dto.setStatuseCode(employer.getStatuseCode());
+		dto.setStatuseCode(employer.getStatusCode());
 		dto.setPosts(employer.getPosts());
 		dto.setPostCount(employer.getPostCount());
 		dto.setUserType(employer.getUserType());
+		dto.setPicture(employer.getPicture());
 		return dto;
 	}
 	public static jobSeekerDTO mapJobSeekerToDTO(jobSeeker jobSeeker)
@@ -141,13 +167,14 @@ public class entityToDTOMapper {
 		dto.setEmail(jobSeeker.getEmail());
 		dto.setPassword(jobSeeker.getPassword());
 		dto.setUserName(jobSeeker.getUserName());
-		dto.setStatuseCode(jobSeeker.getStatuseCode());
+		dto.setStatuseCode(jobSeeker.getStatusCode());
 		dto.setUserType(jobSeeker.getUserType());
 		dto.setEducation(jobSeeker.getEducation());
 		dto.setApplications(jobSeeker.getApplications());
 		dto.setApplicationCount(jobSeeker.getApplicationCount());
 		dto.setSkills(jobSeeker.getSkills());
 		dto.setEmploymentState(jobSeeker.getEmploymentState()); 
+		dto.setPicture(jobSeeker.getPicture());
 		return dto;
 	}
 	
@@ -166,9 +193,10 @@ public class entityToDTOMapper {
 		dto.setPassword(companyAdmin.getPassword());
 		dto.setUserName(companyAdmin.getUserName());
 		dto.setCompanyFields(companyAdmin.getCompanyFields());
-		dto.setStatuseCode(companyAdmin.getStatuseCode());
+		dto.setStatuseCode(companyAdmin.getStatusCode());
 		dto.setEmployers(companyAdmin.getEmployers());
 		dto.setUserType(companyAdmin.getUserType());
+		dto.setPicture(companyAdmin.getPicture());
 		return dto;
 	}
 }

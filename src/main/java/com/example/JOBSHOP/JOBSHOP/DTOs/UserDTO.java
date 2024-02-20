@@ -2,6 +2,8 @@ package com.example.JOBSHOP.JOBSHOP.DTOs;
 
 import java.util.List;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
+
 public class UserDTO extends baseEntityDTO<Long>{
 	
 		protected String userName;
@@ -9,11 +11,19 @@ public class UserDTO extends baseEntityDTO<Long>{
 		protected String userType;
 		private String email;
 		
+		protected byte[] picture;
+		
 		protected String Address;
 		
 		protected List<String> contacts;
 		
 		
+		public byte[] getPicture() {
+			return picture;
+		}
+		public void setPicture(byte[] picture) {
+			this.picture = picture;
+		}
 		public UserDTO() {
 			super();
 		}

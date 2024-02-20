@@ -1,8 +1,9 @@
 	package com.example.JOBSHOP.JOBSHOP.DTOs;
 	
 	import java.util.List;
-	
-	import com.example.JOBSHOP.JOBSHOP.models.Post;
+
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
+import com.example.JOBSHOP.JOBSHOP.models.Post;
 	import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
 	import com.fasterxml.jackson.annotation.JsonBackReference;
 	import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,9 +18,7 @@
 		private jobSeeker jobSeekerr;
 		
 	    private String Experience;
-	    
-	    private String approvalState;
-	    
+	   	    
 	    private Post Postt;	
 	
 	    public List<String> getAdditionalSkills() {
@@ -39,12 +38,6 @@
 		}
 		public void setAdditionalExperience(String Experience) {
 			this.Experience = Experience;
-		}
-		public String getApprovalState() {
-			return approvalState;
-		}
-		public void setApprovalState(String approvalState) {
-			this.approvalState = approvalState;
 		}
 		public Post getPost() {
 			return Postt;

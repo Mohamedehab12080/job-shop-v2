@@ -11,11 +11,13 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class companyAdministrator extends User{
 
 	@Column(nullable = false,unique = true)
+	//@NotBlank
 	private String companyName;
 	
 	@JsonIgnore

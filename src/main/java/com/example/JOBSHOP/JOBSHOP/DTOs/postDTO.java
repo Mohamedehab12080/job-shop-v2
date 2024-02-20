@@ -1,6 +1,8 @@
 package com.example.JOBSHOP.JOBSHOP.DTOs;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Application;
 import com.example.JOBSHOP.JOBSHOP.models.Employer;
 import com.example.JOBSHOP.JOBSHOP.models.postField;
@@ -11,15 +13,19 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String Title;
 	private String description;
 	private String jobRequirments;
-	private String postState;
 	private String location;
 	private String employmentType;
+	private byte[] employerpicture;
+	private String employerUserName;
+//	private companyProfile companyProfile;
+//	
+	private String companyName;
+	private Long profileId;
+	private String adminUserName;
 	
-	
-	private companyProfile companyProfile;
-	
-	private Employer employer;
-	
+
+	//	private Employer employer;
+//	
 	@JsonIgnore
 	private List<postField> postFields=new ArrayList<postField>();
 	
@@ -32,7 +38,39 @@ public class postDTO extends baseEntityDTO<Long>{
 	
 	private Long applicationCount;
 	
+
 	
+	public String getAdminUserName() {
+		return adminUserName;
+	}
+	public void setAdminUserName(String adminUserName) {
+		this.adminUserName = adminUserName;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	public Long getProfileId() {
+		return profileId;
+	}
+	public void setProfileId(Long profileId) {
+		this.profileId = profileId;
+	}
+	public byte[] getEmployerpicture() {
+		return employerpicture;
+	}
+	public void setEmployerpicture(byte[] employerpicture) {
+		this.employerpicture = employerpicture;
+	}
+	public String getEmployerUserName() {
+		return employerUserName;
+	}
+	public void setEmployerUserName(String employerUserName) {
+		this.employerUserName = employerUserName;
+	}
 	public String getTitle() {
 		return Title;
 	}
@@ -51,12 +89,6 @@ public class postDTO extends baseEntityDTO<Long>{
 	public void setJobRequirments(String jobRequirments) {
 		this.jobRequirments = jobRequirments;
 	}
-	public String getPostState() {
-		return postState;
-	}
-	public void setPostState(String postState) {
-		this.postState = postState;
-	}
 	public String getLocation() {
 		return location;
 	}
@@ -69,18 +101,18 @@ public class postDTO extends baseEntityDTO<Long>{
 	public void setEmploymentType(String employmentType) {
 		this.employmentType = employmentType;
 	}
-	public companyProfile getCompanyProfile() {
-		return companyProfile;
-	}
-	public void setCompanyProfile(companyProfile companyProfile) {
-		this.companyProfile = companyProfile;
-	}
-	public Employer getEmployer() {
-		return employer;
-	}
-	public void setEmployer(Employer employer) {
-		this.employer = employer;
-	}
+//	public companyProfile getCompanyProfile() {
+//		return companyProfile;
+//	}
+//	public void setCompanyProfile(companyProfile companyProfile) {
+//		this.companyProfile = companyProfile;
+//	}
+//	public Employer getEmployer() {
+//		return employer;
+//	}
+//	public void setEmployer(Employer employer) {
+//		this.employer = employer;
+//	}
 	public List<postField> getPostFields() {
 		return postFields;
 	}

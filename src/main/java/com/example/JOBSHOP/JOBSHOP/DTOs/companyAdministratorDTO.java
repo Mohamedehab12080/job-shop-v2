@@ -7,8 +7,11 @@ import com.example.JOBSHOP.JOBSHOP.models.Employer;
 import com.example.JOBSHOP.JOBSHOP.models.companyField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.validation.constraints.NotBlank;
+
 public class companyAdministratorDTO extends UserDTO{
 
+	//@NotBlank
 	private String companyName;
 	
 	@JsonIgnore

@@ -17,14 +17,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name="employer")
 public class Employer extends User{
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonBackReference
     @JoinColumn(name = "companyAdministrator_id")
+    //@NotNull
     private companyAdministrator companyAdministrator;
     
  	@OneToMany(mappedBy = "employer",cascade = CascadeType.ALL)
@@ -34,7 +36,7 @@ public class Employer extends User{
  	@Formula("(select count(*) from Post posts where posts.employer_id = id)") //Query between() subQuery
  	private Long postCount;
  	
- 	@JsonIgnore
+ 	@JsonIgnore	
  	@OneToMany(mappedBy = "employer",cascade = CascadeType.ALL)
  	private List<employerField> employerFields= new ArrayList<employerField>();
     

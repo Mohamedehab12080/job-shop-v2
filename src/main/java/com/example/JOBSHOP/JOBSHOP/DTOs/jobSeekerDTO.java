@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class jobSeekerDTO extends UserDTO{
 private String education;
 	
+	
 	private String employmentState;
 	
 	private String experience;
@@ -17,7 +18,7 @@ private String education;
 	
 	@JsonIgnore
 	private List<Application> applications=new ArrayList<Application>();
-		
+	
  	private Long applicationCount;  
  	
 	

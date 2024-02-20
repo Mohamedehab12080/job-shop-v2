@@ -1,4 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.models;
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,12 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class Follow {
-
-	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Follow extends baseEntity<Long>{
+	
     @ManyToOne
     @JoinColumn(name = "followerId")
     private User follower;
@@ -21,12 +19,6 @@ public class Follow {
     @JoinColumn(name = "followingId")
     private User following;
     
-	public Long getFollowId() {
-		return id;
-	}
-	public void setFollowId(Long followId) {
-		this.id = followId; 
-	}
 	public User getFollower() {
 		return follower;
 	}

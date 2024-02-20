@@ -1,25 +1,35 @@
 package com.example.JOBSHOP.JOBSHOP.controllers;
 
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.JOBSHOP.JOBSHOP.DTOImpl.entityToDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.DTOs.employerProfileDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.postDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Employer;
 import com.example.JOBSHOP.JOBSHOP.models.Post;
 import com.example.JOBSHOP.JOBSHOP.models.employerField;
+import com.example.JOBSHOP.JOBSHOP.models.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.services.employerFieldService;
+import com.example.JOBSHOP.JOBSHOP.services.employerProfileService;
 import com.example.JOBSHOP.JOBSHOP.services.employerService;
+import com.example.JOBSHOP.JOBSHOP.services.jobSeekerService;
+import com.example.JOBSHOP.JOBSHOP.services.postService;
 
 @RestController
 @RequestMapping("/employer")
@@ -30,16 +40,40 @@ public class employerController {
 	
 	@Autowired
 	private employerFieldService employerFieldService;
+	@Autowired
+	private employerProfileService employerProfileService;
+	@Autowired 
+	private postService postService;
 	
-	@PostMapping("/insert")
-	public ResponseEntity<?> insertEmployer(@RequestBody Employer employer)
+	@GetMapping("/findProfile/{id}")
+	public ResponseEntity<employerProfileDTO> findProfile(@PathVariable Long id)
 	{
-		return ResponseEntity.ok(employerService.insertEmployer(employer)); 
+		return ResponseEntity.ok(convertEmployerProfileToDTO(employerProfileService.findByEmployer(id)));
 	}
+	@PutMapping("/insertPicture/{id}")
+	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody byte[] file) throws SQLException, IOException
+	{	
+		try {
+			return ResponseEntity.ok(employerService.insertPicture(id,file));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	@GetMapping("/findPosts/{id}")
+	public List<postDTO> getPosts(@PathVariable Long id)
+	{
+		List<Post> listPost=postService.findByEmployer(id);
+		return listPost.stream()
+				.map(this::convertPost)
+				.collect(Collectors.toList());
+	} 
+	
 	@GetMapping("/findPost/{empId}")
 	public List<postDTO> findAllPostsWithEmpId(@PathVariable Long empId)
 	{
-		List<Post> Posts=employerService.findByEmpId(empId);
+		List<Post> Posts=employerService.findPostsByEmployerId(empId);
 		return Posts.stream()
 				.map(this::convertPost)
 				.collect(Collectors.toList()); 
@@ -56,7 +90,7 @@ public class employerController {
 	private postDTO convertPost(Post post)
 	{
 		return entityToDTOMapper.mapPostToDTO(post);
-	}
+	} 
 	private employerDTO convert(Employer employer)
 	{
 		return entityToDTOMapper.mapEmployerToDTO(employer);
@@ -76,16 +110,29 @@ public class employerController {
 				.collect(Collectors.toList());
 	}
 	
+	
+	
+	@GetMapping("/findById/{id}")
+	public ResponseEntity<?> findById(@PathVariable Long id)
+	{
+		Employer employer=employerService.findById(id);
+		if(employer!=null)
+		{
+			System.out.println("employer Posts : "+employer.getPosts().get(0).getId());
+			return ResponseEntity.ok(entityToDTOMapper.mapEmployerToDTO(employer));
+		}else 
+		{
+			return null;
+		}
+	}
+	
 	private employerFieldDTO convertToEmployerFieldDTO(employerField employerField)
 	{
 		return entityToDTOMapper.mapEmployerFieldToDTO(employerField);
 	}
 	
-	@GetMapping("/findById/{id}")
-	public ResponseEntity<employerDTO> findById(@PathVariable Long id)
+	private employerProfileDTO convertEmployerProfileToDTO(employerProfile employerProfile)
 	{
-		Employer employer=employerService.findById(id);
-		System.out.println("employer Posts : "+employer.getPosts().get(0).getId());
-		return ResponseEntity.ok(entityToDTOMapper.mapEmployerToDTO(employer));
+		return entityToDTOMapper.mapEmployerProfileToDTO(employerProfile);
 	}
 }

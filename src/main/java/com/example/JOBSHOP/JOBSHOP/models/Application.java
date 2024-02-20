@@ -2,6 +2,8 @@ package com.example.JOBSHOP.JOBSHOP.models;
 
 import java.util.List;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
@@ -16,9 +18,7 @@ public class Application extends baseEntity<Long>{
 	private jobSeeker jobSeeker;
 	
     private String Experience;
-    
-    private String approvalState;
-    
+        
     @ManyToOne
     @JoinColumn(name="Post_id")
     private Post Post;
@@ -40,12 +40,6 @@ public class Application extends baseEntity<Long>{
 	}
 	public void setAdditionalExperience(String Experience) {
 		this.Experience = Experience;
-	}
-	public String getApprovalState() {
-		return approvalState;
-	}
-	public void setApprovalState(String approvalState) {
-		this.approvalState = approvalState;
 	}
 	public Post getPost() {
 		return Post;

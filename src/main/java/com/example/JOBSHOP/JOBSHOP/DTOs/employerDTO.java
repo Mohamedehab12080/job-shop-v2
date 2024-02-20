@@ -10,10 +10,13 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.validation.constraints.NotNull;
+
 public class employerDTO extends UserDTO{
 	
 	
 		@JsonBackReference
+		//@NotNull
 	    private companyAdministrator companyAdministrator;
 	    
 	    @JsonIgnore

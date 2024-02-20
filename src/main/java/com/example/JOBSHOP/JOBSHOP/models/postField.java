@@ -1,5 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.models;
 
+import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 

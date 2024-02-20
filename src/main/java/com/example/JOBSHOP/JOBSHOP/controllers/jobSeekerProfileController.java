@@ -21,10 +21,10 @@ public class jobSeekerProfileController {
 	@Autowired
 	private followService followService;
 	
-	@GetMapping("/all/{jobSeekerId}")
+	@GetMapping("/getInfo/{jobSeekerId}")
 	public ResponseEntity<?> getAllJobSeekerDataWithId(@PathVariable Long jobSeekerId)
 	{
-		jobSeekerProfile profile=new jobSeekerProfile(jobSeekerService.findJobSeekerProfileWithjobSeekerID(jobSeekerId).getJobSeeker(),followService);
+		jobSeekerProfile profile=new jobSeekerProfile(jobSeekerService.getReferenceById(jobSeekerId),followService);
 		System.out.println("Jobseeker Followers:"+profile.getFollowers()+"\n Followings: "+profile.getFollowings());
 		return ResponseEntity.ok(profile);
 	}
