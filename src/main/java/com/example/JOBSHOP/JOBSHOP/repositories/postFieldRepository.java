@@ -8,4 +8,5 @@ import com.example.JOBSHOP.JOBSHOP.models.postField;
 @Repository
 public interface postFieldRepository extends JpaRepository<postField,Long>{
 
+	postField findByEmployerFieldId(Long id);
 }

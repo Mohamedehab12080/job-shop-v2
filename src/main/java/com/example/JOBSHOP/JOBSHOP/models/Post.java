@@ -47,7 +47,7 @@ public class Post extends baseEntity<Long>{
 	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
     private Long fieldCount;
    
-	private List<String> additionalSkills;
+	private List<String> skills;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "Post",cascade = CascadeType.ALL)
@@ -111,11 +111,11 @@ public class Post extends baseEntity<Long>{
 	public void setFieldCount(Long fieldCount) {
 		this.fieldCount = fieldCount;
 	}
-	public List<String> getAdditionalSkills() {
-		return additionalSkills;
+	public List<String> getSkills() {
+		return skills;
 	}
-	public void setAdditionalSkills(List<String> additionalSkills) {
-		this.additionalSkills = additionalSkills;
+	public void setSkills(List<String> additionalSkills) {
+		this.skills = additionalSkills;
 	}
 	public List<Application> getApplications() {
 		return applications;

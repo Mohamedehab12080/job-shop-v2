@@ -65,4 +65,15 @@ public class companyProfileService {
 			}
 		}
 
-}
+		/**
+		 * 
+		 * @author BOB
+		 * @return companyProfile for specific companyAdmin
+		 */
+		public companyProfile findByCompanyAdmin(Long id)
+		{
+			return compnayProfileRepository.findByCompanyAdministratorId(id).get();
+
+		}
+		}
+

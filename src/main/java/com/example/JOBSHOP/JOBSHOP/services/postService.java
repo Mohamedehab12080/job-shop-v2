@@ -13,6 +13,8 @@ import com.example.JOBSHOP.JOBSHOP.models.Post;
 import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
 import com.example.JOBSHOP.JOBSHOP.repositories.jobSeekerRepository;
 import com.example.JOBSHOP.JOBSHOP.repositories.postRepository;
+import com.example.JOBSHOP.JOBSHOP.specifications.postSpecification;
+import com.example.JOBSHOP.JOBSHOP.specifications.searchModels.postSearch;
 
 @Service
 public class postService{
@@ -24,6 +26,11 @@ public class postService{
 	private jobSeekerService jobSeekerService;
 	
 	
+	public List<Post> findPostsWithSearch(postSearch postSearch)
+	{
+		postSpecification postSpec=new postSpecification(postSearch);
+		return postRepository.findAll(postSpec);
+	}
 
     public Post getReferenceById(Long id)
 	{
@@ -88,6 +95,10 @@ public class postService{
 	public List<Post> findByEmployer(Long id)
 	{ 
 		return postRepository.findByEmployerId(id);
+	}
+	public List<Post> findByCompanyProfile(Long id)
+	{ 
+		return postRepository.findByCompanyProfileId(id);
 	}
 	
 

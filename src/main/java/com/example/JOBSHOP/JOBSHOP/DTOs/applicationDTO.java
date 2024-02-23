@@ -19,12 +19,13 @@ import com.example.JOBSHOP.JOBSHOP.models.Post;
 		
 	    private String Experience;
 	   	    
-	    private Post Postt;	
+	    private Post post;	
 	
-	    public List<String> getAdditionalSkills() {
+	    
+	    public List<String> getSkills() {
 			return Skills;
 		}
-		public void setAdditionalSkills(List<String> Skills) {
+		public void setSkills(List<String> Skills) {
 			this.Skills = Skills;
 		}
 		public jobSeeker getJobSeeker() {
@@ -33,17 +34,17 @@ import com.example.JOBSHOP.JOBSHOP.models.Post;
 		public void setJobSeeker(jobSeeker jobSeekerr) {
 			this.jobSeekerr = jobSeekerr;
 		}
-		public String getAdditionalExperience() {
+		public String getExperience() {
 			return Experience;
 		}
-		public void setAdditionalExperience(String Experience) {
+		public void setExperience(String Experience) {
 			this.Experience = Experience;
 		}
 		public Post getPost() {
-			return Postt;
+			return post;
 		}
-		public void setPost(Post postt) {
-			this.Postt = postt;
+		public void setPost(Post post) {
+			this.post = post;
 		}
 	    
 	    

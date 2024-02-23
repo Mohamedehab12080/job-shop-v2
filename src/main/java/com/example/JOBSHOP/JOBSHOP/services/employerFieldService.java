@@ -18,6 +18,10 @@ public class employerFieldService{
 	private employerFieldRepository employerFieldRepository;
 	
 
+	public Long findIdbyCompanyFieldId(Long id)
+	{
+		return employerFieldRepository.findByCompanyFieldId(id);
+	}
     public employerField getReferenceById(Long id)
 	{
 		return employerFieldRepository.getReferenceById(id);

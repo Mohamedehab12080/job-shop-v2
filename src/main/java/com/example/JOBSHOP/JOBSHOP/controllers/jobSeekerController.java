@@ -21,6 +21,7 @@ import com.example.JOBSHOP.JOBSHOP.DTOImpl.entityToDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.DTOs.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Application;
 import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.services.applicationService;
 import com.example.JOBSHOP.JOBSHOP.services.jobSeekerService;
 
 @RestController
@@ -30,6 +31,8 @@ public class jobSeekerController {
 	@Autowired
 	private jobSeekerService jobSeekerService;
 	
+	@Autowired 
+	private applicationService applicationService;
 	@PostMapping("/apply")
 	public ResponseEntity<?>Apply(@RequestBody applicationDTO app)
 	{

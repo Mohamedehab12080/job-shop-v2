@@ -23,10 +23,10 @@ public class Application extends baseEntity<Long>{
     @JoinColumn(name="Post_id")
     private Post Post;
     
-	public List<String> getAdditionalSkills() {
+	public List<String> getSkills() {
 		return Skills;
 	}
-	public void setAdditionalSkills(List<String> Skills) {
+	public void setSkills(List<String> Skills) {
 		this.Skills = Skills;
 	}
 	public jobSeeker getJobSeeker() {
@@ -35,10 +35,10 @@ public class Application extends baseEntity<Long>{
 	public void setJobSeeker(jobSeeker jobSeeker) {
 		this.jobSeeker = jobSeeker;
 	}
-	public String getAdditionalExperience() {
+	public String getExperience() {
 		return Experience;
 	}
-	public void setAdditionalExperience(String Experience) {
+	public void setExperience(String Experience) {
 		this.Experience = Experience;
 	}
 	public Post getPost() {

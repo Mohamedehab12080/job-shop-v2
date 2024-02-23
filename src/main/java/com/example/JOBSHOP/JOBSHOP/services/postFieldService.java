@@ -14,6 +14,13 @@ public class postFieldService {
 	@Autowired 
 	private postFieldRepository postFieldRepository;
 	
+	@Autowired
+	private employerFieldService employerFieldService;
+	
+	public postField findByEmployerField(Long id)
+	{
+		return postFieldRepository.findByEmployerFieldId(employerFieldService.findIdbyCompanyFieldId(id));
+	}
 	
     public postField getReferenceById(Long id)
 	{

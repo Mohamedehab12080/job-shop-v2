@@ -1,21 +1,29 @@
 package com.example.JOBSHOP.JOBSHOP.controllers;
 
 import java.io.IOException;
+
+
+
 import java.sql.SQLException;
 import java.util.List;
 
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.ModelAndView;
+
 import com.example.JOBSHOP.JOBSHOP.DTOImpl.entityToDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.DTOs.employerFieldDTO;
@@ -28,11 +36,11 @@ import com.example.JOBSHOP.JOBSHOP.models.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.services.employerFieldService;
 import com.example.JOBSHOP.JOBSHOP.services.employerProfileService;
 import com.example.JOBSHOP.JOBSHOP.services.employerService;
-import com.example.JOBSHOP.JOBSHOP.services.jobSeekerService;
 import com.example.JOBSHOP.JOBSHOP.services.postService;
 
-@RestController
-@RequestMapping("/employer")
+
+@Controller
+//@RequestMapping("/employer")
 public class employerController {
 
 	@Autowired
@@ -61,13 +69,20 @@ public class employerController {
 		}
 
 	}
-	@GetMapping("/findPosts/{id}")
-	public List<postDTO> getPosts(@PathVariable Long id)
+	
+	@RequestMapping(value="/sss",method = RequestMethod.GET)
+	public  ModelAndView getPosts()
 	{
-		List<Post> listPost=postService.findByEmployer(id);
-		return listPost.stream()
-				.map(this::convertPost)
-				.collect(Collectors.toList());
+		ModelAndView modelAndView = new ModelAndView("index");
+		List<Post> listPost=postService.findByEmployer(2L);
+		
+		 List<postDTO> dtoList=listPost.stream() 
+				 .map(this::convertPost) 
+		 .collect(Collectors.toList()); 
+		 System.out.println(dtoList.get(0).getCompanyName());
+		 modelAndView.addObject("posts", dtoList); 
+		 return modelAndView;
+		
 	} 
 	
 	@GetMapping("/findPost/{empId}")
@@ -78,6 +93,7 @@ public class employerController {
 				.map(this::convertPost)
 				.collect(Collectors.toList()); 
 	}
+	
 	@GetMapping("/findAll/{compId}")
 	public List<employerDTO> findAllEmployersWithCompanyAdminId(@PathVariable Long compId)
 	{
@@ -118,7 +134,7 @@ public class employerController {
 		Employer employer=employerService.findById(id);
 		if(employer!=null)
 		{
-			System.out.println("employer Posts : "+employer.getPosts().get(0).getId());
+//			System.out.println("employer Posts : "+employer.getPosts().get(0).getId());
 			return ResponseEntity.ok(entityToDTOMapper.mapEmployerToDTO(employer));
 		}else 
 		{

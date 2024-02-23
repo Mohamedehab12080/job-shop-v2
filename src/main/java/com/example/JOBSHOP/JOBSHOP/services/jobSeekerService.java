@@ -113,11 +113,11 @@ public class jobSeekerService{
 	 /**
 	 * 
 	 * @author BOB
-	 * @Function find all jobSeeker's submitted applications by jobSeeker_id.
+	 * @Function find all jobSeeker's submitted applications by jobSeeker_id Order by LIFO.
 	 */
 	 public List<Application> findAllApplicationsForJobSeeker(Long id)
 	 {
-		return applicationService.findByJobSeekerId(id);
+		return applicationService.findByJobSeekerIdOrderByCreatedDate(id);
 	 }
 	 
 	 /**

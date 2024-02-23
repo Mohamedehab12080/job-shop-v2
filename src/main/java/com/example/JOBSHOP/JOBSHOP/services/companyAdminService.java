@@ -18,6 +18,8 @@ import com.example.JOBSHOP.JOBSHOP.repositories.companyProfileRepository;
 import com.example.JOBSHOP.JOBSHOP.repositories.employerFieldRepository;
 import com.example.JOBSHOP.JOBSHOP.repositories.employerRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class companyAdminService {
 
@@ -38,6 +40,10 @@ public class companyAdminService {
 	 private employerProfileService employerProfileService;
 	 
 	 
+	 public companyProfile findcompanyProfileIdByCompanyName(String companyName)
+	 {
+		 return companyProfileService.findByCompanyAdmin(companyAdminRepository.findByCompanyName(companyName));
+	 }
 	 public Employer createEmployer(Employer employer)
 	 {
 		employerProfile employerProfile=new employerProfile();
@@ -75,12 +81,40 @@ public class companyAdminService {
 //			applicationRepository.updateEntity(t.getId(),t.getStatusCode()); 
 //		}
 		
-		public companyAdministrator update(companyAdministrator t)
+		/**
+		 * 
+		 * @author BOB 
+		 * @Fucntion update companyAdministrator (companyName,userName,Password,Email,Contacts)
+		 */
+		@Transactional
+		public companyAdministrator update(companyAdministrator newCompanyAdministrator)
 		{
-			if(getReferenceById(t.getId())!=null)
+			companyAdministrator oldCompanyAdministrator=getReferenceById(newCompanyAdministrator.getId());
+			if(oldCompanyAdministrator!=null)
 			{
+				if(newCompanyAdministrator.getCompanyName()!=null)
+				{
+					oldCompanyAdministrator.setCompanyName(newCompanyAdministrator.getCompanyName()); 
+				} 
+			   if(newCompanyAdministrator.getPassword()!=null)
+				{
+					oldCompanyAdministrator.setPassword(newCompanyAdministrator.getPassword()); 
+				}
+			   if(newCompanyAdministrator.getContacts()!=null)
+				{
+					oldCompanyAdministrator.setContacts(newCompanyAdministrator.getContacts()); 
+				}
+			    if(newCompanyAdministrator.getEmail()!=null)
+				{
+			    	oldCompanyAdministrator.setEmail(newCompanyAdministrator.getEmail()); 
+				} 
+			    if(newCompanyAdministrator.getUserName()!=null)
+				{
+			    	oldCompanyAdministrator.setUserName(newCompanyAdministrator.getUserName()); 
+				} 
+				
 //				logInfo("Employer Updated Successfully");
-				return companyAdminRepository.save(t);
+				return companyAdminRepository.save(oldCompanyAdministrator);
 			}else 
 			{
 //				logError("EmployerNotFound");
@@ -114,7 +148,7 @@ public class companyAdminService {
 			
 			 int endIndex=Math.min(i+batchSize, employerFields.size());
 			 List<employerField> batch=employerFields.subList(i, endIndex);
-			 employerFieldService.insertAll(employerFields);
+			 employerFieldService.insertAll(batch);
 		}
 		 
 	 }
@@ -145,7 +179,7 @@ public class companyAdminService {
 	 
 	 public int deleteEmployerWithId(Long id)
 	 { 
-		 Employer employer=employerService.getReferenceById(id);
+		 Employer employer=employerService.findById(id);
 		 if(employer!=null)
 		 {
 //			 employerRepository.delete(employer);
@@ -159,11 +193,10 @@ public class companyAdminService {
 	 public companyAdministrator insertPicture(Long id,byte[] picture)
 	 {
 		try {
-			Optional<companyAdministrator> companyAdminUpdate=companyAdminRepository.findById(id);
-			 if(companyAdminUpdate.isPresent())
+			companyAdministrator companyAdminUpdate=companyAdminRepository.getReferenceById(id);
+			 if(companyAdminUpdate!=null)
 			 {
-				 System.out.println("Job Seeker :" +companyAdminUpdate.get().getEmail());
-				 companyAdministrator companyAdminForUpdate=companyAdminUpdate.get();
+				 companyAdministrator companyAdminForUpdate=companyAdminUpdate;
 				 companyAdminForUpdate.setPicture(picture);
 				 return companyAdminRepository.save(companyAdminForUpdate);
 			 }else  

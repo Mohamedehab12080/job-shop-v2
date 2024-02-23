@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 
@@ -21,7 +22,7 @@ public class employerField extends baseEntity<Long>{
 	//@NotNull
 	private Employer employer;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name="companyField_id")
 	//@NotNull
 	private companyField companyField;

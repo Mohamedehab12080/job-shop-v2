@@ -10,22 +10,32 @@ public class companyFieldDTO extends baseEntityDTO<Long>{
 
 	private String fieldName;
 	
-	private companyAdministrator companyAdministrator;
+	private Long companyAdministratorId;
+	
+	private String companyName;
 	
 	private List<String> requiredQualifications;
 	private List<String> skills;
 	
+	
+	
+	public String getCompanyName() {
+		return companyName;
+	}
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
 	public String getFieldName() {
 		return fieldName;
 	}
 	public void setFieldName(String fieldName) {
 		this.fieldName = fieldName;
 	}
-	public companyAdministrator getCompanyAdmin() {
-		return companyAdministrator;
+	public Long getCompanyAdministratorId() {
+		return companyAdministratorId;
 	}
-	public void setCompanyAdmin(companyAdministrator companyAdmin) {
-		this.companyAdministrator = companyAdmin;
+	public void setCompanyAdministratorId(Long companyAdminId) {
+		this.companyAdministratorId = companyAdminId;
 	}
 	public List<String> getRequiredQualifications() {
 		return requiredQualifications;

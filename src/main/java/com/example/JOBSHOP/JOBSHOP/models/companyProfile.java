@@ -22,7 +22,7 @@ public class companyProfile extends userProfile{
 
 	@OneToOne
 	@JoinColumn(name="companyAdministrator_id")
-	private companyAdministrator companyAdmin;
+	private companyAdministrator companyAdministrator;
 	
 	@OneToMany(mappedBy = "companyProfile",cascade = CascadeType.ALL)
 	@JsonIgnore
@@ -41,17 +41,17 @@ public class companyProfile extends userProfile{
 	}
 	public companyProfile(companyAdministrator companyAdmin, /*List<Post> posts,*/ Long postCount,followService followService) {
 		super(companyAdmin,followService);
-		this.companyAdmin = companyAdmin;
+		this.companyAdministrator = companyAdmin;
 //		this.posts = posts;
 		this.postCount = postCount;
 	}
 
 	public companyAdministrator getCompanyAdmin() {
-		return companyAdmin;
+		return companyAdministrator;
 	}
 
-	public void setCompanyAdmin(companyAdministrator companyAdmin) {
-		this.companyAdmin = companyAdmin;
+	public void setCompanyAdmin(companyAdministrator companyAdministrator) {
+		this.companyAdministrator = companyAdministrator;
 	}
 
 	public List<Post> getPosts() {

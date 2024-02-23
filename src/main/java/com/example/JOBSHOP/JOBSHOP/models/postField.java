@@ -13,7 +13,7 @@ import jakarta.persistence.OneToOne;
 @Entity
 public class postField extends baseEntity<Long>{
 
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name="employerField_id")
 	private employerField employerField;
 

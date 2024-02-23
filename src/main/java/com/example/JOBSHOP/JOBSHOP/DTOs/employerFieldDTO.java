@@ -1,10 +1,14 @@
 package com.example.JOBSHOP.JOBSHOP.DTOs;
 
+import java.util.List;
+
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Employer;
 
 
 import com.example.JOBSHOP.JOBSHOP.models.companyField;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -12,15 +16,39 @@ public class employerFieldDTO extends baseEntityDTO<Long>{
 
 	
 	//@NotNull
-	private Employer employer;
+	private Long employerId;
+	private String employerUserName;
+	private String fieldName;
+	private List<String> Skills;
+	
 	//@NotNull
+	@JsonBackReference
 	private companyField companyField;
 	
-	public Employer getEmployer() {
-		return employer;
+
+	public List<String> getSkills() {
+		return Skills;
 	}
-	public void setEmployer(Employer employer) {
-		this.employer = employer;
+	public void setSkills(List<String> skills) {
+		Skills = skills;
+	}
+	public String getFieldName() {
+		return fieldName;
+	}
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+	public Long getEmployerId() {
+		return employerId;
+	}
+	public void setEmployerId(Long employerId) {
+		this.employerId = employerId;
+	}
+	public String getEmployerUserName() {
+		return employerUserName;
+	}
+	public void setEmployerUserName(String employerUserName) {
+		this.employerUserName = employerUserName;
 	}
 	public companyField getCompanyField() {
 		return companyField;

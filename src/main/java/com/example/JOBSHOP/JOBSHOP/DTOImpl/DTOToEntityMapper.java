@@ -26,8 +26,8 @@ public class DTOToEntityMapper {
 		dto.setLastModifiedBy(app.getLastModifiedBy());
 		dto.setLastModifiedDate(app.getLastModifiedDate());
 		dto.setStatusCode(app.getStatuseCode());
-		dto.setAdditionalExperience(app.getAdditionalExperience());
-		dto.setAdditionalSkills(app.getAdditionalSkills());
+		dto.setExperience(app.getExperience());
+		dto.setSkills(app.getSkills());
 		dto.setJobSeeker(app.getJobSeeker());
 		dto.setPost(app.getPost());
 		return dto;
@@ -41,7 +41,7 @@ public class DTOToEntityMapper {
 		dto.setLastModifiedBy(employerField.getLastModifiedBy());
 		dto.setLastModifiedDate(employerField.getLastModifiedDate());
 		dto.setStatusCode(employerField.getStatuseCode());
-		dto.setEmployer(employerField.getEmployer());
+//		dto.setEmployer(employerField.getEmployer());
 		dto.setCompanyField(employerField.getCompanyField());
 		return dto;
 	}
@@ -54,7 +54,7 @@ public class DTOToEntityMapper {
 		dto.setLastModifiedBy(companyField.getLastModifiedBy());
 		dto.setLastModifiedDate(companyField.getLastModifiedDate());
 		dto.setStatusCode(companyField.getStatuseCode());
-		dto.setCompanyAdmin(companyField.getCompanyAdmin());
+//		dto.setCompanyAdmin(companyField.getCompanyAdmin());
 		dto.setFieldName(companyField.getFieldName());
 		dto.setRequiredQualifications(companyField.getRequiredQualifications());
 		dto.setSkills(companyField.getSkills());
@@ -136,9 +136,9 @@ public class DTOToEntityMapper {
 		dto.setEmail(companyAdmin.getEmail());
 		dto.setPassword(companyAdmin.getPassword());
 		dto.setUserName(companyAdmin.getUserName());
-		dto.setCompanyFields(companyAdmin.getCompanyFields());
+//		dto.setCompanyFields(companyAdmin.getCompanyFields());
 		dto.setStatusCode(companyAdmin.getStatuseCode());
-		dto.setEmployers(companyAdmin.getEmployers());
+//		dto.setEmployers(companyAdmin.getEmployers());
 		dto.setUserType(companyAdmin.getUserType());
 		return dto;
 	}
