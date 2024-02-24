@@ -40,7 +40,7 @@ import com.example.JOBSHOP.JOBSHOP.services.postService;
 
 
 @Controller
-//@RequestMapping("/employer")
+@RequestMapping("/employer")
 public class employerController {
 
 	@Autowired
@@ -66,11 +66,11 @@ public class employerController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
-		}
+		}	
 
 	}
 	
-	@RequestMapping(value="/sss",method = RequestMethod.GET)
+	@RequestMapping(value="/findPosts",method = RequestMethod.GET)
 	public  ModelAndView getPosts()
 	{
 		ModelAndView modelAndView = new ModelAndView("index");
@@ -79,7 +79,6 @@ public class employerController {
 		 List<postDTO> dtoList=listPost.stream() 
 				 .map(this::convertPost) 
 		 .collect(Collectors.toList()); 
-		 System.out.println(dtoList.get(0).getCompanyName());
 		 modelAndView.addObject("posts", dtoList); 
 		 return modelAndView;
 		

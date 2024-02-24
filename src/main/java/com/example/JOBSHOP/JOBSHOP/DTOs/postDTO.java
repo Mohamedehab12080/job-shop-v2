@@ -1,13 +1,16 @@
 package com.example.JOBSHOP.JOBSHOP.DTOs;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+
+import javax.imageio.ImageIO;
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.models.Application;
-import com.example.JOBSHOP.JOBSHOP.models.Employer;
 import com.example.JOBSHOP.JOBSHOP.models.postField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.example.JOBSHOP.JOBSHOP.models.companyProfile;
 public class postDTO extends baseEntityDTO<Long>{
 
 	private String Title;
@@ -17,6 +20,7 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String employmentType;
 	private byte[] employerpicture;
 	private String employerUserName;
+	public String format;
 //	private companyProfile companyProfile;
 //	
 	private String companyName;
@@ -59,9 +63,44 @@ public class postDTO extends baseEntityDTO<Long>{
 	public void setProfileId(Long profileId) {
 		this.profileId = profileId;
 	}
-	public byte[] getEmployerpicture() {
-		return employerpicture;
+	public String getEmployerpicture() {
+		String base64=Base64.getEncoder().encodeToString(employerpicture);
+			this.format=detectImageExtension(employerpicture);
+		return base64;
 	}
+//	private String getImageFormat(byte[] imageData) throws IOException
+//	{
+//	ByteArrayInputStream input=new ByteArrayInputStream(imageData);
+//		String format=detectImageExtension(imageData);/*ImageIO.getImageReadersBySuffix(null).next().getFormatName();*/
+//	input.close();
+//		return format;
+//	}
+	 public static String detectImageExtension(byte[] imageData) {
+	        if (imageData == null || imageData.length < 4) {
+	            return null; // Insufficient data to determine the extension
+	        }
+
+	        // JPEG magic number: FF D8 FF
+	        if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8 && imageData[2] == (byte) 0xFF) {
+	            return "jpg";
+	        }
+
+	        // PNG magic number: 89 50 4E 47
+	        if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 && imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
+	            return "png";
+	        }
+
+	        // GIF magic number: 47 49 46 38
+	        if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 && imageData[2] == (byte) 0x46 && imageData[3] == (byte) 0x38) {
+	            return "gif";
+	        }
+
+	        // Add more checks for other image formats as needed...
+
+	        return null; // Unknown image format
+	    }
+
+
 	public void setEmployerpicture(byte[] employerpicture) {
 		this.employerpicture = employerpicture;
 	}

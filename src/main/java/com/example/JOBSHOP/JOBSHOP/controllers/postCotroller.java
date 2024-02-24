@@ -63,7 +63,7 @@ public class postCotroller {
 	public List<postDTO> findBostWithSpecifications(@RequestBody postSearch postSearch)
 	{
 		List<Post> postList=postService.findPostsWithSearch(postSearch);
-		return postList.stream()
+		return postList.stream() 
 				.map(this::convertPost)
 				.collect(Collectors.toList());
 	} 
