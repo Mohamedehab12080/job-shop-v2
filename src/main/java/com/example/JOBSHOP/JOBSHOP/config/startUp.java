@@ -10,19 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.example.JOBSHOP.JOBSHOP.models.Employer;
-import com.example.JOBSHOP.JOBSHOP.models.Post;
-import com.example.JOBSHOP.JOBSHOP.models.User;
-import com.example.JOBSHOP.JOBSHOP.models.companyAdministrator;
-import com.example.JOBSHOP.JOBSHOP.models.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
-import com.example.JOBSHOP.JOBSHOP.models.jobSeekerProfile;
-import com.example.JOBSHOP.JOBSHOP.services.companyAdminService;
-import com.example.JOBSHOP.JOBSHOP.services.employerService;
-import com.example.JOBSHOP.JOBSHOP.services.followService;
-import com.example.JOBSHOP.JOBSHOP.services.jobSeekerService;
-import com.example.JOBSHOP.JOBSHOP.services.postService;
-import com.example.JOBSHOP.JOBSHOP.services.userService;
+import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerService;
+import com.example.JOBSHOP.JOBSHOP.Follow.followService;
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.postService;
+import com.example.JOBSHOP.JOBSHOP.User.User;
+import com.example.JOBSHOP.JOBSHOP.User.userService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdminService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
+import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfile;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeekerService;
+import com.example.JOBSHOP.JOBSHOP.jobSeekerProfile.jobSeekerProfile;
 
 @Component
 public class startUp implements CommandLineRunner{

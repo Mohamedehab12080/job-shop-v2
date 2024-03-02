@@ -1,19 +1,19 @@
 package com.example.JOBSHOP.JOBSHOP.DTOImpl;
 
-import com.example.JOBSHOP.JOBSHOP.DTOs.UserDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.applicationDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.companyAdministratorDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.companyFieldDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerFieldDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.jobSeekerDTO;
-import com.example.JOBSHOP.JOBSHOP.models.Application;
-import com.example.JOBSHOP.JOBSHOP.models.Employer;
-import com.example.JOBSHOP.JOBSHOP.models.User;
-import com.example.JOBSHOP.JOBSHOP.models.companyAdministrator;
-import com.example.JOBSHOP.JOBSHOP.models.companyField;
-import com.example.JOBSHOP.JOBSHOP.models.employerField;
-import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.Application.Application;
+import com.example.JOBSHOP.JOBSHOP.Application.applicationDTO;
+import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerDTO;
+import com.example.JOBSHOP.JOBSHOP.User.User;
+import com.example.JOBSHOP.JOBSHOP.User.UserDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministratorDTO;
+import com.example.JOBSHOP.JOBSHOP.companyField.companyField;
+import com.example.JOBSHOP.JOBSHOP.companyField.companyFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.employerField.employerField;
+import com.example.JOBSHOP.JOBSHOP.employerField.employerFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeekerDTO;
 
 public class DTOToEntityMapper {
 	

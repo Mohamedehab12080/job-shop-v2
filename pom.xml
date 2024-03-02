@@ -17,6 +17,17 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
+	<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-lang3</artifactId>
+     <!-- Or the latest version -->
+</dependency>
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-text</artifactId>
+    <version>1.9</version> <!-- Or the latest version -->
+</dependency>
+
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-thymeleaf</artifactId>

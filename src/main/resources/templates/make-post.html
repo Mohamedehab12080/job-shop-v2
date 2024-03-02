@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: boots_trap}">
+<title>Make a post</title>
+</head>
+<body>
+			<div th:replace="~{fragments :: nav_bar}"></div>
+<div class="container col-md-offset-3 col-md-8 mt-lg-5">
+	
+	<div class="row mt-2">
+		<div th:if="${param.success}">
+			<p class="alert alert-info">Registration successfully <br>
+			please check your Gmail to complete your registration.</p>
+		</div>
+		<div class="mb-4"><h2>User registration Form</h2></div>
+	</div>
+	<form th:action="@{/register/signUp}" method="post" th:object="${post}" class="px-4">
+		<div class="mb-3 row">
+	    <label for="userName" class="col-sm-2 col-form-label">userName</label>
+	    <div class="col-sm-6">
+	      <input type="text" required id="userName" autofocus="autofocus"
+	      class="form-control" name="userName" th:field="*{userName}">
+	    </div>
+	    </div>
+	    <div class="mb-3 row">
+	    <label for="email" class="col-sm-2 col-form-label">Email</label>
+	    <div class="col-sm-6">
+	      <input type="text" required id="email" autofocus="autofocus" class="form-control" th:field="*{email}">
+	    </div>	    
+	  	</div>
+	  <div class="mb-3 row">
+	    <label for="password" class="col-sm-2 col-form-label">Password</label>
+	    <div class="col-sm-6">
+	      <input type="password" required class="form-control" id="password" name="password" th:field="*{password}">
+	    </div>
+	    
+  		</div>
+  		
+  		<div>
+			  <button type="submit" class="btn btn-success">Register</button>
+			  <span>Reqgistered already?<a href="/" th:href="@{authenticate/login-form}">
+				  Login here.
+			  </a></span>
+		  </div>
+	</form>
+	
+</div>
+</body>
+</html>

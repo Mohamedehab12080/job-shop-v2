@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Postcards</title>
+    <title>public</title>
     <link rel="stylesheet" type="text/css" href="/css/post.css">
 </head>
 <body>
-    <h1>Postcards</h1>
+    <h1>public</h1>
+    <img th:src="@{/images/logo.png}" alt="JOBSHOP Logo" height="40">
     <div th:each="post : ${posts}" class="post">
         <div class="author">
-<img th:src="${post.employerpicture} != null ? ('data:image/'+${post.format}+';base64,' + ${post.employerpicture}) : '/images/default.png'" alt="Author's Profile Image" class="profile-image">        <span th:text="${post.employerUserName}" class="author-name"></span>
+<img th:src="${post.employerpicture} != null ? ('data:image/'+${post.format}+';base64,' + ${post.employerpicture}) : '/images/default.png'" alt="Author's Profile Image" class="profile-image">        
+<span th:text="${post.employerUserName}" class="author-name"></span>
         <span th:text="${post.format}"></span>
         </div>
         <div class="content">
             <h2 th:text="${post.Title}"></h2>
-            <p th:text="${post.description}"></p>
+            <p th:text="${post.additionalSkills}"></p>
+            
         </div>
     </div>
 </body>

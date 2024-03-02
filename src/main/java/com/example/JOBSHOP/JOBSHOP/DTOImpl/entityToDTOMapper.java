@@ -3,26 +3,26 @@ package com.example.JOBSHOP.JOBSHOP.DTOImpl;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.JOBSHOP.JOBSHOP.DTOs.UserDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.applicationDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.companyAdministratorDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.companyFieldDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.companyProfileDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerFieldDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.employerProfileDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.jobSeekerDTO;
-import com.example.JOBSHOP.JOBSHOP.DTOs.postDTO;
-import com.example.JOBSHOP.JOBSHOP.models.Application;
-import com.example.JOBSHOP.JOBSHOP.models.Employer;
-import com.example.JOBSHOP.JOBSHOP.models.Post;
-import com.example.JOBSHOP.JOBSHOP.models.User;
-import com.example.JOBSHOP.JOBSHOP.models.companyAdministrator;
-import com.example.JOBSHOP.JOBSHOP.models.companyField;
-import com.example.JOBSHOP.JOBSHOP.models.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.models.employerField;
-import com.example.JOBSHOP.JOBSHOP.models.employerProfile;
-import com.example.JOBSHOP.JOBSHOP.models.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.Application.Application;
+import com.example.JOBSHOP.JOBSHOP.Application.applicationDTO;
+import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerDTO;
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.postDTO;
+import com.example.JOBSHOP.JOBSHOP.User.User;
+import com.example.JOBSHOP.JOBSHOP.User.UserDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministratorDTO;
+import com.example.JOBSHOP.JOBSHOP.companyField.companyField;
+import com.example.JOBSHOP.JOBSHOP.companyField.companyFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfile;
+import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfileDTO;
+import com.example.JOBSHOP.JOBSHOP.employerField.employerField;
+import com.example.JOBSHOP.JOBSHOP.employerField.employerFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.employerProfile.employerProfile;
+import com.example.JOBSHOP.JOBSHOP.employerProfile.employerProfileDTO;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeekerDTO;
 
 public class entityToDTOMapper {
 
@@ -37,7 +37,7 @@ public class entityToDTOMapper {
 		dto.setStatuseCode(app.getStatusCode());
 		dto.setExperience(app.getExperience());
 		dto.setSkills(app.getSkills());
-//		dto.setJobSeeker(app.getJobSeeker());
+		dto.setJobSeeker(app.getJobSeeker());
 //		dto.setPost(app.getPost());
 		return dto;
 	}
