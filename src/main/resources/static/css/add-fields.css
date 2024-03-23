@@ -1,0 +1,255 @@
+@charset "UTF-8";
+	
+	 body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding:10px;
+            background-color: #f5f5f5;
+            overflow-y: auto; /* Add overflow-y property to enable vertical scrolling */
+
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 80px); /* Adjust the max-height according to your layout */
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+       .grid {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.grid label {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: calc(100% /6 - 20px); /* Adjust the number of columns here */
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    
+}
+.checkbox-label:hover {
+    background-color: #e0e0e0; /* Darker background color on hover */
+}
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            resize: none;
+        }
+        input[type="submit"] {
+            background-color: rgb(0, 128, 192);
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        
+        /**
+        from here
+        **/
+		.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/*
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+*/
+.checkbox-label {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 8px;
+   cursor: pointer;
+    font-size: 16px;
+    background-color: #f0f0f0; /* Set background color */
+    border-radius: 5px;
+}
+
+.checkbox-label:hover {
+    background-color: #e0e0e0; /* Darker background color on hover */
+}
+
+.checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: 10px;
+    width: 10px;
+    background-color: #ccc; /* Checkbox color */
+    border-radius: 2px;
+}
+
+.checkbox-input:checked + .checkmark {
+    background-color:lightseagreen; /* Checked checkbox color */
+}
+
+.checkmark:after {
+    content: "";
+    display: none;
+}
+
+.checkbox-input:checked + .checkmark:after {
+    content: "\2713"; /* Unicode checkmark symbol */
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 2px;
+    color: white; /* Color of the checkmark symbol */
+    font-size: 12px;
+}
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    margin-right: 10px; /* Adjust margin as needed */
+}
+
+.add-skill-button {
+    padding: 8px 12px;
+    background-color: rgb(0, 128, 192); /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+	.container-field {
+            position: fixed;
+            margin: 20px auto;
+            width: 250px; /* Adjust the width as needed */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+          	overflow-y: auto; /* Add overflow-y property to enable vertical scrolling */
+
+        }
+
+        .field {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .skill {
+            background-color: #007bff;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .icon {
+            margin-right: 5px;
+        }    
+        .scrollable-cards {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.card {
+    display: inline-block;
+    margin-right: 10px; /* Adjust as necessary */
+}
+.skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 10px;
+}
+.deleted-message {
+    position: fixed;
+    top: -60px; /* Start off-screen */
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 60px; /* Adjust height as needed */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+.deleted-message.fade-out {
+    opacity: 0;
+}
+@keyframes slideIn {
+    0% {
+        top: -60px;
+    }
+    100% {
+        top: 20px;
+    }
+}
+.deleted-message i {
+    margin-right: 10px; /* Adjust spacing between icon and message */
+}

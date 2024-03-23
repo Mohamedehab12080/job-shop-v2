@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+			  	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Skills Form</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>  
+	 
+	 
+	 body {
+           font-family: Arial, sans-serif;
+            margin:0;
+            padding:10px;
+            background-color: #f5f5f5;
+            overflow-y: auto; /* Add overflow-y property to enable vertical scrolling */
+
+        }
+        .card-header{
+			background-color: rgb(128, 128, 128);
+		    color: #fff;
+		    padding: 10px;
+		    font-weight: bold;
+		}
+		
+  nav {
+  background-color: #333;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 5px;
+  left: 0;
+  right:0;
+  width: 100%;
+  z-index: 1000;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav ul li {
+  margin-right: 20px;
+  position: relative;
+}
+
+nav ul li:last-child {
+  margin-right: 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+  color: #007bff;
+  transform: scale(1.3);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  transition: transform 0.4s ease-in-out; /* Add transition for smooth scaling */
+}
+
+.logo img:hover {
+  transform: scale(1.3); /* Scale up the logo image on hover */
+}
+
+nav ul li:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -5px; /* Adjust based on your preference */
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: calc(100%); /* Adjust based on your preference */
+  height: 2px; /* Line thickness */
+  background-color: rgb(255, 255, 255);/* Highlight color */
+  transition: transform 0.3s ease-in-out; /* Add transition for transform */
+}
+
+nav ul li:hover::before {
+  content: '';
+  position: absolute;
+  bottom: -5px; /* Adjust based on your preference */
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: calc(100%); /* Adjust based on your preference */
+  height: 2px; /* Line thickness */
+  background-color: rgba(255, 255, 255, 0.3); /* Highlight color with transparency */
+  transition: transform 0.3s ease-in-out; /* Add transition for transform */
+}
+
+nav ul li:hover::after,
+nav ul li:hover::before {
+  transform-origin: center;
+}
+
+nav ul li:hover::after {
+  transform: translateX(-50%) scale(1);
+}
+
+nav ul li:hover::before {
+  transform: translateX(-50%) scale(1);
+}
+
+
+    
+      .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px ;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: calc(100vh - 80px); /* Adjust the max-height according to your layout */
+        }
+        h2 {
+            margin-top: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+       .grid {
+    display: flex;
+    flex-wrap: wrap;
+	}
+
+.grid label {
+    flex-grow: 1;
+    flex-shrink: 0;
+    flex-basis: calc(100% /6 - 20px); /* Adjust the number of columns here */
+    margin-right: 10px;
+    margin-bottom: 10px;
+    background-color: rgb(0, 128, 192);
+    color: #fff;
+    font-size: 14px bold;
+    padding: 6px 12px;
+    border-radius: 20px;
+    
+}
+.checkbox-label:hover {
+    background-color: #e0e0e0; /* Darker background color on hover */
+}
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px bold;
+            resize: none;
+        }
+        input[type="submit"] {
+            background-color: rgb(0, 128, 192);
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        
+        /**
+        from here
+        **/
+		.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+/*
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+*/
+.checkbox-label {
+    display: block;
+    position: relative;
+    padding-left: 30px;
+    margin-bottom: 8px;
+   cursor: pointer;
+    font-size: 16px;
+    background-color: #f0f0f0; /* Set background color */
+    border-radius: 5px;
+}
+
+.checkbox-label:hover {
+    background-color: #e0e0e0; /* Darker background color on hover */
+}
+
+.checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkmark {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    height: 10px;
+    width: 10px;
+    background-color: #ccc; /* Checkbox color */
+    border-radius: 2px;
+}
+
+.checkbox-input:checked + .checkmark {
+    background-color:rgb(128, 255, 128); /* Checked checkbox color */
+}
+
+.checkmark:after {
+    content: "";
+    display: none;
+}
+
+.checkbox-input:checked + .checkmark:after {
+    content: "\2713"; /* Unicode checkmark symbol */
+    display: block;
+    position: absolute;
+    top: -1px;
+    left: 2px;
+    color: white; /* Color of the checkmark symbol */
+    font-size: 12px;
+}
+.input-container {
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    margin-right: 10px; /* Adjust margin as needed */
+}
+
+.add-skill-button {
+    padding: 8px 12px;
+    background-color: rgb(0, 128, 192); /* Button background color */
+    color: #fff; /* Button text color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+	.container-field {
+            position: fixed;
+            margin: 20px auto;
+            width: 250px; /* Adjust the width as needed */
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+          	overflow-y: auto; /* Add overflow-y property to enable vertical scrolling */
+
+        }
+
+        .field {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .skill {
+            background-color: #007bff;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .icon {
+            margin-right: 5px;
+        }    
+        .scrollable-cards {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.card {
+    flex-basis: calc(25% - 20px); /* Adjust the percentage as needed */
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+}
+.skill-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-gap: 10px;
+}
+.deleted-message {
+    position: fixed;
+    margin-top: 70px;
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 60px; /* Adjust height as needed */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+a {
+  text-decoration: none; /* Remove default underline */
+  color: inherit; /* Inherit color from parent */
+  position: relative; /* Position relative for pseudo-element */
+}
+
+a::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; /* Adjust based on your preference */
+  left: 0;
+  width: 100%;
+  height: 2px; /* Line thickness */
+  background-color: transparent; /* Initial color */
+  transition: background-color 0.3s ease-in-out; /* Add transition for color change */
+}
+
+
+.deleted-message.fade-out {
+    opacity: 0;
+}
+@keyframes slideIn {
+    0% {
+        top: -60px;
+    }
+    100% {
+        top: 20px;
+    }
+}
+.deleted-message i {
+    margin-right: 10px; /* Adjust spacing between icon and message */
+}
+.fields-title
+{
+  display: flex;
+  align-items: center;
+}
+.fields-title i{
+  margin-right: 10px;
+  color: #007bff; /* blue color */
+  font-size: 24px;
+}
+.fields-title h2 {
+  color: #333; /* dark gray color */
+  font-size: 20px;
+  margin: 0; 
+}
+ .skills-container {
+            margin-bottom: 20px;
+        }
+        .selected-skill {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+        }
+
+        .selected-skill:hover {
+            background-color: #45a049;
+            cursor: pointer;
+        }
+</style>
+</head>
+<body>
+ 	<nav id="navbar">
+    <a href="#">
+	  <div class="logo">
+	    <img th:src="@{/images/logo.png}" alt="Logo"> <!-- Replace your-logo.png with your actual logo -->
+	    JOB SHOP
+	  </div>
+	</a>
+    <ul>
+      <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#"><i class="fas fa-search"></i> Browse Jobs</a></li>
+      <li><a href="#" th:href="@{/companyAdmin/form}"><i class="fas fa-user"></i> Registration</a></li>
+      <li><a href="#"><i class="fas fa-info-circle"></i> About Us</a></li>
+      <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+    </ul>
+  </nav>
+<br><br><br>
+    
+	<div th:if="${param.deleted}" class="container">
+		<div id="deletedMessage" class="container deleted-message">
+	    <i class="fas fa-check-circle"></i>
+	    <p>Field deleted successfuklly.</p>
+		</div>
+	<div class="fields-title"><i class="fas fa-briefcase"></i> <h2>Your fields</h2></div>
+    <div class="row">
+		
+        <div class="col-md-12">
+            <div class="scrollable-cards">
+                <div class="card-deck">
+                    <div class="skills card" th:each="field : ${addedfields}">
+                        <div th:text="${field.fieldName}" class="card-header"></div>
+                        <div class="card-body">
+                            <div class="skill-grid">
+                                <div th:each="skill : ${field.skills}" class="skill">
+                                    <i class="fas fa-check icon"></i>
+                                    <span th:text="${skill}"></span>
+                                </div>
+                            </div>
+							<a href="#" th:href="@{/companyAdmin/delete-field/{id}(id=${field.id}, userName=${userId})}" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+	<div th:if="${param.success_register}" class="container">
+		<div id="deletedMessage" class="container deleted-message">
+	    <i class="fas fa-check-circle"></i>
+	    <p>Field Added successfuklly.</p>
+		</div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="scrollable-cards">
+                <div class="card-deck">
+                    <div class="skills card" th:each="field : ${addedfields}">
+                        <div th:text="${field.fieldName}" class="card-header"></div>
+                        <div class="card-body">
+                            <div class="skill-grid">
+                                <div th:each="skill : ${field.skills}" class="skill">
+                                    <i class="fas fa-check icon"></i>
+                                    <span th:text="${skill}"></span>
+                                </div>
+                            </div>
+							<a href="#" th:href="@{/companyAdmin/delete-field/{id}(id=${field.id}, userName=${userName})}" class="btn btn-danger">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+	    <div class="container">
+
+        <h2><i class="fas fa-plus-circle"></i>Add Fields</h2>
+        <form id="skillsForm" th:action="@{/companyAdmin/save-field}" method="post" th:object="${companyField}">
+            
+           <input type="hidden" readonly name="companyAdministratorId" id="companyAdministratorId" value="companyField.companyAdministratorId" th:field="*{companyAdministratorId}">
+           <input type="hidden" readonly name="companyName" id="companyName" value="companyField.companyName" th:field="*{companyName}">
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" name="name" required th:field="*{fieldName}">
+            </div>
+            
+			
+            <div class="form-group">
+		    <label>Select Skills:</label>
+		     <div class="input-container">
+			    <input type="text" id="skillSearchInput" class="search-input" placeholder="Search skills">
+			    <button type="button" id="addSkillButton" class="add-skill-button">Add Manualy</button>
+			</div>
+
+		    <br><br>
+		    <div class="grid">
+		        <th:block th:each="skill: ${skills}">
+            <label>
+                <input type="checkbox" name="skill" th:value="${skill.skillName}" th:text="${skill.skillName}">
+            </label>
+        </th:block>
+	    </div>
+		</div>
+
+         <div class="form-group">
+                <label for="selectedSkills">Selected Skills:</label>
+                 <div class="skills-container">
+		        <div class="selected-skills" id="selectedSkillss"></div>
+		    	</div>
+                <textarea id="selectedSkills" rows="4" cols="50" th:field="*{skills}"></textarea>
+            </div>
+           <input type="hidden" readonly name="userName" id="userName" th:value="${userId}">
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+    
+    <script>
+		// Get a reference to the deletion message element
+	var deletedMessage = document.getElementById("deletedMessage");
+	
+	// If the message element exists
+	if (deletedMessage) {
+	    // Set a timeout to remove the message after 3 seconds
+	    setTimeout(function() {
+	         deletedMessage.classList.add("fade-out");
+	    }, 5000); // 3000 milliseconds = 5 seconds
+		}
+
+	</script>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+	 function addSkill ( skill )
+        {
+            var selectedSkillsContainer = document.getElementById( "selectedSkillss" );
+            var skillElement = document.createElement( "div" );
+            skillElement.classList.add( "selected-skill" );
+            skillElement.innerHTML = skill + "<span class='close-icon'>&times;</span>";
+            skillElement.setAttribute("data-skill", skill); // Store the skill data
+            selectedSkillsContainer.appendChild( skillElement );
+    		const textarea = form.querySelector('textarea');
+
+            skillElement.querySelector( ".close-icon" ).addEventListener( "click", function ()
+            {
+				let skillToRemove = skillElement.getAttribute("data-skill")
+                let currentSkills = textarea.value.split(',');
+                let updatedSkills = currentSkills.filter(skill => skill.trim() !== skillToRemove.trim());
+               // textarea.value.replace(/,,/g, ',');
+               textarea.value = updatedSkills.join(',');
+                this.parentElement.remove();
+            } );
+        }
+
+    $(document).ready(function() {
+        $("#addSkillButton").click(function() {
+            var skillInput = $("#skillSearchInput").val().trim(); // Get input value
+            if (skillInput) {
+                var skillsTextarea = $("#selectedSkills");
+                if (skillsTextarea.val()) {
+                    skillsTextarea.val(skillsTextarea.val() + "," + skillInput); // Append skill with comma
+               		
+                } else {
+                    skillsTextarea.val(skillInput); // Set skill as the first entry
+                }
+                addSkill(skillInput);
+                $("#skillSearchInput").val(""); // Clear input field
+            }
+            
+             $('.grid input[type="checkbox"]').each(function() {
+                var label = $(this).closest('label');
+                    label.show();
+            });
+        });
+    });
+</script>
+
+    <script>
+		/*
+    function addSkill() {
+        var skillInput = document.getElementById("skillSearchInput").value.trim(); // Get input value
+        if (skillInput) {
+            var skillsTextarea = document.getElementById("selectedSkills");
+            if (skillsTextarea.value) {
+                skillsTextarea.value += "," + skillInput; // Append skill with comma
+            } else {
+                skillsTextarea.value = skillInput; // Set skill as the first entry
+            }
+            document.getElementById("skillSearchInput").value = ""; // Clear input field
+        }
+    }
+    */
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#skillSearchInput').on('input', function() {
+            var searchText = $(this).val().toLowerCase();
+            $('.grid input[type="checkbox"]').each(function() {
+                var skillName = $(this).attr('value').toLowerCase();
+                var label = $(this).closest('label');
+                if (skillName.includes(searchText)) {
+                    label.show();
+                } else {
+                    label.hide();
+                }
+            });
+        });
+    });
+</script>
+<script>
+    const form = document.getElementById('skillsForm');
+    const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+    const textarea = form.querySelector('textarea');
+
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            let selectedSkills = [];
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    selectedSkills.push(checkbox.value);
+                   
+                }
+            });
+
+            // Check if skills already present in textarea
+            let checkTextArea = textarea.value.split(',');
+            if(checkTextArea.length!=0)
+            {
+				 checkTextArea.forEach(text => {
+                if (!selectedSkills.includes(text)) {
+                    selectedSkills.push(text.replace(/,,/g, ','));
+                }
+                });
+			}
+			//selectedSkills.replace(/,,/g, ',');
+            textarea.value= selectedSkills;
+        });
+    });
+
+    // Function to handle removal of skills when checkbox is unchecked
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (!checkbox.checked) {
+                let skillToRemove = checkbox.value;
+                let currentSkills = textarea.value.split(',');
+                let updatedSkills = currentSkills.filter(skill => skill.trim() !== skillToRemove.trim());
+               // textarea.value.replace(/,,/g, ',');
+                textarea.value = updatedSkills;
+            }
+        });
+    });
+</script>
+
+<script>
+    // Show the navigation bar when the page loads
+    window.onload = function() {
+      var navbar = document.getElementById("navbar");
+      navbar.style.display = "flex";
+    };
+
+    // Always show the navigation bar when scrolling
+    window.onscroll = function() {
+      var navbar = document.getElementById("navbar");
+      navbar.style.display = "flex";
+    };
+  </script>
+    <script>
+		/*
+        const form = document.getElementById('skillsForm');
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+        const textarea = form.querySelector('textarea');
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                let selectedSkills = [];
+                checkboxes.forEach(checkbox => {
+                    if (checkbox.checked) {
+                        selectedSkills.push(checkbox.value);
+                    }
+	                });
+	                
+	             let checkTextArea=textarea.value.split(',');
+                 checkTextArea.forEach(text=>{
+					if(!selectedSkills.includes(text))
+					{
+						selectedSkills.push(text);
+					}
+				});
+                textarea.value = selectedSkills.join(',');
+            });
+        });
+        */
+    </script>
+
+</body>
+</html>

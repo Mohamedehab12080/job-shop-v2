@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add skills</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+   	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+ body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="text"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        select {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 5px;
+        }
+        .selected-skill
+        {
+			background-color: #f0f0f0;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 16px bold;
+            cursor: pointer;
+		}
+		.selected-skill:hover{
+			background-color: rgb(128, 128, 128);
+		}
+		.selected-qualification{
+			background-color: #f0f0f0;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 16px bold;
+            cursor: pointer;
+		}
+		.selected-qualification:hover{
+			background-color: rgb(128, 128, 128);
+		}
+		.close-icon{
+			border-radius: 50%;
+			width: 5px;
+			height: 5px;
+			color: crimson;
+			margin-left:5px;
+			font-size: 22px;
+		}
+        #selectedSkills, #selectedQualifications {
+           	margin:5px;
+           	background-color:rgb(64, 128, 128) ;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .icon {
+            margin-right: 10px;
+        }
+        
+        .submit{
+			padding: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left:700px;
+            
+		}
+		.submit:hover {
+            background-color: #45a049;
+        }
+        .selectedItems {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .skillsIcon{
+			font-size: 4rem;
+      		color: #007bff; 
+		}
+		.qualificationsIcon
+		{
+			font-size: 4rem;
+      		color: #28a745; 
+		}
+/* Hide the search results by default */
+#skillList, #qualificationList {
+  display: none;
+}
+.selectedproficiencies {
+        pointer-events: none;
+        background-color: #f9f9f9; /* Change background color to visually indicate read-only */
+}
+/* Styles for the search results */
+#skillList, #qualificationList {
+  padding: 0; /* Remove default padding */
+  margin: 0; /* Remove default margin */
+  list-style: none; /* Remove bullet points for list items */
+  white-space: nowrap; /* Prevent wrapping onto a new line */
+  overflow-x: auto; /* Enable horizontal scrolling if content overflows */
+  max-width: 100%; /* Ensure it doesn't exceed its container */
+  color: #28a745;
+  font-size:14px bold;
+}
+
+#skillList li, #qualificationList li {
+  display: inline-block; /* Display list items inline */
+  padding: 10px; /* Add padding to each list item */
+  cursor: pointer; /* Change cursor to pointer on hover */
+}
+
+#skillList li:hover, #qualificationList:hover {
+  background-color: #f0f0f0; /* Change background color on hover */
+}
+
+.skills-list {
+    list-style: none;
+    padding: 0;
+    margin-left: 20px;
+}
+
+.skill-item {
+    display: inline-block;
+    margin-right: 10px; /* Adjust as needed */
+}
+
+.skill-degree {
+    font-size: 18px; /* Adjust as needed */
+    font-weight: bold;
+    color: rgb(0, 0, 0); /* Adjust as needed */
+}
+
+ .skills-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;       
+    }
+
+    .skills-table th, .skills-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+        white-space: normal; 
+    }
+
+    .skills-table th {
+        background-color: #f0f0f0;
+        color: #333;
+        font-weight: bold;
+    }
+
+    .skills-table tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    .proficiencies {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f0f0f0;
+        color: #333;
+    }
+
+    .delete-skill {
+        color: #dc3545;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .delete-skill:hover {
+        text-decoration: underline;
+    }
+.inputSpan {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.skill-name {
+    border: none;
+    background: none;
+    font-size: 14px; /* Adjust as needed */
+    color: #333; /* Adjust as needed */
+    vertical-align: middle;
+}
+
+.delete-skill {
+    display: inline-block;
+    margin-left:15px; /* Adjust as needed */
+    color: #888; /* Adjust as needed */
+    text-decoration: none;
+}
+
+.delete-skill:hover {
+    color: #f00; /* Adjust as needed */
+}
+
+.deleted-message {
+    position: fixed;
+    margin-top: 70px;
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 60px; /* Adjust height as needed */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+.add-message{
+	 position: fixed;
+    margin-top: 70px;
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 60px; /* Adjust height as needed */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+a {
+  text-decoration: none; /* Remove default underline */
+  color: inherit; /* Inherit color from parent */
+  position: relative; /* Position relative for pseudo-element */
+}
+
+a::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; /* Adjust based on your preference */
+  left: 0;
+  width: 100%;
+  height: 2px; /* Line thickness */
+  background-color: transparent; /* Initial color */
+  transition: background-color 0.3s ease-in-out; /* Add transition for color change */
+}
+
+
+.deleted-message.fade-out-delete {
+    opacity: 0;
+}
+.add-message.fade-out{
+	opacity: 0;
+}
+@keyframes slideIn {
+    0% {
+        top: -60px;
+    }
+    100% {
+        top: 20px;
+    }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.deleted-message i {
+    margin-right: 10px; /* Adjust spacing between icon and message */
+}
+.add-message i{
+	    margin-right: 10px; /* Adjust spacing between icon and message */
+
+}
+    .Title{
+		text-align: center;
+            font-family: 'Arial', sans-serif; /* Change the font family to your preferred one */
+            color: #333; /* Change the color to your preferred one */
+            font-size: 36px; /* Adjust the font size as needed */
+            text-transform: uppercase; /* Convert text to uppercase */
+            letter-spacing: 2px; /* Add letter spacing */
+            margin-bottom: 20px; /* Add some space below the title */
+            border-bottom: 2px solid #333; /* Add a bottom border */
+            padding-bottom: 10px; /* Add padding to the bottom */
+	}
+	.selected-container{
+		display: flex; /* Use flexbox for layout */
+	    justify-content: space-between; /* Distribute space between the two containers */
+	    border: 1px solid #ccc; /* Optional: Just for visualization */
+	    padding: 10px; /* Optional: Add some padding */
+	    width:100%;
+	}
+	.skills_container{
+		width:100%;
+		height: 80%;
+		overflow: auto;
+		border: 1px solid #000; /* Optional: Just for visualization */
+    	padding: 10px; /* Optional: Add some padding */
+	}
+	.qualifications_container{
+		width: 100%;
+		overflow: auto;
+		height: 80%;
+		border: 1px solid #000; /* Optional: Just for visualization */
+    	padding: 10px; /* Optional: Add some padding */
+    	margin-right: 20px;
+    	margin-left: 60px;
+	}
+	.proficiencies{
+		width: 15%;
+	}
+	    </style>
+	</head>
+	<body>
+		
+		<div style="display: none;" id="deletedMessage" class="container deleted-message">
+	    <i class="fas fa-check-circle"></i>
+	    <p>Deleted Successfully!</p>
+		</div>
+		
+		<div  th:if="${param.success_add}" id="addMessage" class="container add-message">
+	    <i class="fas fa-check-circle"></i>
+	    <p>Submitted successfully</p>
+		</div>
+		
+	 <input type="hidden" id="userId" name="userId" th:value="${userId}">
+	<div class="container">
+		 <h2 class="Title">List of Skills and Proficiency</h2>
+		<button class="submit" onclick="sendToBackEndAjax()">
+   		 Submit Data <i class="fas fa-save" style="color: #007bff;"></i>
+		</button>
+		
+		<div id="form-container">
+   
+        <form id="skillForm">
+   		 <div>
+        <i class="fas fa-search" style="display: inline-block;"></i><input type="text" id="skillSearch" oninput="search()"  onkeypress="handleSkillSearchKeyPress(event)" placeholder="Search skills...">
+        <ul id="skillList"  th:each="skill : ${pre_defined_skills}">
+			<li class="search-result" th:text="${skill.skillName}" onclick="replaceInputText(this.textContent)"><i class="icon">&#x1F4DC;</i></li>
+		</ul>
+		<br>
+        <select title="Choose an option" id="proficiency" class="proficiencies">
+            <option value="good">Good</option>
+            <option value="very-good">Very Good</option>
+            <option value="excellent">Excellent</option>
+        </select>
+        
+    	 <button type="button" onclick="addSkill()"><i class="icon">&#x2713;</i> Add Skill</button>
+   	 </div>
+   	 <div id="selectedSkills" class="selectedItems"></div>
+    </form>
+</div>
+
+	<div id="form-container">
+   
+        <form id="qualifictionForm">
+   		 <div>
+        <i class="fas fa-search" style="display: inline-block;"></i><input type="text" id="qualificationSearch" oninput="searchQualifications()"  onkeypress="handleKeyPress(event)" placeholder="Search Qualifications...">
+       <ul id="qualificationList" th:each="qualification : ${pre_defined_qualifications}">
+			<li class="search-qual-result" onclick="replaceInputText(this.textContent)" th:text="${qualification.qualificationName}"><i class="icon">&#x1F4DC;</i></li>
+		</ul>
+		<br>
+        <select title="Choose an option" id="qualification_proficiency" class="proficiencies">
+            <option value="good">Good</option>
+            <option value="very-good">Very Good</option>
+            <option value="excellent">Excellent</option>
+        </select>
+        
+    	    <button type="button" onclick="addQualification()"><i class="icon">&#x2713;</i> Add Qualification</button>
+   	 </div>
+            <div id="selectedQualifications" class="selectedItems"></div>
+    </form>
+</div>
+<div id="form-container" class="selected-container">
+	
+<div id="form-container">
+    <div class="skills_container" >
+        <h2><i class="fas fa-tools" style="color: #007bff; font-size: larger;"></i> Your skills</h2>
+        <table class="skills-table">
+            <thead>
+                <tr>
+                    <th>Skill</th>
+                    <th>Proficiency</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry: ${skillsMap}">
+                    <td>
+                        <i class="fas fa-check-circle" style="color: rgb(0, 128, 0);"></i>
+                        <span>(<span th:text="${entry.skillName}" class="skill-degree"></span>)</span>
+                    </td>
+                    <td>
+                        <select style="background-color: #f0f0f0;" title="Choose an option" class="selectedproficiencies">
+                            <option value="_">____</option>
+                            <option value="good" th:selected="${entry.skillDegree == 'good'}">Good</option>
+                            <option value="very-good" th:selected="${entry.skillDegree == 'very-good'}">Very Good</option>
+                            <option value="excellent" th:selected="${entry.skillDegree == 'excellent'}">Excellent</option>
+                        </select>
+                    </td>
+                    <td>
+						
+                        <a onclick="deleteSkill(event)" class="delete-skill"><i class="fas fa-trash-alt"></i></a>
+                        <input type="hidden" th:value="${entry.id}" id="skillIdForDelete">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<!--
+<div id="form-container">
+	<div class="skills_container">
+		<h2><i class="fas fa-tools" style="color: #007bff; font-size: larger;"></i> Your skills</h2>
+	
+<ul class="skills-list" th:each="entry: ${skillsMap}">
+    <li class="skill-item">
+		<i class="fas fa-check-circle" style="color: rgb(0, 128, 0);"></i><span>(<span th:text="${entry.skillName}" class="skill-degree"></span>)</span>
+	<select   style="background-color: #f0f0f0;" title="Choose an option" id="skill_loaded_proficiency" class="proficiencies">
+	    <option value="_" >____</option>
+	    <option value="good" th:selected="${entry.skillDegree == 'good'}">Good</option>
+	    <option value="very-good" th:selected="${entry.skillDegree == 'very-good'}">Very Good</option>
+	    <option value="excellent" th:selected="${entry.skillDegree == 'excellent'}">Excellent</option>
+	</select>        
+	<input type="hidden" th:value="${entry.id}" id="skillIdForDelete">
+        <a onclick="deleteSkill(event)" class="delete-skill"><i class="fas fa-trash-alt"></i></a>
+    </li>
+</ul>
+	</div>
+</div>
+	--> 
+	<div id="form-container">
+	<div class="qualifications_container">
+        <h2><i class="fas fa-tools" style="color: #007bff; font-size: larger;"></i> Your qualifications</h2>
+        <table class="skills-table">
+            <thead>
+                <tr>
+                    <th>Qualification</th>
+                    <th>Proficiency</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="entry: ${qualificationMap}">
+                    <td>
+                        <i class="fas fa-check-circle" style="color: rgb(0, 128, 0);"></i>
+                        <span>(<span th:text="${entry.qualificationName}" class="qualification-degree"></span>)</span>
+                    </td>
+                    <td>
+                        <select style="background-color: #f0f0f0;" title="Choose an option" class="selectedproficiencies">
+                            <option value="_">____</option>
+                            <option value="good" th:selected="${entry.qualificationDegree == 'good'}">Good</option>
+                            <option value="very-good" th:selected="${entry.qualificationDegree == 'very-good'}">Very Good</option>
+                            <option value="excellent" th:selected="${entry.qualificationDegree == 'excellent'}">Excellent</option>
+                        </select>
+                    </td>
+                      <td>
+						  	
+                        <a onclick="deleteQual(event)" class="delete-skill"><i class="fas fa-trash-alt"></i></a>
+                        <input type="hidden" th:value="${entry.id}" id="skillIdForDeleteQual">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    </div>
+
+</div>
+<!--
+	<div id="form-container">
+	<div class="qualifications_container">
+		<h2><i class="fas fa-tools" style="color: #007bff; font-size: larger;"></i> Your skills</h2>
+	
+<ul class="qualifications-list" th:each="entry: ${qualificationMap}">
+    <li class="skill-item">
+		<i class="fas fa-check-circle" style="color: rgb(0, 128, 0);"></i><span>(<span th:text="${entry.qualificationName}" class="skill-degree"></span>)</span>
+   	<select style="background-color: #f0f0f0;" title="Choose an option" id="qualification_loaded_proficiency" class="proficiencies">
+	    <option value="good" th:selected="${entry.qualificationDegree == 'good'}">Good</option>
+	    <option value="very-good" th:selected="${entry.qualificationDegree == 'very-good'}">Very Good</option>
+	    <option value="excellent" th:selected="${entry.qualificationDegree == 'excellent'}">Excellent</option>
+	</select>
+       <input type="hidden" th:value="${entry.id}" id="skillIdForDelete">
+        <a onclick="deleteSkill(event)" class="delete-skill"><i class="fas fa-trash-alt"></i></a>
+    </li>
+</ul>
+	</div>
+</div>
+-->
+</div>
+<script>
+	/*
+	This script for update skill proficiencies 
+	*/
+	function enableSelectionProficiencySkills()
+	{
+		var selectElement = document.getElementById('skill_loaded_proficiency');
+        selectElement.style.pointerEvents = 'auto';
+        selectElement.style.backgroundColor = '#f9f9f9'; // Reset background color
+	}
+	function disableSelectionProficiencySkills()
+	{
+		var selectElement = document.getElementById('skill_loaded_proficiency');
+        selectElement.style.pointerEvents = 'none';
+        selectElement.style.backgroundColor = '#f0f0f0'; // Reset background color
+	}
+	function enableSelectionProficiencyQualifications()
+	{
+		var selectElement = document.getElementById('qualification_loaded_proficiency');
+        selectElement.style.pointerEvents = 'auto';
+        selectElement.style.backgroundColor = '#f9f9f9'; // Reset background color
+	}
+	function disableSelectionProficiencyQualifications()
+	{
+		var selectElement = document.getElementById('qualification_loaded_proficiency');
+        selectElement.style.pointerEvents = 'none';
+        selectElement.style.backgroundColor = '#f0f0f0'; // Reset background color
+	}
+	
+</script>
+
+
+ <script>
+	 
+function showAndHideMessage() {
+  var message = document.getElementById('deletedMessage');
+  
+  // Show the message
+  message.style.display = 'block';
+  
+  // Hide the message after 3 seconds (3000 milliseconds)
+  setTimeout(function() {
+    // Apply animation
+    message.style.animation = 'fadeOut 1s ease-in-out forwards';
+    
+    // Hide the message after animation completes
+    setTimeout(function() {
+      message.style.display = 'none';
+      // Reset animation to initial state
+      message.style.animation = '';
+    }, 1000); // Wait for animation duration (1000 milliseconds) before hiding the message
+  }, 3000); // Show the message for 3 seconds (3000 milliseconds)
+}
+		
+	</script>
+	 <script>
+		// Get a reference to the deletion message element
+	var deletedMessage = document.getElementById("addMessage");
+	
+	// If the message element exists
+	if (deletedMessage) {
+	    // Set a timeout to remove the message after 3 seconds
+	    setTimeout(function() {
+	         deletedMessage.classList.add("fade-out");
+	    }, 5000	); // 5000 milliseconds = 5 seconds
+		}
+
+	</script>
+	
+<script>
+  var searchInput = document.getElementById('skillSearch');
+  var searchResults = document.getElementById('skillList');
+ 	var words =[];
+ document.addEventListener('DOMContentLoaded', function() {
+   words =getListContentAsArray();
+
+  function getListContentAsArray() {
+    var listItems = document.querySelectorAll('.search-result');
+    var myList = [];
+    listItems.forEach(item => {
+      myList.push(item.textContent);
+    });
+    return myList;
+  }
+});
+  function search() {
+	  
+    const searchTerm = searchInput.value.trim().toLowerCase();
+    if(searchTerm==='')
+    {
+		hideResults();
+		return;
+	}
+	
+    const matchedWords = words.filter(word => word.toLowerCase().includes(searchTerm));
+    if(matchedWords.length>0)
+    {
+		showResults(matchedWords);
+	}else 
+	{
+		hideResults();
+	}
+  }
+
+  function showResults(results) {
+    searchResults.innerHTML = '';
+    if (results.length > 0) {
+      results.forEach(result => {
+        const li = document.createElement('li');
+        li.textContent = result;
+	li.addEventListener('click', function() {
+	  replaceInputText(result);
+	  addSkill();
+	  setFocusOnInputSkillSearch();
+	});      
+	  searchResults.appendChild(li);
+      });
+      searchResults.style.display = 'inline-block';
+    } else {
+      searchResults.style.display = 'none';
+    }
+  }
+	function hideResults() {
+	  if(searchResults===null)
+	  {
+		  // it will be message for user 
+		 console.log("There is no skills")
+	  }else 
+	  {
+		  searchResults.style.display = 'none';
+	  }
+	}
+  function replaceInputText(text) {
+    searchInput.value = text;
+  	hideResults();
+  }
+ function handleSkillSearchKeyPress(event)
+ {
+	 if (event.key === 'Enter') {
+		 event.preventDefault();
+   		//When press enter add skill
+   		addSkill();
+  }
+ }
+ 
+ function setFocusOnInputSkillSearch() {
+    var searchInput = document.getElementById('skillSearch');
+    searchInput.focus(); // Set focus on the input field
+}
+</script>
+
+
+<script>
+  var searchInputQual = document.getElementById('qualificationSearch');
+  var searchResultsQual = document.getElementById('qualificationList');
+ 	var Qualwords =[];
+ document.addEventListener('DOMContentLoaded', function() {
+   Qualwords =getListContentAsArrayQual();
+
+  function getListContentAsArrayQual() {
+    var listItems = document.querySelectorAll('.search-qual-result');
+    var myList = [];
+    listItems.forEach(item => {
+      myList.push(item.textContent);
+    });
+    return myList;
+  }
+});
+  function searchQualifications() {
+	  
+    const searchTermQual = searchInputQual.value.trim().toLowerCase();
+    if(searchTermQual==='')
+    {
+		hideResultsQual();
+		return;
+	}
+    const matchedWordsQual = Qualwords.filter(word => word.toLowerCase().includes(searchTermQual));
+    if(matchedWordsQual.length>0)
+    {
+		showResultsQual(matchedWordsQual);
+	}else 
+	{
+		hideResultsQual();
+	}
+  }
+
+  function showResultsQual(results) {
+    searchResultsQual.innerHTML = '';
+    if (results.length > 0) {
+      results.forEach(result => {
+        const li = document.createElement('li');
+        li.textContent = result;
+		li.addEventListener('click', function() {
+		  replaceInputTextQual(result);
+		  addQualification();
+		});      
+		
+		  searchResultsQual.appendChild(li);
+      });
+      searchResultsQual.style.display = 'inline-block';
+    } else {
+      searchResultsQual.style.display = 'none';
+    }
+  }
+	function hideResultsQual() {
+	  if(searchResultsQual===null)  
+	  {
+		 // it will be message for user 
+		 console.log("There is no qualifications")
+	  }else 
+	  {
+		   searchResultsQual.style.display = 'none';
+	  }
+	  
+	}
+  function replaceInputTextQual(text) {
+    searchInputQual.value = text;
+  	hideResultsQual();
+  }
+  function handleKeyPress(event)
+ {
+	 if (event.key === 'Enter') {
+		 event.preventDefault();
+   		//When press enter add qual
+   		addQualification();
+  	}
+  
+  }
+   function setFocusOnInputQualSearch() {
+    var searchInput = document.getElementById('qualificationSearch');
+    searchInput.focus(); // Set focus on the input field
+}
+</script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+
+    var selectedSkills = [];
+    var selectedQualifications = [];
+    let userId;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+    // Your code here
+     userId = document.getElementById('userId').value;
+});
+
+
+
+/*
+     function searchSkills() {
+        var input, filter, ul, li, i, txtValue;
+        input = document.getElementById("skillSearch");
+        filter = input.value.toUpperCase();
+        ul = document.getElementById("skillList");
+        var items=ul.children; //Get collection of li> elements
+			
+        if (!filter) {
+            ul.style.display = "none";
+            return;
+        }
+
+        // Show the skill list
+        ul.style.display = "block";
+
+    // Iterate through the original list items
+    for (i = 0; i < items.length; i++) {
+        li = items[i];
+        txtValue = li.textContent || li.innerText;
+
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            // Clone the matched list item and append it to the result list
+            var clonedLi = li.cloneNode(true);
+            clonedLi.onclick = function () {
+                input.value = this.textContent;
+                ul.style.display = "none";
+                addSkill();
+            };
+            ul.appendChild(clonedLi);
+        }
+    }
+/*
+		  items.forEach(skill => {
+                    txtValue = skill.toUpperCase();
+                    if (txtValue.indexOf(filter) > -1) {
+                        li = document.createElement("li");
+                        li.textContent = skill;
+                        li.onclick = function () {
+                            input.value = this.textContent;
+                            ul.style.display = "none";
+                            addSkill(skill);
+                        };
+                        ul.appendChild(li);
+                    }
+                });
+                
+    }
+*/	
+
+    function addSkill() {
+        var skill = document.getElementById("skillSearch").value;
+        var proficiency = document.getElementById("proficiency").value;
+        console.log("user Id : "+userId);
+        if(skill==="")
+        {
+			//display message for the user 
+		}else 
+		{
+			
+        // Add skill to selectedSkills array
+        selectedSkills.push({ skill: skill, proficiency: proficiency });
+		
+        // Display the selected skill in the selectedSkillsDiv
+        var selectedSkillsDiv = document.getElementById("selectedSkills");
+        var skillDiv = document.createElement("div");
+        skillDiv.className = "selected-skill";
+        skillDiv.textContent = skill + " (" + proficiency + ")";
+        var closeIcon = document.createElement("span");
+        closeIcon.className = "close-icon";
+        closeIcon.innerHTML = "&times;";
+        closeIcon.onclick = function () {
+            // Remove the skill from selectedSkills array
+            var index = selectedSkills.findIndex(s => s.skill === skill && s.proficiency === proficiency);
+            if (index !== -1) {
+                selectedSkills.splice(index, 1);
+            }
+            skillDiv.remove();
+        };
+        skillDiv.appendChild(closeIcon);
+        selectedSkillsDiv.appendChild(skillDiv);
+
+        // Clear the search field
+        document.getElementById("skillSearch").value = "";
+		}
+		console.log("List of skills : "+selectedSkills);
+    }
+    
+   
+   
+     function deleteSkill(event) {
+		 
+        // Prevent the default action of the anchor tag (i.e., navigating to a new page)
+        event.preventDefault();
+        var row = event.target.closest('tr');
+        var skillID =row.querySelector('#skillIdForDelete').value;
+        // Find the closest parent <li> element
+       
+
+        // Remove the parent <li> element from the DOM
+        if (row) {
+             deleteSkillAjax(skillID);
+             row.remove();
+            // Here you can also make an AJAX call to delete the item from the server-side if needed
+        } else {
+            console.error("Parent <li> element not found");
+        }
+    }
+    function deleteQual(event) {
+		 
+        // Prevent the default action of the anchor tag (i.e., navigating to a new page)
+        event.preventDefault();
+        var row= event.target.closest('tr');
+        var qualId = row.querySelector('#skillIdForDeleteQual').value
+        // Find the closest parent <li> element
+       
+
+        // Remove the parent <li> element from the DOM
+        if (row) {
+            deleteQualificationAjax(qualId);
+            row.remove();
+            // Here you can also make an AJAX call to delete the item from the server-side if needed
+        } else {
+            console.error("Parent <li> element not found");
+        }
+    }
+    function convertToStrings(array) {
+    if(array.lenght ===0)
+    {
+		return null;
+	}else 
+	{
+		return array.map(element => String(element));
+	}
+}
+
+	
+    function sendToBackEndAjax()
+    {
+		var jobSeekerSkillNames = selectedSkills.map(function(skill) {
+		    return skill.skill+"("+skill.proficiency+")";
+		});
+		var jobSeekerQualificationNames = selectedQualifications.map(function(qualification) {
+		    return qualification.qualification+"("+qualification.qualificationProficiency+")";
+		});
+		
+		   var data = {
+            "jobSeekerSkillDtoList": jobSeekerSkillNames,
+            "qualificationDtoList":jobSeekerQualificationNames,
+            "userId":userId
+        };
+        $.ajax({
+        url: '/jobSeekers/save-skill',
+        type: 'POST',
+       	contentType:'application/json',
+        data: JSON.stringify(data), // Corrected: Use 'data' instead of 'body'
+        dataType: 'json', // Added: Specify the expected data type of the response
+        success: function(response, textStatus, xhr) {
+           if (response.status === "Inserted") {
+        		window.location.href = '/jobSeeker/add-skills/' + data.userId + '?success_add';
+		    } else {
+		        // Handle other cases if needed
+		    }
+        },
+        error: function(xhr, status, error) {
+            // Handle error response
+            console.error(xhr.responseText+" : "+status+" : "+error);
+            // Display an error message to the user
+        }
+    });
+	}
+	
+    function deleteSkillAjax(skillID) {
+    $.ajax({
+        url: '/jobSeekers/delete-skill/' + skillID,
+        type: 'DELETE',
+        success: function(response, textStatus, xhr) {
+            // Handle success response
+            var responseBody=xhr.responseText;
+            if(responseBody==='deleted')
+            {
+				 showAndHideMessage();
+			}else {
+				console.log("can't be deleted")
+			}
+            
+        },
+        error: function(xhr, status, error) {
+            // Handle error response
+            console.error(xhr.responseText+" : "+status+" : "+error);
+            // Display an error message to the user
+        }
+    });
+}
+function deleteQualificationAjax(qualId) {
+    $.ajax({
+        url: '/jobSeekers/delete-qual/' + qualId,
+        type: 'DELETE',
+        success: function(response, textStatus, xhr) {
+            // Handle success response
+            var responseBody=xhr.responseText;
+            if(responseBody==='deleted')
+            {
+				 showAndHideMessage();
+			}else {
+				console.log("can't be deleted");
+			}
+            
+        },
+        error: function(xhr, status, error) {
+            // Handle error response
+            console.error(xhr.responseText+" : "+status+" : "+error);
+            // Display an error message to the user
+        }
+    });
+}
+
+    function addQualification() {
+        var qualification = document.getElementById("qualificationSearch").value;
+		var qualificationProficiency=document.getElementById("qualification_proficiency").value;
+        // Add qualification to selectedQualifications array
+        if(qualification ==="")
+        {
+			//Display Message for user 
+		}else {
+        selectedQualifications.push({ qualification: qualification, qualificationProficiency: qualificationProficiency });
+
+        // Display the selected qualification in the selectedQualificationsDiv
+        var selectedQualificationsDiv = document.getElementById("selectedQualifications");
+        var qualificationDiv = document.createElement("div");
+        qualificationDiv.className = "selected-qualification";
+        qualificationDiv.textContent = qualification + " (" + qualificationProficiency + ")";
+        var closeIcon = document.createElement("span");
+        closeIcon.className = "close-icon";
+        closeIcon.innerHTML = "&times;";
+         closeIcon.onclick = function () {
+            // Remove the skill from selectedSkills array
+            var index = selectedQualifications.findIndex(q => q.qualification === qualification && q.qualificationProficiency === qualificationProficiency);
+            if (index !== -1) {
+                selectedQualifications.splice(index, 1);
+            }
+            qualificationDiv.remove();
+        };
+        qualificationDiv.appendChild(closeIcon);
+        selectedQualificationsDiv.appendChild(qualificationDiv);
+
+        // Clear the search field
+        document.getElementById("qualificationSearch").value = "";
+		}
+        
+    }
+
+    function sendDataToBackend() {
+      if(selectedQualifications.length===0 && selectedSkills.length===0)
+      {
+		 /*
+		    var data = {
+            jobSeekerSkillDtoList: selectedSkills,
+            qualificationDtoList: selectedQualifications,
+        	userId:userId
+        };
+
+        // Send data to backend
+        fetch("/save-skill", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Data added successfully");
+                // You can update UI or perform any other actions upon successful addition
+            } else {
+                console.error("Failed to add data");
+            }
+        })
+        .catch(error => console.error("Error adding data:", error)); 
+	  */
+	  }else 
+	  {
+		    var data = {
+            "jobSeekerSkillDtoList": ["css","Java"],
+            "qualificationDtoList": ["css","Java"],
+            "userId":1
+        };
+
+        // Send data to backend
+        fetch("/jobSeekers/save-skill", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (response.ok) {
+                console.log("Data added successfully");
+                // You can update UI or perform any other actions upon successful addition
+            } else {
+                console.error("Failed to add data");
+            }
+        })
+        .catch(error => console.error("Error adding data:", error)); 
+	  }
+    }
+
+    /*]]>*/
+</script>
+
+
+</body>
+</html>

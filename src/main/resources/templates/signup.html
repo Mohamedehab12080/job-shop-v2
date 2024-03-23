@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #eaeaea; /* Light gray background */
+    margin: 0;
+    padding: 0;
+}
+ nav {
+  background-color: #333;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+nav ul li {
+  margin-right: 20px;
+  position: relative;
+}
+
+nav ul li:last-child {
+  margin-right: 0;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+  transition: color 0.3s ease-in-out;
+}
+
+nav ul li a:hover {
+  color: #007bff;
+  transform: scale(1.3);
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  width: 60px;
+  height: 60px;
+  margin-right: 10px;
+  transition: transform 0.4s ease-in-out; /* Add transition for smooth scaling */
+}
+
+.logo img:hover {
+  transform: scale(1.3); /* Scale up the logo image on hover */
+}
+
+nav ul li:hover::after {
+  content: '';
+  position: absolute;
+  bottom: -5px; /* Adjust based on your preference */
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: calc(100%); /* Adjust based on your preference */
+  height: 2px; /* Line thickness */
+  background-color: rgb(255, 255, 255);/* Highlight color */
+  transition: transform 0.3s ease-in-out; /* Add transition for transform */
+}
+
+nav ul li:hover::before {
+  content: '';
+  position: absolute;
+  bottom: -5px; /* Adjust based on your preference */
+  left: 50%;
+  transform: translateX(-50%) scale(0);
+  width: calc(100%); /* Adjust based on your preference */
+  height: 2px; /* Line thickness */
+  background-color: rgba(255, 255, 255, 0.3); /* Highlight color with transparency */
+  transition: transform 0.3s ease-in-out; /* Add transition for transform */
+}
+
+nav ul li:hover::after,
+nav ul li:hover::before {
+  transform-origin: center;
+}
+
+nav ul li:hover::after {
+  transform: translateX(-50%) scale(1);
+}
+
+nav ul li:hover::before {
+  transform: translateX(-50%) scale(1);
+}
+a {
+  text-decoration: none; /* Remove default underline */
+  color: inherit; /* Inherit color from parent */
+  position: relative; /* Position relative for pseudo-element */
+}
+
+a::before {
+  content: '';
+  position: absolute;
+  bottom: -2px; /* Adjust based on your preference */
+  left: 0;
+  width: 100%;
+  height: 2px; /* Line thickness */
+  background-color: transparent; /* Initial color */
+  transition: background-color 0.3s ease-in-out; /* Add transition for color change */
+}
+
+
+
+.container {
+    max-width: 90%;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff; /* White container background */
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #007bff; /* Blue heading color */
+}
+
+img#profilePreview,
+img#logoPreview {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+    display: none;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    color: #495057; /* Dark gray label color */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="file"],
+select {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da; /* Light border color */
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff; /* Blue submit button background */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.jobSeekerForm,
+.companyForm {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+.deleted-message {
+    position: fixed;
+    margin-top: 70px;
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 90px; /* Adjust height as needed */
+    background-color: #4CAF50; /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+
+.deleted-message.fade-out {
+    opacity: 0;
+}
+@keyframes slideIn {
+    0% {
+        top: -60px;
+    }
+    100% {
+        top: 20px;
+    }
+}
+.deleted-message i {
+    margin-right: 10px; /* Adjust spacing between icon and message */
+}
+
+@media screen and (min-width: 768px) {
+    .container {
+        max-width: 500px;
+    }
+    .upload-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upload-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Adjust the icon size as needed */
+.upload-btn i {
+  margin-right: 10px;
+}
+}
+
+    </style>
+  <script th:inline="javascript">
+    function showForm(selectedOption) {
+        var jobSeekerForm = document.querySelector('.jobSeekerForm');
+        var companyForm = document.querySelector('.companyForm');
+
+        if (selectedOption === "jobSeeker") {
+            jobSeekerForm.classList.add('active');
+            companyForm.classList.remove('active');
+            additionalFieldsForm.style.display = 'none'; // Hide additional fields form for job seeker
+        } else if (selectedOption === "company") {
+            companyForm.classList.add('active');
+            jobSeekerForm.classList.remove('active');
+            additionalFieldsForm.style.display = 'none'; // Hide additional fields form for company initially
+        }
+    }
+    
+</script>
+
+
+
+		
+   
+</head>
+<body>
+	 	<nav id="navbar">
+    <a href="#">
+	  <div class="logo">
+	    <img th:src="@{/images/logo.png}" alt="Logo"> <!-- Replace your-logo.png with your actual logo -->
+	    JOB SHOP
+	  </div>
+	</a>
+    <ul>
+      <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#"><i class="fas fa-search"></i> Browse Jobs</a></li>
+      <li><a href="#" th:href="@{/companyAdmin/form}"><i class="fas fa-user"></i> Registration</a></li>
+      <li><a href="#"><i class="fas fa-info-circle"></i> About Us</a></li>
+      <li><a href="#"><i class="fas fa-envelope"></i> Contact</a></li>
+    </ul>
+  </nav>
+<br><br><br>
+    <div class="container">
+        <h2>User Information</h2>
+        <label for="userType">Select User Type:</label>
+        <select id="userType" onchange="showForm(this.value)">
+            <option value="jobSeeker">Job Seeker</option>
+            <option value="company">Company</option>
+        </select>
+
+        <!-- Job Seeker Form -->
+        <form action="#" method="post" class="jobSeekerForm active" th:object="${jobSeeker}" 
+        th:action="@{/register/save-jobSeeker}" enctype="multipart/form-data">
+            <label for="jobSeekerUsername">Username:</label>
+                <input type="text" name="username" id="jobSeekerUsername" th:field="*{userName}">
+                
+                <label for="jobSeekerPassword">Password:</label>
+                <input type="password" name="password" id="jobSeekerPassword" th:field="*{password}">
+                
+                <input type="hidden" name="userType" id="jobSeekerUserType" value="jobSeeker.userType" th:field="*{userType}">
+
+                <label for="jobSeekerEmail">Email:</label>
+                <input type="email" name="email" id="jobSeekerEmail" th:field="*{email}">
+             	
+             	<label for="jobSeekerAddress">Address:</label>
+                <input type="text" name="Address" id="jobSeekerAddress" th:field="*{Address}">
+                 
+                 <label for="jobSeekerContacts">Enter contacts (comma separated) eg. (whatsapp: 01091499680 ,github:Mohmed12080@gmail.com):</label>
+                <input type="text" name="contacts" id="jobSeekerContacts" th:field="*{contacts}">
+			      <label for="profileImage" class="upload-btn">
+				  <i class="fas fa-cloud-upload-alt"></i> Upload profileImage
+				</label>
+				<input type="file" id="profileImage" name="profileImage" accept="image/*" required onchange="previewImage(this, 'profilePreview')" style="display: none;">
+		       	<img id="profilePreview" src="#" alt="image Preview"><br>
+
+            <input type="submit" value="Save Job Seeker">
+       		
+        </form>
+		<div th:if="${param.jobSeeker_success}">
+				<div id="deletedMessage" class="container deleted-message">
+			    <i class="fas fa-check-circle"></i>
+			    <p>Registered successfully please check your gmail.</p> 
+				</div>
+		</div>
+		<div th:if="${param.jobSeeker_exists}">
+			<!--	<a   th:href="@{/companyAdmin/add-field/{userName}(userName=${companyAdministrator.userName})}">Add fields</a> -->
+				<div id="deletedMessage" class="container deleted-message" style=" background-color:red">
+			    <i class="fas fa-check-circle"></i>
+			    <p>This email is already exists.</p> 
+				</div>
+		</div>
+        <!-- Company Form -->
+        <form action="#" method="post" class="companyForm" th:object="${companyAdministrator}"
+        th:action="@{/register/save-company}"  enctype="multipart/form-data">
+            <label for="companyUsername">Username:</label>
+                <input type="text" name="username" id="companyUsername" th:field="*{userName}">
+                
+                <label for="companyPassword">Password:</label>
+                <input type="password" name="password" id="companyPassword" th:field="*{password}">
+                
+                <input type="hidden" name="userType" id="companyUserType" value="companyAdministrator.userType" th:field="*{userType}">
+
+                <label for="companyEmail">Email:</label>
+                <input type="email" name="email" id="companyEmail" th:field="*{email}">
+                
+                <label for="companyAddress">Address:</label>
+                <input type="text" name="Address" id="companyAddress" th:field="*{Address}">
+             
+                <label for="companyName">Company Name:</label>
+                <input type="text" name="companyName" id="companyName" th:field="*{companyName}">
+        		
+                <label for="companyContacts">Enter contacts (comma separated) eg. (whatsapp: 01091499680 ,github:Mohmed12080@gmail.com):</label>
+                <input type="text" name="contacts" id="companyContacts" th:field="*{contacts}">
+        	
+        		    
+		        <label for="logo" class="upload-btn">
+				  <i class="fas fa-cloud-upload-alt"></i> Upload Logo
+				</label>
+				<input type="file" id="logo" name="logo" accept="image/*" required onchange="previewImage(this, 'logoPreview')" style="display: none;">
+		        <img id="logoPreview" src="#" alt="Logo Preview"><br>
+            		
+				<input type="submit" value="Save Company" th:href="@{/companyAdmin/add-field/{userName}(userName=${companyAdministrator.email})}">
+        </form>
+			<div th:if="${param.company_success}">
+			<!--	<a   th:href="@{/companyAdmin/add-field/{userName}(userName=${companyAdministrator.userName})}">Add fields</a> -->
+				<div id="deletedMessage" class="container deleted-message">
+			    <i class="fas fa-check-circle"></i>
+			    <p>Registered successfully please check your gmail.</p> 
+				</div>
+			</div>
+			<div th:if="${param.company_exists}">
+			<!--	<a   th:href="@{/companyAdmin/add-field/{userName}(userName=${companyAdministrator.userName})}">Add fields</a> -->
+				<div id="deletedMessage" class="container deleted-message" style=" background-color:red">
+			    <i class="fas fa-check-circle"></i>
+			    <p>This email is already exists.</p> 
+				</div>
+			</div>
+    </div>
+    
+    <script>
+		// Get a reference to the deletion message element
+	var deletedMessage = document.getElementById("deletedMessage");
+	
+	// If the message element exists
+	if (deletedMessage) {
+	    // Set a timeout to remove the message after 3 seconds
+	    setTimeout(function() {
+	         deletedMessage.classList.add("fade-out");
+	    }, 5000); // 3000 milliseconds = 5 seconds
+		}
+
+	</script>
+	<script>
+    function previewImage(input, imageID) {
+        const preview = document.getElementById(imageID);
+        const file = input.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block'; // Make the image preview visible
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            // If no file is selected, set default image
+            preview.src = '/images/default.jpg';
+            preview.style.display = 'block'; // Make the default image preview visible
+        }
+    }
+</script>
+</body>
+</html>

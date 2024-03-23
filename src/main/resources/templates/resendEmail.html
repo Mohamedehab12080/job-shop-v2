@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Sender</title>
+
+<style>
+	.container {
+    width: 50%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: #fff;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.btn:active {
+    background-color: #0056b3;
+}
+
+.btn:focus {
+    outline: none;
+}
+.deleted-message {
+    position: fixed;
+    margin-top: 70px;
+    left: 20px; /* Adjust as needed */
+    width: 250px; /* Adjust width as needed */
+    height: 90px; /* Adjust height as needed */
+    background-color: rgb(128, 0, 0); /* Green background color */
+    color: white; /* White text color */
+    padding: 10px; /* Padding around the message */
+    border-radius: 5px; /* Rounded corners */
+    animation: slideIn 0.5s ease forwards; /* Animation for sliding in */
+    opacity: 1;
+    transition: opacity 1s; /* Transition for opacity */
+}
+
+.deleted-message.fade-out {
+    opacity: 0;
+}
+@keyframes slideIn {
+    0% {
+        top: -60px;
+    }
+    100% {
+        top: 20px;
+    }
+}
+.deleted-message i {
+    margin-right: 10px; /* Adjust spacing between icon and message */
+}
+
+</style>
+</head>
+<body>
+	<div th:if="${param.email_notFound}">
+				<div id="deletedMessage" class="container deleted-message" style="" >
+			    <i class="fas fa-check-circle"></i>
+			    <p>This email not found !</p> 
+				</div>
+		</div>
+		<div th:if="${param.invalid_token}">
+				<div id="deletedMessage" class="container deleted-message" style="" >
+			    <i class="fas fa-check-circle"></i>
+			    <p>Invalid token,<br>Please enter your email to send you a verification link</p> 
+				</div>
+		</div>
+		<div th:if="${param.email_notFound}">
+				<div id="deletedMessage" class="container deleted-message" >
+			    <i class="fas fa-check-circle"></i>
+			    <p>Email not found !</p>
+				</div>
+		</div>
+		<div th:if="${param.sent}">
+				<div id="deletedMessage" class="container deleted-message" >
+			    <i class="fas fa-check-circle"></i>
+			    <p>We are sent a verification link on this Email : </p>	
+			    <p th:text="${resendemail}"></p>
+				</div>
+		</div>
+		<div th:if="${param.token_expired}">
+				<div id="deletedMessage" class="container deleted-message" style=" background-color:darkgreen ;width: 250px;height: 105px;">
+			    <i class="fas fa-check-circle"></i>
+			    <p>This token is expired send another verification token to your email</p>
+				</div>
+		</div>
+    <div class="container">
+        <h2>Send Email</h2>
+        <form action="#" th:action="@{/register/resend}" method="post">
+            <div class="form-group" th:if="${resendemail == 'Not'}">
+                <label for="email">Email:</label>
+          		<input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            <div class="form-group" th:if="${resendemail != 'Not'}">
+                <label for="email">Email:</label>
+          		<input type="email" id="email" name="email" th:value="${resendemail}" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+        </form>
+    </div>
+    
+     <script>
+		// Get a reference to the deletion message element
+	var deletedMessage = document.getElementById("deletedMessage");
+	
+	// If the message element exists
+	if (deletedMessage) {
+	    // Set a timeout to remove the message after 5 seconds
+	    setTimeout(function() {
+	         deletedMessage.classList.add("fade-out");
+	    }, 5000); // 5000 milliseconds = 5 seconds
+		}
+
+	</script>
+
+</body>
+</html>
