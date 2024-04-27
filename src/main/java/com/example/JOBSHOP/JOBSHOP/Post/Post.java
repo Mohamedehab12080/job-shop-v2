@@ -1,6 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.Post;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import org.hibernate.annotations.Formula;
@@ -8,12 +9,10 @@ import org.hibernate.annotations.Formula;
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
-import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.postField.postField;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,17 +29,19 @@ import jakarta.persistence.Table;
 public class Post extends baseEntity<Long>{
 
 	private String Title;
+	@Column(length = 1000)
 	private String description;
+	@Column(length = 1000)
 	private String jobRequirments;
 	private String location;
 	private String employmentType;
 	 
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="companyProfile_id")
 	private companyProfile companyProfile;
 	
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="employer_id")
 	private Employer employer;
 	
@@ -51,7 +52,7 @@ public class Post extends baseEntity<Long>{
 	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
     private Long fieldCount;
    
-	private List<String> skills;
+//	private List<String> skills;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "Post",cascade = CascadeType.ALL)
@@ -115,12 +116,12 @@ public class Post extends baseEntity<Long>{
 	public void setFieldCount(Long fieldCount) {
 		this.fieldCount = fieldCount;
 	}
-	public List<String> getSkills() {
-		return skills;
-	}
-	public void setSkills(List<String> additionalSkills) {
-		this.skills = additionalSkills;
-	}
+//	public List<String> getSkills() {
+//		return skills;
+//	}
+//	public void setSkills(List<String> additionalSkills) {
+//		this.skills = additionalSkills;
+//	}
 	public List<Application> getApplications() {
 		return applications;
 	}

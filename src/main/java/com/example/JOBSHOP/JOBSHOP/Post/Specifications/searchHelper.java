@@ -3,11 +3,11 @@ package com.example.JOBSHOP.JOBSHOP.Post.Specifications;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdminService;
-import com.example.JOBSHOP.JOBSHOP.companyField.companyFieldService;
-import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.companyProfile.companyProfileService;
-import com.example.JOBSHOP.JOBSHOP.postField.postField;
+import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.service.companyFieldService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdminService;
 
 @Component
 public class searchHelper {

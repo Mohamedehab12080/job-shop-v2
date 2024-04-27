@@ -1,0 +1,9 @@
+.hideScrollBar::-webkit-scrollbar
+{
+  display: none
+}
+.modal-content-container {
+    max-height: 80vh; /* Set a maximum height to allow scrolling */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+  

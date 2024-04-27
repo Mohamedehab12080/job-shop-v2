@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
-import com.example.JOBSHOP.JOBSHOP.User.User;
-import com.example.JOBSHOP.JOBSHOP.companyField.companyField;
+import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -33,7 +33,15 @@ public class companyAdministrator extends User{
 	@Column(name="companyAdministrator_companyFields")
 	private List<companyField> companyFields=new ArrayList<companyField>();
 	
+	private String description;
 	
+	
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	public String getCompanyName() {
 		return companyName;
 	}

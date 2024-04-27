@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.hibernate.annotations.Formula;
 
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
-import com.example.JOBSHOP.JOBSHOP.User.User;
+import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
-import com.example.JOBSHOP.JOBSHOP.employerField.employerField;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
