@@ -7,7 +7,7 @@ import jakarta.persistence.Entity;
 
 
 @Entity
-public class qualification extends baseEntity<Long>{
+public class Qualification extends baseEntity<Long>{
 
 	@Column(unique = true)
 	private String qualificationName;

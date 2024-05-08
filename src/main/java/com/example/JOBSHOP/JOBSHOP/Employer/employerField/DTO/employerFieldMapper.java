@@ -86,7 +86,7 @@ public class employerFieldMapper {
 		employerField empf=new employerField();
 			
 		companyField compf=new companyField();
-		compf.setId(empfInsert.getCompanyFieldId());
+		compf.setId(empfInsert.getId());
 		empf.setCompanyField(compf);
 		Employer emp=new Employer();
 		emp.setId(empfInsert.getEmployerId());

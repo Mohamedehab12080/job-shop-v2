@@ -24,7 +24,7 @@ public class companyAdministratorDTO extends UserDTO{
 	
 	private List<String> companyFieldsNames;
 	
-	private byte[] picture;
+	private String picture;
 	
 	private String description;
 	
@@ -47,10 +47,10 @@ public class companyAdministratorDTO extends UserDTO{
 	public void setCompanyFieldsNames(List<String> companyFieldsNames) {
 		this.companyFieldsNames = companyFieldsNames;
 	}
-	public byte[] getPicture() {
+	public String getPicture() {
 		return picture;
 	}
-	public void setPicture(byte[] picture) {
+	public void setPicture(String picture) {
 		this.picture = picture;
 	}
 	public String getCompanyName() {

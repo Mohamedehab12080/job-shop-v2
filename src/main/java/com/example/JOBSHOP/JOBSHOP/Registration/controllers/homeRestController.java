@@ -31,7 +31,7 @@ public class homeRestController {
 			{
 				String userName=user.getEmail();
 				System.out.println("User name fetched : "+userName);
-				byte[] img=user.getPicture();
+				String img=user.getPicture();
 				if(img!=null)
 				{
 					System.out.println("Not empty Img : "+img);

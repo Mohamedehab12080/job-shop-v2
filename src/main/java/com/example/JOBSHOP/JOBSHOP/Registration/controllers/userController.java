@@ -136,6 +136,7 @@ public class userController {
 			throw new UserException("user not found for this token");
 		}
 	}
+	
 	@PutMapping("/jobSeeker/update")
 	public ResponseEntity<jobSeekerDTO> updateJobSeekerUser(@RequestBody jobSeeker req,
 			@RequestHeader("Authorization") String jwt) throws UserException

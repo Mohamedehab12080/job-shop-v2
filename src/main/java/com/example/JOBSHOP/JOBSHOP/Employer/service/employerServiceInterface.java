@@ -27,6 +27,6 @@ public interface employerServiceInterface {
 
 	List<Employer> findAllWithCompanyAdministrator(Long id);
 
-	Employer insertPicture(Long id, byte[] picture);
+	Employer insertPicture(Long id, String picture);
 
 }

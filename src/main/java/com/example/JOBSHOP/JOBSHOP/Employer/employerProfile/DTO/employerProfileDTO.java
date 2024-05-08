@@ -20,7 +20,7 @@ public class employerProfileDTO extends userProfile{
 	private String employerEmail;
 	private Long employerId;
 	
-	private byte[] employerPicture;
+	private String employerPicture;
 	private List <String> employerFields;
 	
 	private String companyName;
@@ -71,10 +71,10 @@ public class employerProfileDTO extends userProfile{
 	public void setEmployerEmail(String employerEmail) {
 		this.employerEmail = employerEmail;
 	}
-	public byte[] getEmployerPicture() {
+	public String getEmployerPicture() {
 		return employerPicture;
 	}
-	public void setEmployerPicture(byte[] employerPicture) {
+	public void setEmployerPicture(String employerPicture) {
 		this.employerPicture = employerPicture;
 	}
 

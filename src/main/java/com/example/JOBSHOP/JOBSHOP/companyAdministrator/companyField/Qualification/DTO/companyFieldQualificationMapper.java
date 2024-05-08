@@ -2,7 +2,7 @@ package com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualificat
 
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 
 public class companyFieldQualificationMapper {
 
@@ -24,7 +24,7 @@ public class companyFieldQualificationMapper {
 			comQual.setQualification(dto.getQualification());
 		}else 
 		{
-			qualification obj=new qualification();
+			Qualification obj=new Qualification();
 			obj.setId(dto.getQualificationId());
 		}
 		

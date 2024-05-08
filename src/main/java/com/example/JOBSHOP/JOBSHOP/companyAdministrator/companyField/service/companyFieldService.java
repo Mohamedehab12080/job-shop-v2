@@ -11,8 +11,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldServiceImpl;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.service.postFieldService;
+import com.example.JOBSHOP.JOBSHOP.Post.postField.service.postFieldServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.DTO.companyFieldDTO;
@@ -20,7 +26,7 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualificati
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.service.companyFieldQualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.service.companyFieldSkillsServiceInterface;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.skills.Skill;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
@@ -29,7 +35,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class companyFieldService implements companyFieldServiceInterface{
-	 @Autowired 
+	 
+	@Autowired 
 	 private companyFieldRepository companyFieldRepository;
 	 
 	 @Autowired
@@ -46,10 +53,18 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 @Autowired
 	 private qualificationServiceInterface qualificationServiceI;
 	 
-	 public postField findPostFieldWithFieldName(String fieldName)
-	 {
-		 return postFieldService.findByEmployerField(companyFieldRepository.findIdByFieldName(fieldName));
-	 }
+	 @Autowired
+	 private employerFieldServiceInterface employerFieldServiceI;
+	 
+	 @Autowired
+	 private postFieldServiceInterface postFieldServiceI;
+	 
+	 @Autowired
+	 private postServiceInterface postServiceI;
+//	 public postField findPostFieldWithFieldName(String fieldName)
+//	 {
+//		 return postFieldService.findByEmployerField(companyFieldRepository.findIdByFieldName(fieldName));
+//	 }
 	     
 	 	@Override
 	    public companyField getReferenceById(Long id)
@@ -98,6 +113,27 @@ public class companyFieldService implements companyFieldServiceInterface{
 			companyField t=findById(id);
 			if(t!=null)
 			{
+				List<employerField> employerFieldList=employerFieldServiceI.findAllEmployersFieldsByCompanyFieldId(id);
+				if(!employerFieldList.isEmpty())
+				{
+					for(employerField empField:employerFieldList)
+					{
+						List<postField> postFieldList=postFieldServiceI.findAllPostFieldsByEmployerFieldId(empField.getId());
+						if(!postFieldList.isEmpty())
+						{
+							for(postField postF:postFieldList)
+							{
+								if(postF.getPost()!=null)
+								{
+									postServiceI.deleteById(postF.getPost().getId());
+								}
+								
+								postFieldServiceI.deleteById(postF.getId());
+							}
+						}
+						employerFieldServiceI.deleteById(empField.getId());
+					}
+				}
 				companyFieldRepository.deleteById(id);
 				return "deleted";
 			}else 
@@ -137,20 +173,20 @@ public class companyFieldService implements companyFieldServiceInterface{
 			    {
 			    	Set<String> newQuals = new HashSet<>(dto.getQualifications());//Set of new skills that will be inserted 
 				    
-				    Map<String, qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
+				    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
 				   
-				    List<qualification> qualificationsToInsert = new ArrayList<>();
+				    List<Qualification> qualificationsToInsert = new ArrayList<>();
 				    
 				    for(String newQual:newQuals)
 				    {
-				    	qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
+				    	Qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
 				    	if(qualiciationSearch!=null) 
 				    	{
 				    		existingQuals.put(qualiciationSearch.getQualificationName(),qualiciationSearch);
 				    	}
 				    	
 				    	if (!existingQuals.containsKey(newQual)) {
-				        	qualification newQuall = new qualification();
+				        	Qualification newQuall = new Qualification();
 				        	newQuall.setQualificationName(newQual);
 				            qualificationsToInsert.add(newQuall);
 				        }
@@ -169,13 +205,13 @@ public class companyFieldService implements companyFieldServiceInterface{
 				    qualificationServiceI.insertAll(qualificationsToInsert);
 				    
 				    // Retrieve inserted skills
-				    List<qualification> allQualifications = new ArrayList<>(existingQuals.values());
+				    List<Qualification> allQualifications = new ArrayList<>(existingQuals.values());
 				    allQualifications.addAll(qualificationsToInsert);
 
 				    // Insert companyFieldSkills
 				    List<companyFieldQualification> comapanyFieldQuals = new ArrayList<companyFieldQualification>();
 				    
-				    for (qualification qual : allQualifications) {
+				    for (Qualification qual : allQualifications) {
 				        companyFieldQualification companyFieldQual = new companyFieldQualification();
 				        companyFieldQual.setQualification(qual);
 				        companyFieldQual.setCompanyField(com);
@@ -339,7 +375,7 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 @Override
 	 public List<companyField> findCompanyFieldsWithAdminId(Long Id)
 	 {
-		 return companyFieldRepository.findByCompanyAdministratorId(Id);
+		 return companyFieldRepository.findByCompanyAdministratorIdOrderByCreatedDateDesc(Id);
 	 }
 
 	@Override
@@ -376,20 +412,20 @@ public class companyFieldService implements companyFieldServiceInterface{
 		    {
 		    	Set<String> newQuals = new HashSet<>(dto.getQualifications());//Set of new skills that will be inserted 
 			    
-			    Map<String, qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
+			    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
 			   
-			    List<qualification> qualificationsToInsert = new ArrayList<>();
+			    List<Qualification> qualificationsToInsert = new ArrayList<>();
 			    
 			    for(String newQual:newQuals)
 			    {
-			    	qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
+			    	Qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
 			    	if(qualiciationSearch!=null) 
 			    	{
 			    		existingQuals.put(qualiciationSearch.getQualificationName(),qualiciationSearch);
 			    	}
 			    	
 			    	if (!existingQuals.containsKey(newQual)) {
-			        	qualification newQuall = new qualification();
+			        	Qualification newQuall = new Qualification();
 			        	newQuall.setQualificationName(newQual);
 			            qualificationsToInsert.add(newQuall);
 			        }
@@ -408,13 +444,13 @@ public class companyFieldService implements companyFieldServiceInterface{
 			    qualificationServiceI.insertAll(qualificationsToInsert);
 			    
 			    // Retrieve inserted skills
-			    List<qualification> allQualifications = new ArrayList<>(existingQuals.values());
+			    List<Qualification> allQualifications = new ArrayList<>(existingQuals.values());
 			    allQualifications.addAll(qualificationsToInsert);
 
 			    // Insert companyFieldSkills
 			    List<companyFieldQualification> comapanyFieldQuals = new ArrayList<companyFieldQualification>();
 			    
-			    for (qualification qual : allQualifications) {
+			    for (Qualification qual : allQualifications) {
 			        companyFieldQualification companyFieldQual = new companyFieldQualification();
 			        companyFieldQual.setQualification(qual);
 			        companyFieldQual.setCompanyField(com);

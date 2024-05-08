@@ -26,7 +26,7 @@
 		@JoinColumn(name="jobSeeker_id")
 		private jobSeeker jobSeeker;
 		
-	    private String Experience;
+	    private String experience;
 	    
 	    @JsonIgnore
 	    @OneToMany(mappedBy = "application" ,cascade = CascadeType.ALL)
@@ -62,10 +62,10 @@
 			this.jobSeeker = jobSeeker;
 		}
 		public String getExperience() {
-			return Experience;
+			return experience;
 		}
 		public void setExperience(String Experience) {
-			this.Experience = Experience;
+			this.experience = Experience;
 		}
 		public Post getPost() {
 			return Post;

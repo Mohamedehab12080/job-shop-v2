@@ -6,7 +6,7 @@ import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 
 public interface postFieldServiceInterface {
 
-	postField findByEmployerField(Long id);
+//	postField findByEmployerField(Long id);
 
 	postField getReferenceById(Long id);
 
@@ -20,6 +20,8 @@ public interface postFieldServiceInterface {
 
 	List<postField> insertAll(List<postField> entity);
 
+	List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId);
+	
 	void deleteById(Long id);
 
 }

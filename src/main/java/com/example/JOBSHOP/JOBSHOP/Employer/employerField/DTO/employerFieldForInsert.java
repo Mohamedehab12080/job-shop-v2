@@ -1,15 +1,19 @@
 package com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class employerFieldForInsert {
 
+	
 	private Long employerId;
-	private Long companyFieldId;
+	private Long id;
 	
 	public employerFieldForInsert() {}
-	public employerFieldForInsert(Long employerId, Long companyFieldId) {
+	public employerFieldForInsert(Long employerId, Long id) {
 		super();
 		this.employerId = employerId;
-		this.companyFieldId = companyFieldId;
+		this.id = id;
 	}
 	
 	public Long getEmployerId() {
@@ -18,11 +22,11 @@ public class employerFieldForInsert {
 	public void setEmployerId(Long employerId) {
 		this.employerId = employerId;
 	}
-	public Long getCompanyFieldId() {
-		return companyFieldId;
+	public Long getId() {
+		return id;
 	}
-	public void setCompanyFieldId(Long companyFieldId) {
-		this.companyFieldId = companyFieldId;
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

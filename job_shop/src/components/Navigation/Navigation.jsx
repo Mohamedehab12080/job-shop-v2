@@ -7,10 +7,15 @@ import { Button, Avatar} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import PostModal from "../modals/companyModals/PostModal";
+import PostModal from "../modals/companyModals/postModals/PostModal";
 import { useDispatch, useSelector } from "react-redux";
 import { Logout } from "../../store/Auth/Action";
-import CreateFieldModal from "../modals/companyModals/CreateFieldModal";
+import CreateFieldModal from "../modals/companyModals/FieldsModals/CreateFieldModal";
+import CreateEmployerModal from "../modals/companyModals/EmployersModals/CreateEmployerModal";
+import AddSkillsModal from "../modals/JobSeekerModal/skillsModals/AddSkillsModal";
+import ShowApplicationsModal from "../modals/companyModals/postModals/ShowApplicationsModal";
+import GiveEmployerFields from "../modals/companyModals/FieldsModals/GiveEmployerFields";
+// import GiveEmployerFields from "../modals/companyModals/FieldsModals/GiveEmployerFields";
 export const Navigation = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const auth = useSelector(state => state.auth);
@@ -28,6 +33,18 @@ export const Navigation = () => {
   const handleOpenCreateFieldModal=()=>setOpenCreateFieldModal(true);
   const handleCloseCreateFieldModal=()=>setOpenCreateFieldModal(false);
 
+  const [openGiveEmployerFields,setOpenGiveEmployerFields]=useState(false);
+  const handleOpenGiveEmployerFields=()=>setOpenGiveEmployerFields(true);
+  const handleCloseGiveEmployerFields=()=>setOpenGiveEmployerFields(false);
+
+  const [openAddSkillsModal,setOpenAddSkillsModal]=useState(false);
+  const handleOpenAddSkillsModal=()=>setOpenAddSkillsModal(true);
+  const handleCloseAddSkillsModal=()=>setOpenAddSkillsModal(false);
+
+  const [openShowApplicationsModal,setOpenShowApplicationsModal]=useState(false);
+  const handleOpenShowApplicationsModal=()=>setOpenShowApplicationsModal(true);
+  const handleCloseShowApplicationsModal=()=>setOpenShowApplicationsModal(false);
+
   const dispatch=useDispatch()
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -44,7 +61,7 @@ export const Navigation = () => {
     dispatch(Logout())
   }
   return (
-    <div className="h-screen sticky top-0">
+    <div className="h-screen sticky overflowY top-0">
       <div>
         <div className="py-2">
           <div className="flex">
@@ -60,16 +77,16 @@ export const Navigation = () => {
               className="cursor-pointer flex space-x-1 space-y-0 items-center"
               onClick={() =>
                 item.title === "Profile"
-                  ? navigate(`/profile/${5}`)
+                  ? navigate(`/profile/${auth.user.id}`)
                   : navigate(item.path)
               }
             >
-              {item.title !== "Recommend me" && auth.user !== "jobSeeker" ? (
+              {item.title === "Recommend me" && auth.user.userType === "jobSeeker" ? (
                 <>
                   {item.icon}
                   <p className="text-xl">{item.title}</p>
                 </>
-              ) : item.title === "Recommend me" && auth.user === "jobSeeker" && (
+              ) : item.title !== "Recommend me" &&(
                 <>
                   {item.icon}
                   <p className="text-xl">{item.title}</p>
@@ -98,7 +115,7 @@ export const Navigation = () => {
 
        {auth.user?.userType==="Admin" &&(
          <>
-          <div className="py-5">
+          <div className="py-2">
                 <Button
                   onClick={handleOpenCreateFieldModal}
                   variant="contained"  
@@ -110,6 +127,20 @@ export const Navigation = () => {
                   }}
                 >
                   CREATE FIELD
+            </Button>
+            </div>
+            <div className="py-2">
+                <Button
+                  onClick={handleOpenGiveEmployerFields}
+                  variant="contained"  
+                  sx={{
+                    width: "100%",
+                    borderRadius: "29px",
+                    py: "15px",
+                    bgcolor: "#1e88e5",
+                  }}
+                >
+                Give Employers FIELD
             </Button>
             </div>
             <div className="py-1">
@@ -129,8 +160,46 @@ export const Navigation = () => {
          </>
        )}
 
+
+{auth.user?.userType==="jobSeeker" &&(   
+          <>
+          <div className="py-5">
+              <Button
+                onClick={handleOpenAddSkillsModal}
+                variant="contained"  
+                sx={{
+                  width: "100%",
+                  borderRadius: "29px",
+                  py: "15px",
+                  bgcolor: "#1e88e5",
+                }}
+              >
+                Add Skills
+          </Button>
+          </div>
+          <div className="py-1">
+              <Button
+                onClick={handleOpenShowApplicationsModal}
+                variant="contained"  
+                sx={{
+                  width: "100%",
+                  borderRadius: "29px",
+                  py: "15px",
+                  bgcolor: "#1e88e5",
+                }}
+              >
+                Show Applications
+          </Button>
+          </div>
+          </>
+       )}
+
         <div className="mt-4 flex items-center py-2 space-x-5">
-          <Avatar alt="username" src={userLogo} />
+          <Avatar 
+            onClick={() => navigate(`/profile/${auth.user.id}`)}
+            alt="username" 
+            src={auth.user.picture}  
+          />
          
           <div className="py-2 items-center" >
             <p className="mb-0">{auth.user?.userName}</p>
@@ -138,8 +207,8 @@ export const Navigation = () => {
               <span className="mt-1 opacity-70">@{auth.user?.email.split(" ").join("_").toLowerCase()}</span>
               </div>
           </div>
-          
-
+      <div>
+                
       <Button
         id="basic-button"
         aria-controls={open ? 'basic-menu' : undefined}
@@ -147,10 +216,10 @@ export const Navigation = () => {
         aria-expanded={open ? 'true' : undefined}
         onClick={handleClick}
       >
-       
         <MoreHorizIcon />
 
       </Button>
+      
       <Menu
         id="basic-menu"
         anchorEl={anchorEl}
@@ -162,20 +231,34 @@ export const Navigation = () => {
       >
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </Menu>
-        </div>
+
+                </div>        
+          </div>
       </div>
 
       <section>
             <PostModal openPostModal={openPostModal} handleClose={handleClosePostModal}/>
       </section>
 
-      {/* <section>
-            <CreateEmployerModal openCreateEmployerModal={openCreateEmployerModal} handleClose={handleCloseCreateEmployerModal}/>
-      </section> */}
+       <section>
+            <CreateEmployerModal openCreateEmployerModal={openCreateEmployerModal} handleCloseCreateEmployerModal={handleCloseCreateEmployerModal}/>
+      </section> 
 
       <section>
             <CreateFieldModal  openCreateFieldModal={openCreateFieldModal} handleCloseCreateFieldModal={handleCloseCreateFieldModal}/>
       </section>
+
+      <section>
+        <AddSkillsModal openAddSkillsModal={openAddSkillsModal} handleCloseAddSkillsModal={handleCloseAddSkillsModal}/>
+      </section>
+
+<section>
+  <ShowApplicationsModal openShowApplicationsModal={openShowApplicationsModal} handleCloseShowApplicationsModal={handleCloseShowApplicationsModal}/>
+</section>
+
+ <section>
+  <GiveEmployerFields openGiveEmployerFields = {openGiveEmployerFields} handleCloseGiveEmployerFields={handleCloseGiveEmployerFields} />
+</section> 
     </div>
   );
 };

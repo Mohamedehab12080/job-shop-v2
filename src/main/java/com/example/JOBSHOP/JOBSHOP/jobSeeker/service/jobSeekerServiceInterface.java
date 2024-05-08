@@ -22,7 +22,7 @@ public interface jobSeekerServiceInterface {
 
 	jobSeeker findById(Long id);
 
-	Object insertPicture(Long id, byte[] file);
+	Object insertPicture(Long id, String picture);
 
 	List<Application> findAllApplicationsForJobSeeker(Long id);
 

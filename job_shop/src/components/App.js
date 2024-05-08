@@ -1,9 +1,5 @@
 import './App.css';
 import Home from './HomePage/Home';
-import logo from './common/images/logo.png';
-import Header from './Header';
-import JobSeekersView from './jobSeeker/JobSeekersViews';
-import AppContent from './AppContent';
 import Authentication from './Authentication/Authentication';
 import {Route,Routes} from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,17 +23,7 @@ useEffect(()=>
       <Routes>
      
         <Route path="/*" element={auth.user?<Home />:<Authentication/>}></Route>
-      </Routes>
-      {/* 
-     <div className="container-fluid">
-      <div className="row">
-        <div className="col">
-        <AppContent />
-        </div>
-      </div>
-     </div>
-      <Home />
-      <JobSeekersView /> */}
+      </Routes> 
     </div>
   );
 }

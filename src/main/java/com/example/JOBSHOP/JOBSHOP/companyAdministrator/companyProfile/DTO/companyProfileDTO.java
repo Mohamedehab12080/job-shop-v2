@@ -22,7 +22,7 @@ public class companyProfileDTO{
 	private int followersCount;
 	private int followingsCount;
 	private List<UserDTO> Following;
-	private byte[] picture;
+	private String picture;
 	
 	
 	
@@ -99,11 +99,11 @@ public class companyProfileDTO{
 		this.contacts = contacts;
 	}
 
-	public byte[] getPicture() {
+	public String getPicture() {
 		return picture;
 	}
 
-	public void setPicture(byte[] picture) {
+	public void setPicture(String picture) {
 		this.picture = picture;
 	}
 

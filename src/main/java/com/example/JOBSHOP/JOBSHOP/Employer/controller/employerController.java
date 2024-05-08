@@ -53,7 +53,10 @@ import com.example.JOBSHOP.JOBSHOP.Post.service.postService;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.userService;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
 
 
@@ -73,7 +76,8 @@ public class employerController {
 	private postService postService;
 	@Autowired
 	private userServiceInterface userServiceI;
-	
+	@Autowired
+	private companyProfileService companyProfileService;
 	@GetMapping("/findProfile/{id}")
 	public ResponseEntity<employerProfileDTO> findProfile(@PathVariable Long id
 			,@RequestHeader("Authorization") String jwt) throws UserException
@@ -91,10 +95,10 @@ public class employerController {
 		
 	}
 	@PutMapping("/insertPicture/{id}")
-	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody byte[] file) throws SQLException, IOException
+	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody String picture) throws SQLException, IOException
 	{	
 		try {
-			return ResponseEntity.ok(employerService.insertPicture(id,file));
+			return ResponseEntity.ok(employerService.insertPicture(id,picture));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
@@ -104,12 +108,23 @@ public class employerController {
 	
 	
 	@GetMapping("/findAll/{compId}")
-	public List<employerDTO> findAllEmployersWithCompanyAdminId(@PathVariable Long compId)
+	public ResponseEntity<List<employerDTO> >
+	findAllEmployersWithCompanyAdminId(
+			@PathVariable Long compId
+			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
-		List<Employer> employer= employerService.findAllWithCompanyAdministrator(compId);
-        return employer.stream()
-                .map(this::convert)
-                .collect(Collectors.toList());
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && user.getUserType().equals(Role.Admin))
+		{
+			List<Employer> employer= employerService.findAllWithCompanyAdministrator(compId);
+	        return new ResponseEntity<List<employerDTO>>(employer.stream()
+	                .map(this::convert)
+	                .collect(Collectors.toList()),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+		
 	} 
 	
 	
@@ -139,7 +154,15 @@ public class employerController {
 		{
 			Employer emp=employerService.findById(user.getId());
 			Post savedPost=employerService.createAPost(emp,post);
-			return new ResponseEntity<>(savedPost,HttpStatus.CREATED);
+			Post returnedPost=postService.findById(savedPost.getId());
+			post.setId(returnedPost.getId());
+			post.setCompanyName(companyProfileService
+					.findById(post.getProfileId())
+					.getCompanyAdministrator()
+					.getCompanyName());
+			post.setEmployerUserName(user.getUserName());
+			post.setFieldName(employerFieldService.findById(post.getField()).getCompanyField().getFieldName());
+			return new ResponseEntity<>(post,HttpStatus.CREATED);
 		}else
 		{
 			throw new UserException("User not found for this token");

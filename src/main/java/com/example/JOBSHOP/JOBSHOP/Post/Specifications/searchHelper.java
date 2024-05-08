@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
+import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.service.companyFieldService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
@@ -18,13 +19,13 @@ public class searchHelper {
 	@Autowired
 	private companyFieldService companyFieldService;
 	
-	public companyProfile findCompanyProfile(String companyName)
+	public companyProfile findCompanyProfile(String companyName) throws UserException
 	{
 		return companyAdminService.findcompanyProfileIdByCompanyName(companyName);
 	}
-	public postField findPostFieldWithFieldName(String fieldName)
-	{
-		return companyFieldService.findPostFieldWithFieldName(fieldName);
-	}
-	
+//	public postField findPostFieldWithFieldName(String fieldName)
+//	{
+////		return companyFieldService.findPostFieldWithFieldName(fieldName);
+//	}
+//	
 }

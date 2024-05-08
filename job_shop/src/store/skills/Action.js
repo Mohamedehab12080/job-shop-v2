@@ -1,6 +1,6 @@
 import axios from "axios"
 import { API_BASE_URL, api } from "../../config/api"
-import { GET_SKILLS_FAILURE, GET_SKILLS_SUCCESS } from "./ActionType";
+import { GET_JOBSEEKER_SKILLS_FAILURE, GET_JOBSEEKER_SKILLS_SUCCESS, GET_SKILLS_FAILURE, GET_SKILLS_SUCCESS } from "./ActionType";
 
 
 export const findAllSkills=()=>async(dispatch)=>
@@ -13,3 +13,5 @@ export const findAllSkills=()=>async(dispatch)=>
         dispatch({ type: GET_SKILLS_FAILURE, payload: error.message })
     }
 }
+
+

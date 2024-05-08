@@ -22,6 +22,10 @@ public interface applicationServiceInerface {
 
 	List<Application> insertAll(List<Application> entity);
 
+	Application accept(Long id);
+
+	Application reject(Long id);
+	
 	void deleteById(Long id);
 
 	/**

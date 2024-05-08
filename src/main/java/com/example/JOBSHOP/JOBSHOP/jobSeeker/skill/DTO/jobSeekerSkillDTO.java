@@ -18,13 +18,16 @@ public class jobSeekerSkillDTO extends baseEntityDTO<Long>{
 		return skillName;
 	}
 	public void setSkillName(String skillName) {
-		if(skillName.contains("(good)") || skillName.contains("(very-good)") ||skillName.contains("(excellent)"))
+		if(skillName!=null)
 		{
-			setSkillDegree(skillName.substring(skillName.indexOf("(")+1,skillName.indexOf(")")));
-			this.skillName= skillName.substring(0,skillName.indexOf("(")).strip();
-		}else 
-		{
-			this.skillName=skillName;
+			if(skillName.contains("(good)") || skillName.contains("(very-good)") ||skillName.contains("(excellent)"))
+			{
+				setSkillDegree(skillName.substring(skillName.indexOf("(")+1,skillName.indexOf(")")));
+				this.skillName= skillName.substring(0,skillName.indexOf("(")).strip();
+			}else 
+			{
+				this.skillName=skillName;
+			}
 		}
 	}
 	public Long getJobSeekerId() {

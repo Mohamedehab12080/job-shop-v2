@@ -19,6 +19,9 @@ import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.applicationReturnedSkillsAndQualifications;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerService;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class applicationServiceImpl implements applicationServiceInerface{
@@ -37,6 +40,7 @@ public class applicationServiceImpl implements applicationServiceInerface{
 		 applicationReturnedSkillsAndQualifications.setRemainedSkills(remainedSkills);
 		 return applicationReturnedSkillsAndQualifications;
 	}
+	
 	@Override
     public Application getReferenceById(Long id)
 	{
@@ -98,7 +102,7 @@ public class applicationServiceImpl implements applicationServiceInerface{
 	@Override
 	public void deleteById(Long id)
 	{
-		Application t=getReferenceById(id);
+		Application t=findById(id);
 		if(t!=null)
 		{
 			applicationRepository.deleteById(id);
@@ -121,7 +125,15 @@ public class applicationServiceImpl implements applicationServiceInerface{
 	@Override
 	public List<applicationDTO> getBestApplicationsForPost(postDTO Post) {
         
-		List<Application> applications = applicationRepository.findByPostId(Post.getId());
+		List<Application> applications = applicationRepository
+		        .findByPostId(Post.getId())
+		        .stream()
+		        .filter(app -> {
+		            // Check if statusCode is not 'Rejected' or is null
+		            return app.getStatusCode() == null || app.getStatusCode().equals("Accepted") || !app.getStatusCode().equals("Rejected");
+		        })
+		        .collect(Collectors.toList()); // Collect the filtered applications into a List
+
 
 		List<applicationDTO> appDtos=applications.stream().
 				map(this::convertFrongApplicationToDTO).collect(Collectors.toList());
@@ -129,15 +141,93 @@ public class applicationServiceImpl implements applicationServiceInerface{
 		List<ApplicationScore> applicationScores = new ArrayList<>();
         
 		List<String> postSkills=new ArrayList<String>();
-			for(String skill:Post.getPostField().getSkills())
+			for(String skill:Post.getSkills())
 			{
 				postSkills.add(skill);
 			}
+
+			List<String> postQualifications=new ArrayList<String>();
+			for(String qual:Post.getQualifications())
+			{
+				postQualifications.add(qual);
+			}
 		
-		
+
         // Calculate score for each application
         for (applicationDTO applicationdto : appDtos) {
-            int score = calculateScore(postSkills, applicationdto.getSkills());
+            int score = jobSeekerService.calculateScore(
+            		postQualifications,
+            		postSkills,
+            		applicationdto.getQualifications(),
+            		applicationdto.getSkills());
+            
+			  List<String>remainedSkills=returningRemainedSkillsForListOfPosts(
+											new ArrayList<String>(postSkills),
+											new ArrayList<String>(applicationdto.getSkills()));
+
+			List<String> remainedQualifications=returningRemainedQualificationsForPostList(
+													new ArrayList<String>(postQualifications),
+													new ArrayList<String>(applicationdto.getQualifications()));
+			List<String> matchedSkills=new ArrayList<String>();
+			
+			for(String matchedSkill:postSkills)
+			{
+				if(!remainedSkills.contains(matchedSkill))
+				{
+					matchedSkills.add(matchedSkill);
+				}
+			}
+			
+			applicationdto.setMatchedSkills(matchedSkills);
+			
+			List<String> matchedQualifications=new ArrayList<String>();
+			
+			for(String matchedQualification:postQualifications)
+			{
+				if(!remainedQualifications.contains(matchedQualification))
+				{
+					matchedQualifications.add(matchedQualification);
+				}
+			}
+			
+			applicationdto.setMatchedQualifications(matchedQualifications);
+			applicationdto.setRemainedSkills(remainedSkills);
+			applicationdto.setRemainedQualifications(remainedQualifications);
+			applicationdto.setPostSkills(postSkills);
+			applicationdto.setPostQualifications(postQualifications);
+			applicationdto.setPostExperienc(Post.getExperience());
+			 if(!matchedSkills.isEmpty())
+	            {
+				 if(applicationdto.getStatuseCode()!=null)
+				 {
+					 if(!applicationdto.getStatuseCode().equals("Accepted"))
+					 {
+						 if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
+				            {
+			            			applicationdto.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+			            		
+				            }else 
+				            {                  //(matchedSkills.size()+matchedQualifications.size())/
+				            	applicationdto.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+				            } 
+					 }else
+					 {
+						 applicationdto.setStatuseCode("Accepted with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+					 }
+					
+				 }else 
+				 {
+					 if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
+			            {
+		            			applicationdto.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+		            		
+			            }else 
+			            {                  //(matchedSkills.size()+matchedQualifications.size())/
+			            	applicationdto.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+			            } 
+				 }
+	            	
+	            }
             applicationScores.add(new ApplicationScore(applicationdto, score));
         }
         
@@ -149,7 +239,6 @@ public class applicationServiceImpl implements applicationServiceInerface{
         for (ApplicationScore applicationScore : applicationScores) {
             sortedApplications.add(applicationScore.getApplication());
         }
-        
         return sortedApplications;
     }
 	
@@ -411,6 +500,20 @@ public class applicationServiceImpl implements applicationServiceInerface{
 	@Override
 	public Application findByJobSeekerIdAndPostId(Long jobSeekerId, Long postId) {
 		return applicationRepository.findByPostIdAndJobSeekerId(postId,jobSeekerId);
+	}
+
+	@Transactional
+	@Override
+	public Application accept(Long id) {
+		applicationRepository.acceptApplication(id);
+		return findById(id);
+	}
+
+	@Transactional
+	@Override
+	public Application reject(Long id) {
+		applicationRepository.rejectApplication(id);
+		return findById(id);
 	}
 	
 }

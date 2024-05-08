@@ -26,7 +26,7 @@ public class postField extends baseEntity<Long>{
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JsonBackReference
 	@JoinColumn(name="Post_id")
-	private Post Post;
+	private Post post;
 	
 	private List<String> skills=new ArrayList<String>();
 	
@@ -52,10 +52,12 @@ public class postField extends baseEntity<Long>{
 		this.employerField = employerField;
 	}
 	public Post getPost() {
-		return Post;
+		return post;
 	}
 	public void setPost(Post post) {
-		this.Post = post;
+		this.post = post;
 	}
+
+	
 	
 }

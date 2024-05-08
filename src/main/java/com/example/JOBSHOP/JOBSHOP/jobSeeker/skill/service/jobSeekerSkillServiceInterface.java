@@ -14,5 +14,4 @@ public interface jobSeekerSkillServiceInterface {
 	List<jobSeekerSkill> insertAll(List<jobSeekerSkill> skillsList);
 	String deleteById(Long id);
 	Optional<jobSeekerSkill> findByJobSeekerIdAndSkillId(Long jobSeekerId,Long skillId);
-	
-}
+	}

@@ -10,7 +10,12 @@ import Grid from "@mui/material/Grid";
 import axios from "axios";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { createPost } from "../../../store/Post/Action";
+import {getEmployerFields } from "../../../../store/company/Employer/Action";
+import { createPost } from "../../../../store/Post/Action";
+import { uploadToCloudnary } from "../../../../Utils/UploadToCloudnary.";
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const style = {
   position: "absolute",
@@ -40,78 +45,175 @@ export default function PostModal({ openPostModal, handleClose }) {
   var [selectedQualifications, setSelectedQualifications] = React.useState(
     []
   );
+  const [disabled,setDisabled]=React.useState(false);
   var [filteredSkills, setFilteredSkills] = React.useState(skillsOptions);
   var [filteredQualifications, setFilteredQualifications] =
     React.useState(qualificationOptions);
   const [filterInputSkills, setFilterInputSkills] = React.useState("");
   const [filterInputQualifications, setFilterInputQualifications] =
     React.useState("");
-  const [selectedCategory, setSelectedCategory] = React.useState("");
   const [fields, setFields] = React.useState([]);
   const [selectedField, setSelectedField] = React.useState(null);
 
   const post=useSelector(state=>state.post)
-  const dispatch =useDispatch()
+  const dispatch =useDispatch();
 
-  React.useEffect(() => {
-    
-    // Fetch fields when the component mounts
+  const auth=useSelector(state=>state.auth)
+  const dispatch2=useDispatch();
+
+  const emp=useSelector(state=>state.emp)
+  const [uploadingImage, setUploadingImage] = React.useState(true);
+    const [selectedImage, setSelectedImage] = React.useState("");
+    const [uploadProgress, setUploadProgress] = React.useState(0);
+    const [uploadStatus, setUploadStatus] = React.useState(null); // 'uploading', 'success', 'error'
+  const [postImageUrl,setPostImageUrl]=React.useState("");
+  React.useEffect(()=>
+{
     if(openPostModal)
     {
-      fetchFields();
+      dispatch2(getEmployerFields(auth.user.id))
     }
-  }, []); // Empty dependency array ensures the effect runs only once after initial render
+},[openPostModal,dispatch2,auth.user.id]);
 
-  const fetchFields = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8089/employer/findFields/2"
-      ); // Replace '/api/findFields/1' with your actual endpoint
-      setFields(response.data);
-    } catch (error) {
-      console.error("Error fetching fields:", error);
+React.useEffect(()=>
+{
+    if(openPostModal)
+    {
+      setFields(emp.fields);
     }
-  };
-  const [categorySkills, setCategorySkills] = React.useState([]);
-  const [categoryQualifications, setCategoryQualifications] = React.useState(
-    []
-  );
+},[openPostModal,emp]);
 
-  const handleFieldSelect = (event) => {
-    const selectedFieldId = event.target.value;
-    const field = fields.find((field) => field.id === Number(selectedFieldId));
+const renderIcon = () => {
+  if (uploadStatus === 'uploading') {
+    return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
+  } else if (uploadStatus === 'success') {
+    return <FontAwesomeIcon icon="check-circle" />; // Display checkmark icon on successful upload
+  } else if (uploadStatus === 'error') {
+    return <FontAwesomeIcon icon="exclamation-circle" />; // Display error icon if upload fails
+  } else {
+    return <FontAwesomeIcon icon="cloud-upload-alt" />; // Default upload icon
+  }
+};
+  // React.useEffect(() => {
+    
+  //   // Fetch fields when the component mounts
+  //   if(openPostModal)
+  //   {
+  //     fetchFields();
+  //   }
+  // }, []); // Empty dependency array ensures the effect runs only once after initial render
+
+  // const fetchFields = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:8089/employer/findFields/2"
+  //     ); // Replace '/api/findFields/1' with your actual endpoint
+  //     setFields(response.data);
+  //   } catch (error) {
+  //     console.error("Error fetching fields:", error);
+  //   }
+  // };
+
+  const handleFieldSelect = (value) => {
+    const field = fields.find((field) => field.id === Number(value));
     setSelectedField(field);
-    setCategorySkills(field.skills);
-    setCategoryQualifications(field.qualifications);
-    const filteredSkills = categorySkills;
-    skillsOptions = categorySkills;
-    setFilteredSkills(filteredSkills);
-    const filteredQualifications = categoryQualifications;
-    qualificationOptions = categoryQualifications;
-    setFilteredQualifications(filteredQualifications);
-    if (selectedField && selectedField.skills && selectedField.qualifications) {
-      formik.setFieldValue("field", selectedField.id); // Set the selected field value in Formik state
-    }
+    console.log("Selected Field ID : ",field.id);
+    skillsOptions = field.skills;
+    setFilteredSkills(field.skills);
+    qualificationOptions = field.qualifications;
+    setFilteredQualifications(field.qualifications);
+    formik.setFieldValue("field",field.id);
   };
-
-  const handleSubmit = async (values) => {
-    // try {
-      console.log("values : ",values);
-    //   const response = await axios.post(
-    //     "http://localhost:8089/employer/post",
-    //     values
-    //   );
-    //   if (response.status === 200) {
-    //     console.log("Form data submitted successfully:", response.data);
-    //     formik.resetForm();
-    //    setSelectedSkills([]);
-    //    setSelectedQualifications([]);
-    //   }
-    // } catch (error) {
-    //   console.error("Error submitting form data : ", error);
-    // }
-    dispatch(createPost(values));
-    console.log("post Response : ",post.response)
+  const [preview,setPreview]=React.useState("");
+  const handleFileUpload=(e)=>
+      {
+      setUploadProgress(0); // Reset progress when a new file is selected
+      setUploadStatus(null); // Reset status
+        const file=e.target.files[0];
+        var reader=new FileReader();
+        reader.onloadend=function(){
+          setPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      }
+        const handleSelectImage = async () => {
+          try {
+  // Set status to 'uploading' before making the request
+          if(!preview){
+            return; 
+          }else {
+            setUploadingImage(true);
+            setUploadStatus('uploading');
+            const imgUrl = await uploadToCloudnary(preview ,{
+              onUploadProgress: (progressEvent) => {
+                  const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                  setUploadProgress(progress);
+                },
+          });
+          setPostImageUrl(imgUrl);
+          console.log("image url : ",imgUrl);
+          setSelectedImage(imgUrl);
+          setUploadingImage(false);
+          setUploadStatus('success'); 
+          return imgUrl;// Set status to 'success' after successful upload
+          }
+         
+          } catch (error) {
+          console.error('Error uploading file:', error);
+          setUploadStatus('error'); // Set status to 'error' if upload fails
+          }
+      };
+  
+  const handleSubmit = async (values,actions) => {
+    const imageUrl = await handleSelectImage();
+      if( imageUrl !=="")
+      {
+        const updatedValues = {
+          ...values,
+          postImage: imageUrl
+        };
+        console.log("values : ",updatedValues);
+        dispatch(createPost(updatedValues));
+        setDisabled(true);
+        if(post.response.id !== 0)
+        {
+          actions.resetForm();
+          setSelectedSkills([]);
+          setSelectedField("");
+          setSelectedQualifications([]);
+          setFilteredSkills([]);
+          setFilterInputQualifications([]);
+          setPreview("");
+          setDisabled(false);
+        }
+        console.log("post Response : ",post.response)
+      }else 
+      {
+        dispatch(createPost(values));
+        setDisabled(true);
+        if(post.response.id !== 0)
+        {
+          actions.resetForm();
+          setDisabled(false);
+        }
+        console.log("post Response : ",post.response)
+      }
+  // else 
+  //   {
+  //     if(uploadingImage === true)
+  //       {
+  //           console.log("values : ",values);
+  //         dispatch(createPost(values));
+  //         setDisabled(true);
+  //         if(post.response.id !== 0)
+  //         {
+  //           // actions.resetForm();
+  //           // setPreview("");
+  //           setDisabled(false);
+  //         }
+  //         console.log("post Response : ",post.response)
+  //       } 
+  //   }
   };
 
   const validationSchema = Yup.object().shape({
@@ -121,6 +223,7 @@ export default function PostModal({ openPostModal, handleClose }) {
     field: Yup.number().required("Field is required"),
     jobRequirments: Yup.string().required("Job requirements are required"),
     employmentType: Yup.string().required("Employment type is required"),
+    experience:Yup.string().required("You must select the experience needed")
   });
 
   const formik = useFormik({
@@ -128,17 +231,18 @@ export default function PostModal({ openPostModal, handleClose }) {
       title: "",
       description: "",
       location: "",
-      employerId:2,
-      field: 0,
+      field:0,
       skills: [],
       qualifications: [],
       jobRequirments: "",
       employmentType: "",
+      experience:""
     },
     validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
 
+    
   const handleAddSkill = (skill) => {
     if (!selectedSkills.includes(skill)) {
       const updatedSkills = [...selectedSkills, skill];
@@ -237,10 +341,19 @@ export default function PostModal({ openPostModal, handleClose }) {
           <form onSubmit={formik.handleSubmit}>
             <Grid container direction="column" spacing={2}>
               <Grid item container justifyContent="center">
-                <Button type="submit" variant="contained" color="primary">
+                <Button type="submit" 
+                variant="contained" 
+                color="primary"
+                disabled={disabled}>
                   Save
                 </Button>
               </Grid>
+              <Grid item xs={12}>
+                <div>
+                    {renderIcon()}
+                    {uploadStatus === 'uploading' && <span>Uploading: {uploadProgress}%</span>}
+                </div>
+                </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -294,7 +407,7 @@ export default function PostModal({ openPostModal, handleClose }) {
                   name="field"
                   label="Select a Field"
                   value={selectedField ? selectedField.id : ""}
-                  onChange={handleFieldSelect}
+                  onChange={(event) => handleFieldSelect(event.target.value)}
                   error={formik.touched.field && Boolean(formik.errors.field)}
                   helperText={formik.touched.field && formik.errors.field}
                   variant="outlined"
@@ -306,6 +419,34 @@ export default function PostModal({ openPostModal, handleClose }) {
                   ))}
                 </TextField>
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  select
+                  id="experience"
+                  name="experience"
+                  label="Experience"
+                  value={formik.values.experience}
+                  onChange={formik.handleChange}
+                  variant="outlined"
+                  error={
+                    formik.touched.experience &&
+                    Boolean(formik.errors.experience)
+                  }
+                  helperText={
+                    formik.touched.experience &&
+                    formik.errors.experience
+                  }
+                >
+                  <MenuItem value="No">No</MenuItem>
+                  <MenuItem value="1-2">1-2</MenuItem>
+                  <MenuItem value="2-5">2-5</MenuItem>
+                  <MenuItem value="5-8">5-8</MenuItem>
+                  <MenuItem value="8-10">8-10</MenuItem>
+                  <MenuItem value="more than 10">more than 10</MenuItem>
+                </TextField>
+              </Grid>
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -475,6 +616,37 @@ export default function PostModal({ openPostModal, handleClose }) {
                   <MenuItem value="Close">Close</MenuItem>
                 </TextField>
               </Grid>
+              <Grid item xs={12}>
+                <input
+                    accept="image/*"
+                    id="upload-picture"
+                    name="postImage"
+                    type="file"
+                    onChange={handleFileUpload}
+                />
+                 <Grid item>
+                    {preview && (
+                    <div
+                        style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        }}
+                    >
+                        <img
+                        src={preview}
+                        alt=""
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }}
+                        />
+                    </div>
+                    )}
+                </Grid>
+               
+            </Grid>
             </Grid>
           </form>
         </Box>

@@ -6,8 +6,9 @@ import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
 
 public interface employerFieldServiceInterface {
 
-	Long findIdbyCompanyFieldId(Long id);
+//	Long findIdbyCompanyFieldId(Long id);
 
+	List<employerField> findAllEmployersFieldsByCompanyFieldId(Long id);
 	employerField getReferenceById(Long id);
 
 	List<employerField> findAll();

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
 import com.example.JOBSHOP.JOBSHOP.Base.BaseService;
+import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 
 @Service
@@ -69,9 +70,16 @@ public class companyProfileService {
 		 * @author BOB
 		 * @return companyProfile for specific companyAdmin
 		 */
-		public companyProfile findByCompanyAdmin(Long id)
+		public companyProfile findByCompanyAdmin(Long id) throws UserException
 		{
-			return compnayProfileRepository.findByCompanyAdministratorId(id).get();
+		
+			if(compnayProfileRepository.findByCompanyAdministratorId(id).isPresent())
+			{
+				return compnayProfileRepository.findByCompanyAdministratorId(id).get();
+			}else 
+			{
+				throw new UserException("user not found for this companyAdmin id");
+			}
 		}
 		}
 

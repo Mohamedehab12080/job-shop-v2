@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar } from "@mui/material";
+import { Avatar, Box,Tab } from "@mui/material";
 import logo from "../common/images/default.jpg";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -7,28 +7,81 @@ import ImageIcon from "@mui/icons-material/Image";
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import TagFacesIcon from '@mui/icons-material/TagFaces';
 import Button from '@mui/material/Button';
-import PostCard from "./PostCard";
-import PostCardJobSeeker from "./PostCardJobSeeker"
+import PostCard from "./posts/PostCard";
+import PostCardJobSeeker from "./posts/PostCardJobSeeker"
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { getJobSeekerMatchedPostsAfterLogin } from "../../store/Auth/Action";
-import { fetchMatchedPosts } from "../../store/Post/Action";
+import { fetchCompanyPosts, fetchEmployerPosts, fetchMatchedPosts } from "../../store/Post/Action";
+import PostCardSocial from "./posts/PostCardSocial"
+import PostCardCompany from "./posts/PostCardCompany";
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
+// import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
+// import { responseUploadUrl } from "../../Utils/Server";
+
+
 const validationSchema = Yup.object().shape({
   content: Yup.string().required("Info is required"),
 });
 
 const HomeSection = () => {
+  const [tabValue,setTabValue]=useState("1");
   const auth = useSelector(state => state.auth);  
   const post = useSelector(state => state.post);
   const dispatch=useDispatch();
-  
+  const dispatch2=useDispatch();
+  const [jobSeekerPosts,setJobSeekerPosts]=useState([]);
+  const [companyPosts,setCompanyPosts]=useState([]);
+  const [jobSeekerPostsUserPosts,setJobSeekerPostsUserPosts]=useState([]);
+  const [companyPostsUserPosts,setCompanyPostsUserPosts]=useState([]);
+  const [preview,setPreview]=useState("");
+  const [statusOfPosts,setStatusOfPosts]=useState(false);
+  const handleChange = (event,newValue)=>
+    {
+        setTabValue(newValue)
+       
+        // if (newValue === '2') {
+        //   console.log("Clicked ")
+        //   handleFetchPosts();
+        //   // Call handleFetchPosts when the second tab is clicked
+        //   if(auth.user.userType ==="jobSeeker")
+        //     {
+        //       dispatch2()
+        //       // setJobSeekerPostsUserPosts(post.posts);
+        //     }else 
+        //     {
+        //       if(auth.user.userType==="Employer")
+        //       {
+        //         dispatch2(fetchEmployerPosts(auth.user.id));
+        //         setCompanyPostsUserPosts(post.userPosts);
+        //       }
+        //     }
+        // }
+    }
+  const handleFetchPosts = () => {
+    setStatusOfPosts(true); // Set statusOfPosts to true on button click
+  };
 React.useEffect(()=>
 {
-  if(auth.user){
-    dispatch(fetchMatchedPosts(auth.user.id))
+  if(auth.user.userType==="jobSeeker"){
+    dispatch(fetchMatchedPosts(auth.user.id));
+  }else 
+  {
+    dispatch(fetchCompanyPosts(auth.user.id));
   }
-},[dispatch,auth.user]
-)
+},[dispatch,auth.user.id,auth.user.userType]
+);
+
+React.useEffect(()=>
+{
+  if(auth.user.userType==="jobSeeker")
+  {
+    setJobSeekerPosts(post.posts);
+  }else {
+    setCompanyPosts(post.posts);
+  }
+},[post,auth.user.userType]);
 
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
@@ -36,27 +89,6 @@ React.useEffect(()=>
     console.log("values ", values);
   };
 
-// const [posts,setPosts] =useState([]);
-
-// React.useEffect(() => {
-//   fetchPosts();
- 
-// },[]); // Ensure useEffect runs only once when component mounts
-
-
-// const fetchPosts=async () =>
-// {
-//     try
-//     {
-//         const response = await axios.get(
-//             `http://localhost:8089/Post/findPostsWithProfileSkills/${auth.user.id}`
-//           ); // Replace '/api/findFields/1' with your actual endpoint
-//           setPosts(response.data);
-//     }catch(error)
-//     {
-//         console.error("Error fetching posts : ",error);
-//     }
-// }
 
   const formik = useFormik({
     initialValues: {
@@ -67,13 +99,43 @@ React.useEffect(()=>
     validationSchema,
   });
 
-  const handleSelectImage = (event) => {
+ 
+  const handleFileUpload=(e)=>
+  {
+    console.log(e.target.files[0]);
+    const file=e.target.files[0];
+    var reader=new FileReader();
+    reader.onloadend=function(){
+      setPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // const handleSendFile=async(e)=>
+  //   {
+  //     e.preventDefault();
+  //     if(!preview) return; 
+  //     try {
+  //       const res=await axios.post("http://localhost:8000/upload",{
+  //         image_url:preview,
+  //       });
+  //       console.log("response : ",res);
+  //     } catch (error) {
+  //       console.log("Error in handleSendFile : ",error);
+  //     }
+  //   };
+
+  const handleSelectImage = async (event) => {
     setUploadingImage(true);
-    const imgUrl = event.target.files[0];
+    event.preventDefault();
+    if(!preview) return;
+    const imgUrl = await uploadToCloudnary(preview);
     formik.setFieldValue("image", imgUrl);
+    console.log("image url : ",imgUrl);
     setSelectedImage(imgUrl);
     setUploadingImage(false);
   };
+
 
   
   return (
@@ -106,7 +168,7 @@ React.useEffect(()=>
                       type="file"
                       name="imageFile"
                       className="hidden"
-                      onChange={handleSelectImage}
+                      onChange={handleFileUpload}
                     />
                   </label>
                   <FmdGoodIcon className="text-[#1d9bf0]"/>
@@ -125,17 +187,100 @@ React.useEffect(()=>
                     }}
                     variant="contained"
                     type="submit"
+                    onClick={handleSelectImage}
                   >
                     POST
                   </Button>
                 </div>
               </div>
             </form>
+            <div>
+              
+              {preview && <img src={preview} alt="" />}
+            </div>
           </div>
         </div>
       </section>
-      <section>
-        {post.posts.length > 0 ? (
+      <section className='py-5'>
+            <Box sx={{width:'100%',typography:'body1' }}>
+                <TabContext value={tabValue}>
+                    <Box sx={{borderBottom:1,borderColor:'divider'}}>
+                        <TabList onChange={handleChange} aria-label="lab API tabs example">
+                            <Tab label="Job Posts" value="1" />
+                            <Tab label="Your Posts" value="2" />
+                        </TabList> 
+                    </Box>
+   <TabPanel key="1" value='1'>    
+            <section>
+             {jobSeekerPosts.length > 1 ?(jobSeekerPosts.map((p)=>(
+            (p.companyName !== "" &&(
+              <PostCardJobSeeker
+              key={p.id}
+              id={p.id}
+              employerId={p.employerId}
+              employerUserName={p.employerUserName}
+              Title={p.title}
+              description={p.description}
+              jobRequirements={p.jobRequirements} 
+              location={p.location}
+              employmentType={p.employmentType}
+              companyName={p.companyName}
+              profileId={p.profileId}
+              skills={p.skills}
+              qualifications={p.qualifications}
+              field={p.field}
+              employerpicture={p.employerpicture}
+              fieldName={p.fieldName}
+              createdDate={p.createdDate}
+              remainedSkills={p.remainedSkills}
+              remainedQualifications={p.remainedQualifications}
+              state={p.state}
+              matchedQulifications={p.matchedQulifications}
+              matchedSkills={p.matchedSkills}
+              applicationCount={p.applicationCount}
+              jobSeekerId={auth.user.id}
+              Experience={p.experience}
+              postImage={p.postImage}
+            />
+            ))
+        ))):companyPosts.length > 0 ? (
+          companyPosts.map((p)=>(
+            <>
+              <PostCardCompany
+                  key={p.id}
+                  id={p.id}
+                  employerId={p.employerId}
+                  employerUserName={p.employerUserName}
+                  Title={p.title}
+                  description={p.description}
+                  jobRequirements={p.jobRequirements} 
+                  location={p.location}
+                  employmentType={p.employmentType}
+                  companyName={p.companyName}
+                  profileId={p.profileId}
+                  skills={p.skills}//p.postField.skills
+                  qualifications={p.qualifications}//p.postField.qualifications
+                  field={p.field}
+                  employerpicture={p.employerpicture}
+                  fieldName={p.fieldName}//p.postField.employerField.companyField.fieldName
+                  createdDate={p.createdDate}
+                  remainedSkills={p.remainedSkills}
+                  remainedQualifications={p.remainedQualifications}
+                  state={p.state}
+                  matchedQulifications={p.matchedQulifications}
+                  matchedSkills={p.matchedSkills}
+                  applicationCount={p.applicationCount}
+                  Experience={p.experience}
+                  postImage={p.postImage}
+                />
+            </>
+          ))
+        ):(
+          <></>
+        )}
+
+
+        {/* {post.posts.length > 0 ? (
           post.posts.map(p => (
             auth.user?.userType==="Admin" ? <PostCard key={p.id} /> :(
                 <PostCardJobSeeker
@@ -143,7 +288,7 @@ React.useEffect(()=>
                   id={p.id}
                   employerId={p.employerId}
                   employerUserName={p.employerUserName}
-                  Title={p.title}
+                  Tit le={p.title}
                   description={p.description}
                   jobRequirements={p.jobRequirements} 
                   location={p.location}
@@ -166,8 +311,123 @@ React.useEffect(()=>
               ))
           )) : (
             <p>No posts found.</p>
-          )}
+          )} */}
       </section>
+        </TabPanel>
+  <TabPanel key="2" value='2'>
+        {setStatusOfPosts && (
+            <section key="2">
+            {jobSeekerPostsUserPosts.length > 1 ?(jobSeekerPostsUserPosts.map((p)=>(
+           (p.companyName !== "" &&(
+             <PostCardJobSeeker
+             key={p.id}
+             id={p.id}
+             employerId={p.employerId}
+             employerUserName={p.employerUserName}
+             Title={p.title}
+             description={p.description}
+             jobRequirements={p.jobRequirements} 
+             location={p.location}
+             employmentType={p.employmentType}
+             companyName={p.companyName}
+             profileId={p.profileId}
+             skills={p.skills}
+             qualifications={p.qualifications}
+             field={p.field}
+             employerpicture={p.employerpicture}
+             fieldName={p.fieldName}
+             createdDate={p.createdDate}
+             remainedSkills={p.remainedSkills}
+             remainedQualifications={p.remainedQualifications}
+             state={p.state}
+             matchedQulifications={p.matchedQulifications}
+             matchedSkills={p.matchedSkills}
+             applicationCount={p.applicationCount}
+             jobSeekerId={auth.user.id}
+             Experience={p.experience}
+             postImage={p.postImage}
+           />
+           ))
+       ))):companyPosts.length > 0 ? (
+        companyPosts.map((p)=>(
+           p.employerId===auth.user.id && auth.user.userType==="Employer" &&(
+            <>
+             <PostCardCompany
+                 key={p.id}
+                 id={p.id}
+                 employerId={p.employerId}
+                 employerUserName={p.employerUserName}
+                 Title={p.title}
+                 description={p.description}
+                 jobRequirements={p.jobRequirements} 
+                 location={p.location}
+                 employmentType={p.employmentType}
+                 companyName={p.companyName}
+                 profileId={p.profileId}
+                 skills={p.skills}//p.postField.skills
+                 qualifications={p.qualifications}//p.postField.qualifications
+                 field={p.field}
+                 employerpicture={p.employerpicture}
+                 fieldName={p.fieldName}//p.postField.employerField.companyField.fieldName
+                 createdDate={p.createdDate}
+                 remainedSkills={p.remainedSkills}
+                 remainedQualifications={p.remainedQualifications}
+                 state={p.state}
+                 matchedQulifications={p.matchedQulifications}
+                 matchedSkills={p.matchedSkills}
+                 applicationCount={p.applicationCount}
+                 Experience={p.experience}
+                 postImage={p.postImage}
+               />
+           </>
+           )
+         ))
+       ):(
+         <></>
+       )
+        }
+
+
+       {/* {post.posts.length > 0 ? (
+         post.posts.map(p => (
+           auth.user?.userType==="Admin" ? <PostCard key={p.id} /> :(
+               <PostCardJobSeeker
+                 key={p.id}
+                 id={p.id}
+                 employerId={p.employerId}
+                 employerUserName={p.employerUserName}
+                 Tit le={p.title}
+                 description={p.description}
+                 jobRequirements={p.jobRequirements} 
+                 location={p.location}
+                 employmentType={p.employmentType}
+                 companyName={p.companyName}
+                 profileId={p.profileId}
+                 skills={p.postField.skills}
+                 qualifications={p.postField.qualifications}
+                 field={p.field}
+                 employerpicture={p.employerpicture}
+                 fieldName={p.postField.employerField.companyField.fieldName}
+                 createdDate={p.createdDate}
+                 remainedSkills={p.remainedSkills}
+                 remainedQualifications={p.remainedQualifications}
+                 state={p.state}
+                 matchedQulifications={p.matchedQulifications}
+                 matchedSkills={p.matchedSkills}
+                 applicationCount={p.applicationCount}
+               />
+             ))
+         )) : (
+           <p>No posts found.</p>
+         )} */}
+     </section>
+              )}
+ 
+             </TabPanel>
+      </TabContext>
+            </Box>
+        </section>
+  
 
     </div>
   );

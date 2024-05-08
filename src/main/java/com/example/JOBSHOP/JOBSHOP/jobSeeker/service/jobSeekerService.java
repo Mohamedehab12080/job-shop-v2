@@ -35,7 +35,7 @@ import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postRepository;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.controller.skillsAndQualificationsRequest;
@@ -49,6 +49,7 @@ import com.example.JOBSHOP.JOBSHOP.jobSeeker.requests.saveSkillsRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.jobSeekerSkill;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillMapper;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillRepository;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.skills.Skill;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
@@ -90,6 +91,7 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	 private postRepository postService;
 	 @Autowired
 	 private applicationQualificationInterface applicationQualificationI;
+	 
 //	 public List<User> getJobSeekerFollowers(jobSeeker jobSeeker)
 //	 {
 //		 return followSerivice.getFollowersById(jobSeeker);
@@ -253,91 +255,103 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	 * added to his skills in jobSeekerSkill table
 	 */
 	 @Override
+	 @Transactional
 	 public applicationReturnedSkillsAndQualifications applyForPost(applicationDTO app)
 	 {
-		 Application apps=applicationMapper.mapDTOToApplicationForInsertApplicaiton(app);
-		 Optional<Post> post=postService.findById(apps.getPost().getId()); 
-		 List<applicationQualification> appQualListForInsert=new ArrayList<applicationQualification>();
-		 List<applicationSkill>appSkillListForInsert=new ArrayList<applicationSkill>();
-		List<String> skillsToSend=new ArrayList<String>();
-		List<String> qualificationsToSend=new ArrayList<String>();
 		 
-		 for(applicationSkillDTO appSkill:app.getApplicationSkills())
-		 {
-			 jobSeekerSkill jobSeekerSkill=jobSeekerSkillServiceI.findById(appSkill.getJobSeekerSkillId()).get();
-			 skillsToSend.add(jobSeekerSkill.getSkill().getSkillName());
-		 }
+		 try {
+			 Application apps=applicationMapper.mapDTOToApplicationForInsertApplicaiton(app);
+			 Optional<Post> post=postService.findById(apps.getPost().getId()); 
+			 List<applicationQualification> appQualListForInsert=new ArrayList<applicationQualification>();
+			 List<applicationSkill>appSkillListForInsert=new ArrayList<applicationSkill>();
+			 List<String> skillsToSend=new ArrayList<String>();
+			 List<String> qualificationsToSend=new ArrayList<String>();
+			 
+			 for(applicationSkillDTO appSkill:app.getApplicationSkills())
+			 {
+				 jobSeekerSkill jobSeekerSkill=jobSeekerSkillServiceI.findById(appSkill.getJobSeekerSkillId()).get();
+				 skillsToSend.add(jobSeekerSkill.getSkill().getSkillName());
+			 }
 
-		 for(applicationQualificationDTO appQual:app.getApplicationQualifications())
-		 {
-			 jobSeekerQualification qual=jobSeekerQualificationServiceI.findById(appQual.getJobSeekerQualificationId()).get();
-			 qualificationsToSend.add(qual.getQualification().getQualificationName());
-		 }
-		 
-		 if(post.isPresent())
-		 {
-			 postDTO postDto=convertPostToDto(post.get());
-			 List<String> postSkills=new ArrayList<String>();
-			 List<String> postQualifications=new ArrayList<String>();
-				
-					for(String skill:postDto.getPostField().getSkills())
-					{
-						postSkills.add(skill);
-					}
-					
-					for(String qual:postDto.getPostField().getQualifications())
-					{
-						postQualifications.add(qual);
-					}
-					
-			 if(applicationService
-					 .returningTheRemainedSkills(postSkills,skillsToSend)
-					 .equals("No")
-					 && applicationService
-					 .returningRemainedQualifications(postQualifications, qualificationsToSend).equals("No"))
+			 for(applicationQualificationDTO appQual:app.getApplicationQualifications())
 			 {
-				 return applicationService.getApplicationReturnedSkillsAndQualifications(); // return the remained skills without apply 
-			 }else if(applicationService
-					 .returningRemainedQualifications
-					 (postQualifications, qualificationsToSend)
-					 .equals("Yes"))
+				 jobSeekerQualification qual=jobSeekerQualificationServiceI.findById(appQual.getJobSeekerQualificationId()).get();
+				 qualificationsToSend.add(qual.getQualification().getQualificationName());
+			 }
+			 
+			 if(post.isPresent())
 			 {
-				 Application insertedApp=applicationService.insert(apps);// apply
-				 for(applicationQualification appQual:
-					 	 app.getApplicationQualifications()
-						 .stream()
-						 .map(this::convertDTOToApplicationQualification)
-						 .collect(Collectors.toList()))
+				 postDTO postDto=convertPostToDto(post.get());
+				 List<String> postSkills=postDto.getSkills();
+				 List<String> postQualifications=postDto.getQualifications();
+					
+//						for(String skill:)
+//						{
+//							postSkills.add(skill);
+//						}
+//						
+//						for(String qual:)
+//						{
+//							postQualifications.add(qual);
+//						}
+						
+				 if(applicationService
+						 .returningTheRemainedSkills(postSkills,skillsToSend)
+						 .equals("No")
+						 && applicationService
+						 .returningRemainedQualifications(postQualifications, qualificationsToSend).equals("No"))
 				 {
-					 appQual.setApplication(insertedApp);
-					 appQualListForInsert.add(appQual);
-				 }
-				 System.out.println("Application Qualification For insert List Size : "+appQualListForInsert.size());
-				 applicationQualificationI.insertAll(appQualListForInsert);
-				 
-				for(applicationSkill appSkill:
-					app.getApplicationSkills()
-					.stream()
-					.map(this::convertDTOToApplicationSkill)
-					.collect(Collectors.toList()))
-				{
-					appSkill.setApplication(apps);
-					appSkillListForInsert.add(appSkill);
-				}
-				applicationSkillServiceI.insertAll(appSkillListForInsert);
-				 System.out.println("Application Skills For insert List Size : "+appSkillListForInsert.size());
+					 applicationReturnedSkillsAndQualifications returnedWithoutApply=applicationService.getApplicationReturnedSkillsAndQualifications();
+					 returnedWithoutApply.setMatched(false);
+					 returnedWithoutApply.setPostId(app.getPostId());
+					 return returnedWithoutApply; // return the remained skills without apply 
+				 }else if(applicationService
+						 .returningRemainedQualifications
+						 (postQualifications, qualificationsToSend)
+						 .equals("Yes"))
+				 {
+					 Application insertedApp=applicationService.insert(apps);// apply
+					 for(applicationQualification appQual:
+						 	 app.getApplicationQualifications()
+							 .stream()
+							 .map(this::convertDTOToApplicationQualification)
+							 .collect(Collectors.toList()))
+					 {
+						 appQual.setApplication(insertedApp);
+						 appQualListForInsert.add(appQual);
+					 }
+					 System.out.println("Application Qualification For insert List Size : "+appQualListForInsert.size());
+					 applicationQualificationI.insertAll(appQualListForInsert);
+					 
+					for(applicationSkill appSkill:
+						app.getApplicationSkills()
+						.stream()
+						.map(this::convertDTOToApplicationSkill)
+						.collect(Collectors.toList()))
+					{
+						appSkill.setApplication(apps);
+						appSkillListForInsert.add(appSkill);
+					}
+					applicationSkillServiceI.insertAll(appSkillListForInsert);
+					 System.out.println("Application Skills For insert List Size : "+appSkillListForInsert.size());
 
-				 return applicationService.getApplicationReturnedSkillsAndQualifications(); // return the remained skills if it contains skills
-				 
+					 applicationReturnedSkillsAndQualifications returnedWithApply=applicationService.getApplicationReturnedSkillsAndQualifications();
+					 returnedWithApply.setMatched(true);
+					 returnedWithApply.setPostId(app.getPostId());
+					 return returnedWithApply;
+				 }else 
+				 {
+					 return null;
+				 }
 			 }else 
 			 {
 				 return null;
 			 }
-		 }else 
-		 {
-			 return null;
-		 }
-		 
+			 
+		} catch (Exception e) {
+			System.out.println("Error From apply : :  : "+e.getMessage());
+			return null;
+		}
 	 }
 	 
 	 private applicationQualification convertDTOToApplicationQualification(applicationQualificationDTO dto)
@@ -362,7 +376,7 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	 * @author BOB
 	 * @Function jobSeeker update his picture
 	 */
-	 public jobSeeker insertPicture(Long id,byte[] picture)
+	 public jobSeeker insertPicture(Long id,String picture)
 	 {
 		 try {
 			Optional<jobSeeker> jobSeekerUpdate=jobSeekerRepository.findById(id);
@@ -457,7 +471,14 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 //		    return sortedPosts;
 //		}
 	 
-		 @Override
+	 
+	 /**
+	  * @author BOBO
+	  * The sorted method the score to sort the postScore objects. 
+	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
+	  */
+	 
+	 @Override
 	 public List<postDTO> getPostsWithSkillsOnPublic(Long jobSeekerId) {
 	     // Fetch job seeker and their skills
 	     jobSeeker jobSeeker = findById(jobSeekerId);
@@ -491,9 +512,9 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				// Calculate and sort post scores
 				List<postDTO> sortedPosts = posts.stream()				       
 						.map(post -> {
-				            Set<String> postSkills = post.getPostField().getSkills().stream()
+				            Set<String> postSkills = post.getSkills().stream()
 				                    .collect(Collectors.toSet());
-				            Set<String> postQualifications = post.getPostField().getQualifications().stream()
+				            Set<String> postQualifications = post.getQualifications().stream()
 				                    .collect(Collectors.toSet());
 
 				            int score = calculateScore(
@@ -502,8 +523,15 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				            		new ArrayList<String>(jobSeekerQualifications),
 				            		new ArrayList<>(jobSeekerSkills));
 				            
-				            List<String>remainedSkills=applicationService.returningRemainedSkillsForListOfPosts(new ArrayList<String>(postSkills), new ArrayList<String>(jobSeekerSkills));
-				            List<String> remainedQualifications=applicationService.returningRemainedQualificationsForPostList(new ArrayList<String>(postQualifications), new ArrayList<String>(jobSeekerQualifications));
+				            List<String>remainedSkills=applicationService
+				            							.returningRemainedSkillsForListOfPosts(
+				            									new ArrayList<String>(postSkills),
+				            									new ArrayList<String>(jobSeekerSkills));
+				            
+				            List<String> remainedQualifications=applicationService
+				            									.returningRemainedQualificationsForPostList(
+				            											new ArrayList<String>(postQualifications),
+				            											new ArrayList<String>(jobSeekerQualifications));
 				            List<String> matchedSkills=new ArrayList<String>();
 				            for(String matchedSkill:postSkills)
 				            {
@@ -539,40 +567,58 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
 //							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
 					            }
+				            	System.out.println("Matched Skills : "+matchedSkills);
+					            return new postScore(post, score);
+				            }else 
+				            {
+				            	postDTO post2=new postDTO();
+				            	
+				            	return new postScore(post2, score);
 				            }
-				            System.out.println("Matched Skills : "+matchedSkills);
-				            return new postScore(post, score);
-				        })
-						
-						.sorted(
-								Comparator
-								.comparingInt((postScore) -> {
-		                    if (((postScore) postScore)
-		                    		.getPost()
-		                    		.getRemainedSkills()
-		                    		.isEmpty()
-		                    		&& 
-		                    		((postScore) postScore)
-		                    		.getPost()
-		                    		.getRemainedQualifications()
-		                    		.isEmpty()) {
-		                    	
-		                        return ((postScore) postScore)
-		                        		.getScore();
-		                    } else 
-		                    {
-		                    	return ((postScore) postScore)
-		                    			.getPost()
-		                    			.getRemainedSkills()
-		                    			.size()
-		                    			+((postScore) postScore)
-		                    			.getPost()
-		                    			.getRemainedQualifications()
-		                    			.size();
-		                    }
-		                }).reversed()) // Reverse to get highest score first
-		                .map(postScore::getPost) // Accessing the postDTO directly from postScore
-		                .collect(Collectors.toList());
+				            
+				        })// Update the comparator to prioritize posts with more matched skills and fewer remaining skills
+					    .sorted(Comparator.comparingInt(postScore -> {
+					        postDTO post = ((postScore) postScore).getPost();
+					        int matchedSkillsCount = post.getMatchedSkills().size() + post.getMatchedQulifications().size();
+					        int remainedSkillsCount = post.getRemainedSkills().size() + post.getRemainedQualifications().size();
+					        double ratio = (double) matchedSkillsCount / (matchedSkillsCount + remainedSkillsCount);
+					        				// this multiply for retaining precision
+					        System.out.println("Ratioooooo :::: "+(-ratio * 10000));
+					        return  (int) (-ratio * 10000);  // The negative for getting the higher matched skills and qualifications and lower missedSkills Posts first
+					    }))
+					          
+					    .map(postScore -> ((postScore) postScore).getPost()) // Extract the postDTO from postScore
+					    .collect(Collectors.toList());
+				
+//						.sorted(
+//								Comparator
+//								.comparingInt((postScore) -> {
+//		                    if (((postScore) postScore)
+//		                    		.getPost()
+//		                    		.getRemainedSkills()
+//		                    		.isEmpty()
+//		                    		&& 
+//		                    		((postScore) postScore)
+//		                    		.getPost()
+//		                    		.getRemainedQualifications()
+//		                    		.isEmpty()) {
+//		                    	
+//		                        return ((postScore) postScore)
+//		                        		.getScore();
+//		                    } else 
+//		                    {
+//		                    	return ((postScore) postScore)
+//		                    			.getPost()
+//		                    			.getRemainedSkills()
+//		                    			.size()
+//		                    			+((postScore) postScore)
+//		                    			.getPost()
+//		                    			.getRemainedQualifications()
+//		                    			.size();
+//		                    }
+//		                }).reversed()) // Reverse to get highest score first
+//		                .map(postScore::getPost) // Accessing the postDTO directly from postScore
+//		                .collect(Collectors.toList());
 
 				
 				// Map to store unique post IDs
@@ -779,7 +825,7 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 			 * @param applicationSkills
 			 * @return calculate the score of matching between list of skills and another list of skills  
 			 */
-			private static int calculateScore(List<String> postQualifications,List<String> postSkillSet,List<String>applicationQualifications, List<String> applicationSkills) {   
+			public static int calculateScore(List<String> postQualifications,List<String> postSkillSet,List<String>applicationQualifications, List<String> applicationSkills) {   
 				Map<String, Integer> postSkillCount = new HashMap<>();
 			    Map<String, Integer> applicationSkillCount = new HashMap<>();
 			    
@@ -877,43 +923,44 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 		private void processSkills(Long userId, Set<String> skillDTOs) {
 		 try {
 			    List<jobSeekerSkillDTO>jobSeekerSkillsToInsert=new ArrayList<jobSeekerSkillDTO>();
-		 
-			    for (String skillDTO : skillDTOs) {
-			        jobSeekerSkillDTO jobSeekerSkillToInsert = new jobSeekerSkillDTO();
-			    	System.out.println("Skill before subString : "+skillDTO);
-			    	jobSeekerSkillToInsert.setSkillName(skillDTO);
-			    	System.out.println("Skill after subString : "+jobSeekerSkillToInsert.getSkillName());
-			    	System.out.println("skillDegree after subString : "+jobSeekerSkillToInsert.getSkillDegree());
-			    	Skill skill = skillServiceI.findByName(jobSeekerSkillToInsert.getSkillName());
-			        Skill insertedSkill=skill;
-			        if (skill == null) {
-			            skill = new Skill();
-			            skill.setSkillName(jobSeekerSkillToInsert.getSkillName());
-			           insertedSkill=skillServiceI.insertForJobSeekerOperation(skill);
-			          
-			        }
-//			        Skill skillObject=new Skill();
-//			    	Long skillID = skillServiceI.findIdByName(jobSeekerSkillToInsert.getSkillName());
-//			        System.out.println("The ID of The skill : "+jobSeekerSkillToInsert.getSkillName()+" "+skillID);		    	
-//			    	skillObject.setId(skillID);
-//			    	jobSeekerSkillToInsert.setSkill(skillObject);
-			        if(insertedSkill!=null)
-			        {
-//					    skillObject.setId(insertedSkill.getId());
-				        jobSeekerSkillToInsert.setSkill(insertedSkill); // Also here.
-			    	}
-			        
-//			        jobSeeker jobSeekerObject=new jobSeeker();
-//			        jobSeekerObject.setId(userId);
-			        jobSeekerSkillToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
-//			        jobSeekerSkillToInsert.setSkillDegree(skillDTO.getSkillDegree());
-			        jobSeekerSkillsToInsert.add(jobSeekerSkillToInsert);
-			    }
-//			    if(!skillsToInsert.isEmpty())
-//			    {
-//				    skillServiceI.insertAll(skillsToInsert);
-//			    }
+			    List<jobSeekerSkillDTO> oldJobSeekerSkills=
+			    		jobSeekerSkillServiceI
+			    		.findByJobSeekerId(userId)
+			    		.stream()
+			    		.map(
+			    				jobSeekerSkillMapper::mapJobSeekerSkillToDTO
+			    			)
+			    		.collect(Collectors.toList());
 			    
+			    for(jobSeekerSkillDTO jobSeekerSkilldto:oldJobSeekerSkills)
+			    {
+			    	if(skillDTOs.stream().anyMatch(str->str.equalsIgnoreCase(jobSeekerSkilldto.getSkillName())))
+			    	{
+			    		skillDTOs.remove(jobSeekerSkilldto.getSkillName());
+			    	}
+			    }
+			    
+			    for (String skillDTO : skillDTOs) {
+			        
+			    		jobSeekerSkillDTO jobSeekerSkillToInsert = new jobSeekerSkillDTO();
+				    	Skill skill = skillServiceI.findByName(skillDTO);
+				    	Skill insertedSkill=null;
+				    	if (skill == null) {
+				            skill = new Skill();
+				            skill.setSkillName(jobSeekerSkillToInsert.getSkillName());
+				           insertedSkill=skillServiceI.insertForJobSeekerOperation(skill);			          
+				        }else
+				        {
+					    		insertedSkill=skill;
+					    		jobSeekerSkillToInsert.setSkill(insertedSkill); // Also here.
+						        jobSeekerSkillToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
+						        
+						        jobSeekerSkillsToInsert.add(jobSeekerSkillToInsert);					    	
+				        }
+				       
+			    	
+			    }
+
 			    List <jobSeekerSkill> jobSeekerSkillsList=jobSeekerSkillsToInsert.stream().map(this::convertFromDtoToJobSeekerSkill).collect(Collectors.toList());
 			    if(!jobSeekerSkillsList.isEmpty())
 			    {
@@ -927,39 +974,44 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 		
 		private void processQualifications(Long userId,Set<String> qualificationDTOs) {
 			try {
-			List<qualification> qualificationsToInsert = new ArrayList<>();
+			List<jobSeekerQualificationDTO>oldJobSeekerQualifications=jobSeekerQualificationServiceI.findByJobSeekerId(userId)
+					.stream().map(jobSeekerQualificationMapper::mapJobSeekerQualificationToDTO)
+					.collect(Collectors.toList());
 		    List<jobSeekerQualificationDTO>jobSeekerQualificationsToInsert=new ArrayList<jobSeekerQualificationDTO>();
-	 
+		    for(jobSeekerQualificationDTO jobSeekerQualificationdto:oldJobSeekerQualifications)
+		    {
+		    	if(qualificationDTOs.stream().anyMatch(str->str.equalsIgnoreCase(jobSeekerQualificationdto.getQualificationName())))
+		    	{
+		    		qualificationDTOs.remove(jobSeekerQualificationdto.getQualificationName());
+		    	}
+		    }
+		    
 		    for (String qualificationDto : qualificationDTOs) {
 		        jobSeekerQualificationDTO jobSeekerQualificationToInsert = new jobSeekerQualificationDTO();
-		    	System.out.println("Skill before subString : "+qualificationDto);
-		    	jobSeekerQualificationToInsert.setQualificationName(qualificationDto);
-		    	System.out.println("Skill after subString : "+jobSeekerQualificationToInsert.getQualificationName());
-		    	System.out.println("skillDegree after subString : "+jobSeekerQualificationToInsert.getQualificationDegree());
-		    	qualification qualification = qualificationServiceI.findByName(jobSeekerQualificationToInsert.getQualificationName());
-		    	qualification insertedQualification=qualification; //initialized if qualification exists for insert
+		    	Qualification qualification = qualificationServiceI.findByName(qualificationDto);
+		    	Qualification insertedQualification=null; //initialized if qualification exists for insert
 		        if (qualification == null) {
-		        	qualification = new qualification();
+		        	qualification = new Qualification();
 		        	qualification.setQualificationName(jobSeekerQualificationToInsert.getQualificationName());
 		        	insertedQualification=qualificationServiceI.insert(qualification);
+		        }else
+		        {
+		        
+		        		insertedQualification=qualification;
+				        jobSeekerQualificationToInsert.setQualification(insertedQualification); // Also here.				        
+				        jobSeekerQualificationToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
+				        jobSeekerQualificationsToInsert.add(jobSeekerQualificationToInsert);	
+		        	
 		        }
 		        
-		        if(insertedQualification!=null)
-		        {
-//				    skillObject.setId(insertedSkill.getId());
-		        	jobSeekerQualificationToInsert.setQualification(insertedQualification); // Also here.
-		    	}
 		        
-		        jobSeekerQualificationToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
-//		        jobSeekerSkillToInsert.setSkillDegree(skillDTO.getSkillDegree());
-		        jobSeekerQualificationsToInsert.add(jobSeekerQualificationToInsert);
 		    }
-//		    if(!skillsToInsert.isEmpty())
-//		    {
-//			    skillServiceI.insertAll(skillsToInsert);
-//		    }
+		    List <jobSeekerQualification> jobSeekerQualificationList=
+		    		jobSeekerQualificationsToInsert
+		    		.stream()
+		    		.map(this::convertFromDtoToJobSeekerQualification)
+		    		.collect(Collectors.toList());
 		    
-		    List <jobSeekerQualification> jobSeekerQualificationList=jobSeekerQualificationsToInsert.stream().map(this::convertFromDtoToJobSeekerQualification).collect(Collectors.toList());
 		    if(!jobSeekerQualificationList.isEmpty())
 		    {
 		        jobSeekerQualificationServiceI.insertAll(jobSeekerQualificationList);

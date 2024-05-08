@@ -33,7 +33,7 @@ import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.jobSeekerQualification;
@@ -172,10 +172,10 @@ public class jobSeekerController {
 	}
 	
 	@PutMapping("/insertPicture/{id}")
-	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody byte[] file) throws SQLException, IOException
+	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody String picture) throws SQLException, IOException
 	{	
 		try {
-			return ResponseEntity.ok(jobSeekerServiceI.insertPicture(id,file));
+			return ResponseEntity.ok(jobSeekerServiceI.insertPicture(id,picture));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

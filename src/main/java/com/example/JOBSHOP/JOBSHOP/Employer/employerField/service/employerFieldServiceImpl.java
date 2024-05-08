@@ -18,12 +18,12 @@ public class employerFieldServiceImpl implements employerFieldServiceInterface{
 	@Autowired
 	private employerFieldRepository employerFieldRepository;
 	
-
-	@Override
-	public Long findIdbyCompanyFieldId(Long id)
-	{
-		return employerFieldRepository.findByCompanyFieldId(id);
-	}
+//
+//	@Override
+//	public Long findIdbyCompanyFieldId(Long id)
+//	{
+//		return employerFieldRepository.findByCompanyFieldId(id);
+//	}
 	@Override
     public employerField getReferenceById(Long id)
 	{
@@ -82,6 +82,12 @@ public class employerFieldServiceImpl implements employerFieldServiceInterface{
 	public List<employerField> findAllEmployerFieldsWithId(Long id)
 	{
 		return employerFieldRepository.findByEmployerId(id);  
+	}
+	
+	
+	@Override
+	public List<employerField> findAllEmployersFieldsByCompanyFieldId(Long id) {
+		return employerFieldRepository.findByCompanyFieldId(id);
 	}
 	
 }

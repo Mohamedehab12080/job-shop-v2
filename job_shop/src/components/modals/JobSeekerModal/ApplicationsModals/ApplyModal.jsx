@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { MenuItem } from "@mui/material";
+import { MenuItem, Typography } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -11,6 +11,10 @@ import axios from "axios";
 import * as Yup from "yup";
 import { IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { useDispatch, useSelector } from "react-redux";
+import { findJobSeekerSkillsQualifications } from "../../../../store/JobSeeker/Action";
+import ShowApplicationResultsModal from "./ShowApplicationResults";
+import { applyForPost, showPostsAfterApply } from "../../../../store/Post/Action";
 const style = {
   position: "absolute",
   top: "50%",
@@ -42,29 +46,45 @@ export default function ApplyModal({
   const [isLoading, setIsLoading] = React.useState(true);
   const [jobSeekerSkills,setJobSeekerSkills]=React.useState([{skillName:"",skillId:0}]);
   const [jobSeekerQualifications,setJobSeekerQualifications]=React.useState([{qualificationName:"",qualificationId:0}]);
- 
-  const handleSubmit = async (values) => {
-    try {
-      console.log("values : ", values);
-      const response = await axios.post(
-        "http://localhost:8089/jobSeekers/apply",
-        values
-      );
-      if (response.status === 201) {
-        console.log("Form data submitted successfully:", response.data);
-        formik.resetForm();
-        setSelectedSkills([]);
-        setSelectedQualifications([]);
-        window.location.reload();
-        postRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-    } catch (error) {
-      console.error("Error submitting form data : ", error);
+  const [openShowApplicationResultsModal,setOpenShowApplicationResultsModal]=React.useState(false);
+  const handleOpenShowApplicationResultsModal=()=>setOpenShowApplicationResultsModal(true);
+  const handleCloseShowApplicationResultsModal=()=>setOpenShowApplicationResultsModal(false);
+  const auth=useSelector(state=>state.auth);
+  const post=useSelector(state=>state.post);
+  const jobSeeker=useSelector(state=>state.jobSeeker);
+  const dispatch=useDispatch();
+  const dispatch2=useDispatch();
+  const dispatch3=useDispatch();
+  const [disable,setDisable]=React.useState(false);
+  // const [selectedExperience, setSelectedExperience] = useState("");
+  React.useEffect(()=>
+{
+    if(openApplyModal)
+    {
+      dispatch(findJobSeekerSkillsQualifications(auth.user.id));
     }
-  };
 
+},[dispatch,openApplyModal,auth.user.id]);
+
+const handleCloseAndDeleteAppliedPost=()=>{
+  if(post.stateOfApplication)
+  {
+    dispatch3(showPostsAfterApply(postIdd));
+  }
+  handleClose();
+}
+  const handleSubmit = async (values) => {
+      dispatch2(applyForPost(values));
+      setDisable(!post.stateOfApplication);
+      handleOpenShowApplicationResultsModal(true);
+  };
+  const validationSchema = Yup.object().shape({
+    experience:Yup.string().required("You must select the experience needed"),
+    postId:Yup.string().required("This post deleted")
+});
   const formik = useFormik({
     initialValues: {
+      experience:"",
       applicationSkills: [
         {
           jobSeekerSkillId:0
@@ -76,129 +96,86 @@ export default function ApplyModal({
         }
       ],
       jobSeekerId:id,
-      postId:postIdd
+      postId:postIdd,
     },
-    // validationSchema: validationSchema,
+    validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
 
-  const fetchFields = async () => {
-    try {
-      const response=await axios.get(`http://localhost:8089/jobSeekers/findSkills/${id}`);
-      if(response.status===200) {
-        console.log("Form data submitted successfully:", response.data);
-       
-        const returnedSkills = skills.map(skillName =>
-          {
-            const matched=response.data.jobSeekerSkillList.find(
-              skill => skill.skillName !==skillName
-            )
-            if(matched)
-            {
-              return {
-                skillName:matched.skillName,
-                skillId:matched.id
-              }
-            }
-          }).filter(obj => obj !== null);
+  React.useEffect(()=>
+{
+  if(openApplyModal)
+  {
+    const returnedSkills = jobSeeker.skillsObjects
+    .filter(skill => !skills.includes(skill.skillName))
+    .map(({ skillName, id }) => ({ skillName, skillId: id }));
   
-          let myListSkills= returnedSkills.reduce((unique , item) => {
-            if(!unique.some(obj => obj.id === item.id))
-            {
-              unique.push(item);
-            }
-            return unique
-          },[]);
-          setJobSeekerSkills(myListSkills);
-         
-        const returnedQualifications = Qualifications.map(qual =>
-        {
-          const matched=response.data.jobSeekerQualificationsList.find(
-            qualification => qualification.qualificationName !==qual
-          )
-          if(matched)
-          {
-            return {
-              qualificationName:matched.qualificationName,
-              qualificationId:matched.id
-            }
-          }
-        }).filter(obj => obj !== null);
-
-        let myList= returnedQualifications.reduce((unique , item) => {
-          if(!unique.some(obj => obj.id === item.id))
-          {
-            unique.push(item);
-          }
-          return unique
-        },[]);
-        setJobSeekerQualifications(myList);
-        // const qualificationsToAppear = [];
-        // const seenQualifications = new Set();
-        
-        // Qualifications.forEach(qualification => {
-        //     const matchingQual = response.data.jobSeekerQualificationsList.find(qual => qual.qualificationName !== qualification);
-        //     if (matchingQual && !seenQualifications.has(matchingQual.qualificationName)) {
-        //         qualificationsToAppear.push(matchingQual);
-        //         seenQualifications.add(matchingQual.qualificationName);
-        //     }
-        // });
-        
-        // setJobSeekerQualifications(qualificationsToAppear);
-
-        const updatedQualificationsList = Qualifications.map(qualification => {
-          const matchingQualification = response.data.jobSeekerQualificationsList.find(
-            qual => qual.qualificationName === qualification
-          );
-          if (matchingQualification) {
-            return {
-              qualification: qualification,
-              qualificationId: matchingQualification.id
-            };
-          }
-          return null;
-        }).filter(obj => obj !== null);
-        setSelectedQualifications(updatedQualificationsList);
-
-        const ListOfObjectOfUpdatedQualifications = updatedQualificationsList.map(
-          (qual) => ({
-            jobSeekerQualificationId: qual.qualificationId,
-          })
-        );
-        formik.setFieldValue("applicationQualifications",ListOfObjectOfUpdatedQualifications);
-        
-        const updateSkillsList = skills.map(skillq => {
-          const matchingSkill = response.data.jobSeekerSkillList.find(
-            skill => skill.skillName === skillq
-          );
-          if (matchingSkill) {
-            return {
-              skill: skillq,
-              skillId: matchingSkill.id
-            };
-          }
-          return null;
-        }).filter(obj => obj !== null);
-        setSelectedSkills(updateSkillsList);
-
-        const ListOfObjectsOfSkills = updateSkillsList.map(
-          (skill) => ({
-            jobSeekerSkillId: skill.skillId,
-          })
-        );
-        formik.setFieldValue("applicationSkills",ListOfObjectsOfSkills);
-      }
-      setIsLoading(false); // Data fetching complete
-    } catch (error) {
-      console.error("Error fetching fields:", error);
-      setIsLoading(false); // Data fetching failed
-    }
-  };
-  React.useEffect(() => {
-    if (openApplyModal) {
-      fetchFields();
-    }
-  }, [openApplyModal]);
+    console.log('Returned Skills:', returnedSkills);
+    // const myListSkills = returnedSkills.reduce((unique, item) => {
+    //   if (item && item.skillId && !unique.some(obj => obj.skillId === item.skillId)) {
+    //     unique.push(item);
+    //   }
+    // return unique;
+    // },[]);
+    setJobSeekerSkills(returnedSkills);  
+    
+  
+  
+    const returnedQualifications=jobSeeker.qualificationsObjects
+    .filter(qual=>!Qualifications.includes(qual.qualificationName))
+    .map(({qualificationName,id})=>({qualification:qualificationName,qualificationId:id}));
+  // const myList = returnedQualifications.reduce((unique, item) => {
+  //   if (!unique.some(obj => obj.qualificationId === item.qualificationId)) {
+  //     unique.push(item);
+  //   }
+  //   return unique;
+  // },[]);
+  console.log("Returned Qualifications : ",returnedQualifications)
+  setJobSeekerQualifications(returnedQualifications);
+  
+  const updatedQualificationsList = Qualifications.map(qualification => {
+  const matchingQualification = jobSeeker.qualificationsObjects.find(
+    qual => qual.qualificationName === qualification
+  );
+  if (matchingQualification) {
+    return {
+      qualification: qualification,
+      qualificationId: matchingQualification.id
+    };
+  }
+  return null;
+  }).filter(obj => obj !== null);
+  setSelectedQualifications(updatedQualificationsList);
+  
+  const ListOfObjectOfUpdatedQualifications = updatedQualificationsList.map(
+  (qual) => ({
+    jobSeekerQualificationId: qual.qualificationId,
+  })
+  );
+  formik.setFieldValue("applicationQualifications",ListOfObjectOfUpdatedQualifications);
+  
+  const updateSkillsList = skills.map(skillq => {
+  const matchingSkill =jobSeeker.skillsObjects.find(
+    skill => skill.skillName === skillq
+  );
+  if (matchingSkill) {
+    return {
+      skill: skillq,
+      skillId: matchingSkill.id
+    };
+  }
+  return null;
+  }).filter(obj => obj !== null);
+  setSelectedSkills(updateSkillsList);
+  
+  const ListOfObjectsOfSkills = updateSkillsList.map(
+  (skill) => ({
+    jobSeekerSkillId: skill.skillId,
+  })
+  );
+  formik.setFieldValue("applicationSkills",ListOfObjectsOfSkills);
+  }  
+},[openApplyModal,jobSeeker]);
 
   
 //   const validationSchema = Yup.object().shape({
@@ -234,7 +211,6 @@ export default function ApplyModal({
     const filteredJobSeekerSkills = jobSeekerSkills.filter(
       (skill) => !selectedSkillsId.includes(skill.skillId)
     );
-
     setJobSeekerSkills(filteredJobSeekerSkills);
 
       const ListOfObjectOfUpdatedSkills = updatedSkills.map(
@@ -326,7 +302,7 @@ export default function ApplyModal({
     <div>
       <Modal
         open={openApplyModal}
-        onClose={handleClose}
+        onClose={handleCloseAndDeleteAppliedPost}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -336,39 +312,44 @@ export default function ApplyModal({
               <IconButton
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={handleClose}
+                onClick={handleCloseAndDeleteAppliedPost}
               >
                 <CloseIcon style={{ color: isHovered ? 'red' : 'black' }} />
               </IconButton>
-              <p className="">Add Remained Skills , Qualificaitons </p>
+              <p className="">Apply for this job </p>
             </div>
           </div>
-          {isLoading ? ( // Show loading indicator while fetching data
-            <div>Loading...</div>
-          ) : (
+          
             <form onSubmit={formik.handleSubmit}>
               <Grid container direction="column" spacing={2}>
                 <Grid item container justifyContent="center">
-                  <Button type="submit" variant="contained" color="primary">
+                  <Button type="submit" variant="contained"
+                  disabled={disable}
+                  color="primary">
                     Save
                   </Button>
                 </Grid>
-                <Grid item xs={12}>
-                  <div className="selected-skills-container">
+                <Grid container direction="row" spacing={2} item xs={12}>
+                <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+                     ** skills for apply :
+                </Typography>
+                  <div className="ml-3 text-xl selected-skills-container">
                     {selectedSkills.length > 0 ? (
                       selectedSkills.map((skill, index) => (
                         <div key={index} className="selected-skill">
-                          <span>{skill.skill}</span>
-                          <IconButton
+                          <span>- {skill.skill}</span>
+                          {!skills.includes(skill.skill) &&(
+                            <IconButton
                             onClick={() => handleRemoveSkill(skill.skill,skill.skillId)}
                             aria-label="delete"
                             size="small"
                           >
                             <Close />
                           </IconButton>
+                          )}
                         </div>
                       ))
-                    ) : (
+                    ) : jobSeekerSkills.length > 0 && (
                       <div className="error-message">
                         At least one skill is required
                       </div>
@@ -397,13 +378,17 @@ export default function ApplyModal({
                   </div>
                 </Grid>
 
-                <Grid item xs={12}>
-                  <div className="selected-qualifications-container">
+                <Grid container direction="row" item xs={12}>
+                <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+                     ** Qualifications for apply :
+                </Typography>
+                  <div className="ml-3 text-xl selected-qualifications-container">
                     {selectedQualifications.length > 0 ? (
                       selectedQualifications.map((qualification, index) => (
                         <div key={index} className="selected-qualification">
-                          <span>{qualification.qualification}</span>
-                          <IconButton
+                          <span>- {qualification.qualification}</span>
+                          {!Qualifications.includes(qualification.qualification) &&(
+                            <IconButton
                             onClick={() =>
                               handleRemoveQualification(qualification.qualification,qualification.qualificationId)
                             }
@@ -412,15 +397,17 @@ export default function ApplyModal({
                           >
                             <Close />
                           </IconButton>
+                          )}
                         </div>
                       ))
-                    ) : (
+                    ) : jobSeekerQualifications.length > 0 && (
                       <div className="error-message">
                         At least one qualification is required
                       </div>
                     )}
                   </div>
                 </Grid>
+                
                 <Grid item xs={12}>
                   <div
                     className="skills-scroll-container"
@@ -441,9 +428,43 @@ export default function ApplyModal({
                  )}
                   </div>
                 </Grid>
+                <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  select
+                  id="experience"
+                  name="experience"
+                  label="Experience"
+                  value={formik.values.experience}
+                  onChange={formik.handleChange}
+                  variant="outlined"
+                  error={
+                    formik.touched.experience &&
+                    Boolean(formik.errors.experience)
+                  }
+                  helperText={
+                    formik.touched.experience &&
+                    formik.errors.experience
+                  }
+                >
+                  <MenuItem value="No">No</MenuItem>
+                  <MenuItem value="1-2">1-2</MenuItem>
+                  <MenuItem value="2-5">2-5</MenuItem>
+                  <MenuItem value="5-8">5-8</MenuItem>
+                  <MenuItem value="8-10">8-10</MenuItem>
+                  <MenuItem value="more than 10">more than 10</MenuItem>
+                </TextField>
               </Grid>
+
+              </Grid>
+              <section>
+                <ShowApplicationResultsModal 
+                openShowApplicationResultsModal={openShowApplicationResultsModal} 
+                handleCloseShowApplicationResultsModal={handleCloseShowApplicationResultsModal}/>
+              </section>
             </form>
-          )}
+            
+          
         </Box>
       </Modal>
     </div>

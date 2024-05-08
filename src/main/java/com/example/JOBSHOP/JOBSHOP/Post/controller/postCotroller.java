@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,14 +22,21 @@ import com.example.JOBSHOP.JOBSHOP.Application.Application;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
+import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
+import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.Specifications.postSearch;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postService;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
+import com.example.JOBSHOP.JOBSHOP.Registration.service.userService;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerService;
 
 @RestController
@@ -39,13 +48,22 @@ public class postCotroller {
 	@Autowired
 	private postService postService;
 	
-	@Autowired
-	private applicationServiceImpl applicationService;
+
 	@Autowired 
 	private jobSeekerService jobSeekerService;
 
 	@Autowired
 	private userServiceInterface userServiceI;
+	
+	@Autowired
+	private companyProfileService companyProfileService;
+	
+	@Autowired
+	private applicationServiceInerface applicationServiceI;
+	
+	@Autowired 
+	private employerServiceInterface employerServiceI;
+	
 //	@GetMapping("/findByTitle/{title}")
 //	public List<postDTO> findAllPostsWithTitle(@PathVariable String title)
 //	{
@@ -72,12 +90,104 @@ public class postCotroller {
 				.collect(Collectors.toList());
 	} 
 	
-	@GetMapping("/getBestApplications/{id}") //Post id
-	public List<applicationDTO> getBestApplicationsForPost(@PathVariable Long id)
-	{ 
-		return applicationService.getBestApplicationsForPost(convertPost(postService.findById(id)));
+	@DeleteMapping("companyDeletePost/{postId}")
+	public ResponseEntity<?> deletePost(
+			@PathVariable("postId") Long postId
+			,@RequestHeader("Authorization") String jwt)throws UserException 
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			postService.deleteById(postId);
+			return new ResponseEntity< >("Post Deleted Success",HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+			
 	}
 	
+	@GetMapping("/getBestApplications/{id}") //Post id
+	public ResponseEntity<List<applicationDTO>> getBestApplicationsForPost(
+			@PathVariable Long id,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{ 
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			System.out.println("Size of Returned Best Applications : "+applicationServiceI
+					.getBestApplicationsForPost(
+							convertPost(
+									postService
+									.findById(id)
+									)).size());
+			return new 
+					ResponseEntity<List<applicationDTO>>(
+							applicationServiceI
+							.getBestApplicationsForPost(
+									convertPost(
+											postService
+											.findById(id)
+											)),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
+	
+	@DeleteMapping("/deleteApplication/{id}")
+	private ResponseEntity<?> 
+	deleteApplicationByApplicationId(@PathVariable Long id
+			,@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			applicationServiceI.deleteById(id);
+			return new ResponseEntity<>("Deleted successfully",HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
+	
+	@PutMapping("/acceptApplication/{id}")
+	private ResponseEntity<applicationDTO> acceptApplication(
+			@PathVariable Long id,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			return new ResponseEntity<>(convertApplicationsWithPostSkillsAndQualifications(applicationServiceI.accept(id)),HttpStatus.OK);
+		}else
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
+	
+
+
+	@PutMapping("/rejectApplication/{id}")
+	private ResponseEntity<applicationDTO> rejectApplication(
+			@PathVariable Long id,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			return new ResponseEntity<>(convertApplicationsWithPostSkillsAndQualifications(applicationServiceI.reject(id)),HttpStatus.OK);
+		}else
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
+	
+	private applicationDTO convertApplicationsWithPostSkillsAndQualifications(Application app)
+	{
+		applicationMapper appMapper=new applicationMapper(postService);
+		return appMapper.mapApplicationToDTOIncludingPostSkillsAndQualifications(app);
+	}
 	private applicationDTO convertApplicationToDTO(Application app)
 	{
 		return applicationMapper.mapApplicationToDTO(app);
@@ -191,23 +301,98 @@ public class postCotroller {
 ////				.collect(Collectors.toList());
 ////	}   
 ////	
-	@GetMapping("/findByCompanyProfile/{id}")
-	public List<String> findByCompanyProfileId(@PathVariable("id") Long id)
+	@GetMapping("/findByCompanyProfileAdminId/{id}")
+	public ResponseEntity<List<String>> findByCompanyProfileId(
+			@PathVariable("id") Long id
+			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
-		List<Post> postList=postService.findByCompanyProfile(id);
-		List<String> postTitles=new ArrayList<String>();
-		for(Post post:postList)
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
 		{
-			postTitles.add(post.getTitle());
+			companyProfile compPR=companyProfileService.findByCompanyAdmin(id);
+			List<Post> postList=postService.findByCompanyProfile(compPR.getId());
+			List<String> postTitles=new ArrayList<String>();
+			for(Post post:postList)
+			{
+				postTitles.add(post.getTitle());
+			}
+			return new ResponseEntity<List<String>>(postTitles,HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token or your type not allowed");
 		}
-		return postTitles;
+		
 		
 //		return postList.stream() 
 //				.map(this::convertPost)
 //				.collect(Collectors.toList());
 	}
+	
+	@GetMapping("/findPostsForCompany/{id}")
+	public ResponseEntity<List<postDTO>> findPostsForCompany(
+			@PathVariable("id") Long id
+			,@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user =userServiceI.findUserByJwt(jwt);
+		Employer emp=null;
+		Long companyAdminId;
+		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
+		{
+			if(user.getUserType().equals(Role.Employer))
+			{
+				System.out.println("Condition of user tYpe Employer ");
+				emp=employerServiceI.findById(id);
+				companyAdminId=emp.getCompanyAdmin().getId();
+			}else 
+			{
+				companyAdminId=user.getId();
+			}
+			companyProfile compPR=companyProfileService.findByCompanyAdmin(companyAdminId);
+			List<Post> postList=postService.findByCompanyProfile(compPR.getId());
+			return new ResponseEntity<List<postDTO>>(
+					postList
+					.stream()
+					.map(postMapper::mapPostTODTO)
+					.collect(
+							Collectors
+							.toList())
+					,HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token or your type not allowed");
+		}
+		
+			
+//		return postList.stream() 
+//				.map(this::convertPost)
+//				.collect(Collectors.toList());
+	}
+	
+	@GetMapping("/findPostsForEmployer/{id}")
+	public ResponseEntity<List<postDTO>> findPostsForEmployer(
+			@PathVariable("id") Long id
+			,@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null)
+		{
+			List<Post> postList=postService.findByEmployer(id);
+			return new ResponseEntity<List<postDTO>>(
+					postList
+					.stream()
+					.map(postMapper::mapPostTODTO)
+					.collect(
+							Collectors
+							.toList())
+					,HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
 	private postDTO convertPost(Post post)
 	{
 		return postMapper.mapPostTODTO(post);
 	}
+	
 }

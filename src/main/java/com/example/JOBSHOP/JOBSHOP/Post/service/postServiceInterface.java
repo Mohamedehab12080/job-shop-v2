@@ -35,5 +35,6 @@ public interface postServiceInterface {
 	List<Post> findByEmployerId(Long id);
 
 	Post findPostsWithTitleOne(String title);
+	
 
 }

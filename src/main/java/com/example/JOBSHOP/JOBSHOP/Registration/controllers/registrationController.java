@@ -64,7 +64,7 @@ public class registrationController {
 	
 	@PostMapping("/save-company")
 	public String saveCompanyAdmin(@ModelAttribute("companyAdministrator") companyAdministratorDTO companyAdministrator
-								  ,@RequestParam("logo") MultipartFile profileImage
+								  ,@RequestParam("logo") String profileImage
 								  ,Model model
 								  ,HttpServletRequest request) throws IOException
 	{
@@ -78,7 +78,7 @@ public class registrationController {
 		}else 
 		{
 			companyAdministratorDTO newcompany=companyAdministrator;
-			newcompany.setPicture(profileImage.getBytes());
+			newcompany.setPicture(profileImage);
 			newcompany.setUserType(Role.Admin);
 			companyAdminEmail=companyAdministrator.getEmail();
 			User theUser =userServiceI.registerCompanyAdministrator(newcompany); // service that save the user Info

@@ -33,9 +33,10 @@ public class User{
 	
 	protected boolean isEnabled=false;
 	// Use @Lob annotation for large objects like images
-    @Lob
-    @Column(columnDefinition = "MEDIUMBLOB") 
-    private byte[] picture;
+//    @Lob
+//    @Column(columnDefinition = "MEDIUMBLOB") 
+	
+    private	String picture;
     
     protected String image;
     
@@ -157,11 +158,11 @@ public class User{
 	}
 
 
-	public byte[] getPicture() {
+	public String getPicture() {
 		return picture;
 	}
 
-	public void setPicture(byte[] picture) {
+	public void setPicture(String picture) {
 		this.picture = picture;
 	}
 

@@ -18,4 +18,4 @@ root.render(
        </Provider>
     </BrowserRouter>
    </React.StrictMode>
-);
+   );

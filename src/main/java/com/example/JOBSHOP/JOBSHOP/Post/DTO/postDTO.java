@@ -25,7 +25,7 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String jobRequirments;
 	private String location;
 	private String employmentType;
-	private byte[] employerpicture;
+	private String employerpicture;
 	private String employerUserName;
 	public String format;
 //	private companyProfile companyProfile;
@@ -35,18 +35,50 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String adminUserName;
 	
 	private Long employerId;
-
+	private String postImage;
 	//	private Employer employer;
 //	
 	private postField postField;
+	private String fieldName;
 	private Long field;
 	private List<String> skills;
 	private List<String> qualifications;
-	
+	private String experience;
 //	private List<postField> postFields=new ArrayList<postField>();
 	
+	
+	
 
-    private Long fieldCount;
+    public String getFieldName() {
+		return fieldName;
+	}
+
+
+	public String getExperience() {
+		return experience;
+	}
+
+
+	public void setExperience(String experience) {
+		this.experience = experience;
+	}
+
+
+	public String getPostImage() {
+		return postImage;
+	}
+
+
+	public void setPostImage(String postImage) {
+		this.postImage = postImage;
+	}
+
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
+	private Long fieldCount;
    
 //	private List<String> additionalSkills;
 	
@@ -197,15 +229,15 @@ public class postDTO extends baseEntityDTO<Long>{
 	public void setProfileId(Long profileId) {
 		this.profileId = profileId;
 	}
-	public String getEmployerpicture() {
-		String base64="";
-		if(employerpicture!=null)
-		{
-		 base64=Base64.getEncoder().encodeToString(employerpicture);
-			this.format=detectImageExtension(employerpicture);
-		}
-		return base64;
-	}
+//	public String getEmployerpicture() {
+//		String base64="";
+//		if(employerpicture!=null)
+//		{
+//		 base64=Base64.getEncoder().encodeToString(employerpicture);
+//			this.format=detectImageExtension(employerpicture);
+//		}
+//		return base64;
+//	}
 //	private String getImageFormat(byte[] imageData) throws IOException
 //	{
 //	ByteArrayInputStream input=new ByteArrayInputStream(imageData);
@@ -213,38 +245,50 @@ public class postDTO extends baseEntityDTO<Long>{
 //	input.close();
 //		return format;
 //	}
-	 public static String detectImageExtension(byte[] imageData) {
-	        if (imageData == null || imageData.length < 4) {
-	            return null; // Insufficient data to determine the extension
-	        }
+//	 public static String detectImageExtension(byte[] imageData) {
+//	        if (imageData == null || imageData.length < 4) {
+//	            return null; // Insufficient data to determine the extension
+//	        }
+//
+//	        // JPEG magic number: FF D8 FF
+//	        if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8 && imageData[2] == (byte) 0xFF) {
+//	            return "jpg";
+//	        }
+//
+//	        // PNG magic number: 89 50 4E 47
+//	        if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 && imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
+//	            return "png";
+//	        }
+//
+//	        // GIF magic number: 47 49 46 38
+//	        if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 && imageData[2] == (byte) 0x46 && imageData[3] == (byte) 0x38) {
+//	            return "gif";
+//	        }
+//
+//	        // Add more checks for other image formats as needed...
+//
+//	        return null; // Unknown image format
+//	    }
 
-	        // JPEG magic number: FF D8 FF
-	        if (imageData[0] == (byte) 0xFF && imageData[1] == (byte) 0xD8 && imageData[2] == (byte) 0xFF) {
-	            return "jpg";
-	        }
 
-	        // PNG magic number: 89 50 4E 47
-	        if (imageData[0] == (byte) 0x89 && imageData[1] == (byte) 0x50 && imageData[2] == (byte) 0x4E && imageData[3] == (byte) 0x47) {
-	            return "png";
-	        }
-
-	        // GIF magic number: 47 49 46 38
-	        if (imageData[0] == (byte) 0x47 && imageData[1] == (byte) 0x49 && imageData[2] == (byte) 0x46 && imageData[3] == (byte) 0x38) {
-	            return "gif";
-	        }
-
-	        // Add more checks for other image formats as needed...
-
-	        return null; // Unknown image format
-	    }
-
-
-	public void setEmployerpicture(byte[] employerpicture) {
-		this.employerpicture = employerpicture;
-	}
+//	public void setEmployerpicture(byte[] employerpicture) {
+//		this.employerpicture = employerpicture;
+//	}
+	
+	
 	public String getEmployerUserName() {
 		return employerUserName;
 	}
+	public String getEmployerpicture() {
+		return employerpicture;
+	}
+
+
+	public void setEmployerpicture(String employerpicture) {
+		this.employerpicture = employerpicture;
+	}
+
+
 	public void setEmployerUserName(String employerUserName) {
 		this.employerUserName = employerUserName;
 	}

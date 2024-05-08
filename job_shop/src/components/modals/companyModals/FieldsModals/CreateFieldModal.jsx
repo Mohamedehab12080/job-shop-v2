@@ -3,24 +3,29 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, MenuItem } from "@mui/material";
+import { IconButton, InputAdornment, MenuItem } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useEffect } from "react";
-import {createField, getAllFields} from "../../../store/company/Action"
-import {findAllSkills} from "../../../store/skills/Action"
-import axios from "axios";
-import Header from "../../Header";
-import { getQualifications } from "../../../store/qualifications/Action";
+import {createField, getAllFields} from "../../../../store/company/Action"
+import {findAllSkills} from "../../../../store/skills/Action"
+import { getQualifications } from "../../../../store/qualifications/Action";
+import AddIcon from '@mui/icons-material/Add';
+import ShowFieldsModal from './ShowFieldsModal'
+import * as Yup from "yup";
 
 export default function CreateFieldModal({
   openCreateFieldModal,
   handleCloseCreateFieldModal,
 }) {
   // const jwt=localStorage.getItem("jwt");
+  const [openShowFieldsModal,setOpenShowFieldsModal]=React.useState(false)
+  const handleOpenShowFieldsModal=()=>setOpenShowFieldsModal(true);
+  const handleCloseShowFielsModal=()=>setOpenShowFieldsModal(false);
+  
   var [selectedSkills, setSelectedSkills] = React.useState([]);
   var [filteredSkills, setFilteredSkills] = React.useState([]);
   const [filterInputSkills, setFilterInputSkills] = React.useState("");
@@ -40,29 +45,51 @@ export default function CreateFieldModal({
   var [filteredQuals, setFilteredQuals] = React.useState([]);
   const [filterInputQuals, setFilterInputQuals] = React.useState("");
   
+  const handleSetSkills = () => {
+    if (skills && skills.skills) {
+      
+    }
+  };
+  const handleSetQuals = () => {
+    if (quals && quals.quals) {
+     
+    }
+  };
+
 useEffect(() => {
+  
   if(openCreateFieldModal)
   {
     dispatch2(findAllSkills());
     dispatch3(getQualifications());
-    handleSetSkills();
-    handleSetQuals();
-    setDisplayedSkills(fetchedSkills.slice(0,3))
-    setDisplayedQuals(fetchedQuals.slice(0,3))
   }
-}, [openCreateFieldModal, dispatch2,dispatch3,getQualifications,fetchedQuals,fetchedSkills]);
-const handleSetSkills = () => {
-  if (skills && skills.skills) {
+}, [
+  openCreateFieldModal,
+  dispatch2,dispatch3]);
+
+  useEffect(()=>
+{
+  if(openCreateFieldModal)
+  {
     setFetchedSkills(skills.skills);
-    console.log("skills : ", skills.skills);
   }
-};
-const handleSetQuals = () => {
-  if (quals && quals.quals) {
+},[openCreateFieldModal,skills]);
+
+useEffect(()=>
+{
+  if(openCreateFieldModal)
+  {
     setFetchedQuals(quals.quals);
-    console.log("quals : ", quals.quals);
   }
-};
+},[openCreateFieldModal,quals]);
+
+useEffect(()=>
+{
+  setDisplayedSkills(fetchedSkills.slice(0,10));
+    setDisplayedQuals(fetchedQuals.slice(0,10));
+},[fetchedSkills,fetchedQuals]);
+
+
 // React.useEffect(()=>
 // {
 //   if(openCreateFieldModal)
@@ -90,6 +117,20 @@ const handleAddSkill = (skill) => {
     const updatedSkills = [...selectedSkills, skill];
     setSelectedSkills(updatedSkills);
     if (updatedSkills) {
+      // if(displayedSkills.length===0)
+      // {
+      //   setDisplayedSkills(fetchedSkills.slice(fetchedSkills.indexOf(skill)+1,fetchedSkills.indexOf(skill)+6));
+      // }      
+      // let startIndex=fetchedSkills.length;
+      // for(let item of displayedSkills)
+      // {
+      //   let index=fetchedSkills.indexOf(item);
+      //   if(index!==-1 && index<startIndex)
+      //   {
+      //     startIndex=index;
+      //   }
+      // }
+      // setDisplayedQuals(fetchedSkills.slice(startIndex))
       formik.setFieldValue("skills", updatedSkills);
     }
   }
@@ -100,15 +141,26 @@ const handleRemoveSkill = (skillToRemove) => {
     (skill) => skill !== skillToRemove
   );
   setSelectedSkills(updatedSkills);
+  // if(displayedSkills.length===0)
+  // {
+  //   setDisplayedSkills(fetchedSkills.slice(fetchedSkills.indexOf(skillToRemove),fetchedSkills.indexOf(skillToRemove)+5))
+  // }
   if (updatedSkills) {
     formik.setFieldValue("skills", updatedSkills);
   }
 };
 
 const handleFilterSkills = (input) => {
-  const filtered = fetchedSkills.filter((skill) =>
-    skill.toLowerCase().includes(input.toLowerCase())
-  );
+  const normalizedInput = input.toLowerCase();
+
+  const filtered = fetchedSkills.filter((skill) => {
+    // Check if the normalized skill (converted to lowercase) is not included in selectedSkills
+    // Convert each selected skill to lowercase before checking inclusion
+    return !selectedSkills.some((selectedSkill) =>
+      selectedSkill.toLowerCase().includes(normalizedInput)
+    );
+  });
+
   setFilteredSkills(filtered);
   setFilterInputSkills(input);
 };
@@ -117,8 +169,8 @@ const handleAddQual = (qual) => {
   if (!selectedQuals.includes(qual)) {
     const updatedQuals = [...selectedQuals, qual];
     setSelectedQuals(updatedQuals);
-    if (updatedSkills) {
-      formik.setFieldValue("qualifications", updatedSkills);
+    if (updatedQuals) {
+      formik.setFieldValue("qualifications", updatedQuals);
     }
   }
 };
@@ -133,6 +185,28 @@ const handleRemoveQual = (qualToRemove) => {
   }
 };
 
+const handleAddManualQual=(value)=>
+{
+  if(filterInputQuals !=="" && !selectedQuals.includes(value))
+  {
+    const updatedQuals = [...selectedQuals, value];
+      setSelectedQuals(updatedQuals);
+      formik.setFieldValue("qualifications", updatedQuals);
+      setFilterInputQuals("")
+  }
+}
+
+const handleAddManualSkill=(value)=>
+{
+  if(filterInputSkills !== "" && !selectedSkills.includes(value))
+  {
+    const updatedSkills = [...selectedSkills, value];
+      setSelectedSkills(updatedSkills);
+      formik.setFieldValue("skills", updatedSkills);
+      setFilterInputSkills("")
+  }
+}
+
 const handleFilterQuals = (input) => {
   const filtered = fetchedQuals.filter((qual) =>
     qual.toLowerCase().includes(input.toLowerCase())
@@ -141,21 +215,23 @@ const handleFilterQuals = (input) => {
   setFilterInputQuals(input);
 };
 
-const handleFieldDelete=()=>
-{
-  
-}
+const validationSchema=Yup.object().shape({
+  fieldName:Yup.string().required("FieldName Is required"),
+  qualifications:Yup
+});
   const formik = useFormik({
     initialValues: {
       fieldName: '',
       companyAdministratorId:auth.user.id,
       qualifications:[],
       skills:[],
-      qualifications:[]
      }, // Initialize field with an empty string or appropriate initial value    },
     onSubmit: (values) => {
-      dispatch(createField(values))
-    },
+      dispatch(createField(values));
+      formik.resetForm();
+      setSelectedQuals([])
+      setSelectedSkills([])
+        },
   });
 
   return (
@@ -171,7 +247,7 @@ const handleFieldDelete=()=>
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 600,
+          width: 900,
           bgcolor: "background.paper",
           border: "none",
           boxShadow: 24,
@@ -182,11 +258,11 @@ const handleFieldDelete=()=>
           overflowY: "auto",
         }}
       >
-        <div className="modal-content-container flex items-center justify-between mb-4">
+        <div className="modal-content-container flex items-center mb-4">
           <IconButton onClick={handleCloseCreateFieldModal} aria-label="delete">
             <Close />
           </IconButton>
-          <p className="">Make Post</p>
+          <p className="mt-3 font-semibold text-lg text-gray-500">Create Field</p>
         </div>
         <form onSubmit={formik.handleSubmit}>
         <Grid container spacing={2}>
@@ -202,23 +278,32 @@ const handleFieldDelete=()=>
               >
               </TextField>
             </Grid> 
-            <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  id="filterSkills"
-                  name="filterSkills"
-                  label="Filter Skills"
-                  value={filterInputSkills}
-                  onChange={(e) => handleFilterSkills(e.target.value)}
-                  error={
-                    formik.touched.filterSkills &&
-                    Boolean(formik.errors.filterSkills)
-                  }
-                  helperText={
-                    formik.touched.filterSkills && formik.errors.filterSkills
-                  }
-                />
-              </Grid>
+    <Grid item xs={12}>
+      <TextField
+        fullWidth
+        id="filterSkills"
+        name="filterSkills"
+        label="Filter Skills"
+        value={filterInputSkills}
+        onChange={(e) => handleFilterSkills(e.target.value)}
+        error={
+          formik.touched.filterSkills &&
+          Boolean(formik.errors.filterSkills)
+        }
+        helperText={
+          formik.touched.filterSkills && formik.errors.filterSkills
+        }
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={()=>handleAddManualSkill(filterInputSkills)}>
+                <AddIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </Grid>
               <Grid item xs={12}>
                 <div className="selected-skills-container">
                   {selectedSkills.length > 0 ? (
@@ -275,13 +360,22 @@ const handleFieldDelete=()=>
                   helperText={
                     formik.touched.filteredQuals && formik.errors.filteredQuals
                   }
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton onClick={()=>handleAddManualQual(filterInputQuals)}>
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
-                <div className="selected-skills-container">
+                <div className="selected-qualifications-container">
                   {selectedQuals.length > 0 ? (
                     selectedQuals.map((qual, index) => (
-                      <div key={index} className="selected-skill">
+                      <div key={index} className="selected-qualification">
                         <span>{qual}</span>
                         <IconButton
                           onClick={() => handleRemoveQual(qual)}
@@ -321,9 +415,20 @@ const handleFieldDelete=()=>
               <Button type="submit" variant="contained" color="primary">
                 Save
               </Button>
-            </Grid>
+            
+           </Grid>
+           <Grid item container justifyContent="center" >
+                 <Button 
+                    onClick={() => handleOpenShowFieldsModal()}
+                    variant="outlined" color="primary">
+                      Show fields
+                </Button>
+           </Grid>
             </Grid>
         </form>
+        <section>
+          <ShowFieldsModal openShowFieldsModal={openShowFieldsModal} handleCloseShowFieldsModal={handleCloseShowFielsModal}/>
+        </section>
       </Box>
     </Modal>
   );

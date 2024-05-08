@@ -1,6 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO;
 
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.jobSeekerQualification;
 
@@ -66,7 +66,7 @@ public class jobSeekerQualificationMapper {
 		
 		}else 
 		{
-			qualification qualificationObject=new qualification();
+			Qualification qualificationObject=new Qualification();
 			qualificationObject.setId(jobSeekerQualificationDto.getQualificationId());
 			jobSeekerQualification.setQualification(qualificationObject);
 		}

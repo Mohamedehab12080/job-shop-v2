@@ -50,7 +50,11 @@
 		    <artifactId>jsoup</artifactId>
 		    <version>1.17.2</version>
 		</dependency>
-
+  <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.5.2</version> <!-- Use the latest version available -->
+        </dependency>
 	  <dependency>
 		 <groupId>io.jsonwebtoken</groupId>
 		 <artifactId>jjwt-jackson</artifactId>

@@ -2,7 +2,7 @@ package com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualificat
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -17,7 +17,7 @@ public class companyFieldQualification extends baseEntity<Long>{
 	
 	@ManyToOne
 	@JoinColumn(name="qualification_id")
-	private qualification qualification;
+	private Qualification qualification;
 
 	public companyField getCompanyField() {
 		return companyField;
@@ -27,11 +27,11 @@ public class companyFieldQualification extends baseEntity<Long>{
 		this.companyField = companyField;
 	}
 
-	public qualification getQualification() {
+	public Qualification getQualification() {
 		return qualification;
 	}
 
-	public void setQualification(qualification qualification) {
+	public void setQualification(Qualification qualification) {
 		this.qualification = qualification;
 	}
 	

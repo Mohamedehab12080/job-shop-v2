@@ -2,9 +2,6 @@ import axios from "axios"
 import { API_BASE_URL } from "../../config/api"
 import { GET_USER_PROFILE_FAILURE,REGISTER_USER_SUCCESS, GET_USER_PROFILE_SUCCESS,
      LOGIN_USER_FAILURE, LOGIN_USER_SUCCESS, REGISTER_USER_FAILURE, LOGOUT } from "./ActionType"
-import { type } from "@testing-library/user-event/dist/type"
-import { DateRange } from "@mui/icons-material"
-
 export const loginUser=(loginData)=>async(dispactch)=>
 {
     try {
@@ -13,6 +10,7 @@ export const loginUser=(loginData)=>async(dispactch)=>
         {
             localStorage.setItem("jwt",data.jwt)
         }
+        console.log("data returned : ",data)
         dispactch({type:LOGIN_USER_SUCCESS,payload:data.jwt})
     } catch (error) {
         console.log("error",error)
@@ -42,6 +40,7 @@ export const registrerCompanyUser=(registrerCompanyUserData)=>async(dispactch)=>
         {
             localStorage.setItem("jwt",data.jwt)
         }
+        console.log("data returned : ",data)
         dispactch({type:REGISTER_USER_SUCCESS,payload:data.jwt})
     } catch (error) {
         console.log("error",error)
@@ -91,7 +90,7 @@ export const getUserProfile=(jwt)=>async(dispactch)=>
         dispactch({type:GET_USER_PROFILE_SUCCESS,payload:data})
     } catch (error) {
         console.log("error",error)
-        dispactch({type:GET_USER_PROFILE_FAILURE,payload:error.message()})
+        dispactch({type:GET_USER_PROFILE_FAILURE,payload:error.message})
     }   
 }
 

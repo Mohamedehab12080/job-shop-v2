@@ -1,8 +1,8 @@
 import  React, { useState } from "react";
 import RepeatIcon from '@mui/icons-material/Repeat'
 import { Avatar } from '@mui/material'
-import defaultImg from '../common/images/default.jpg'
-import myImg from '../common/images/myPic.jpg'
+import defaultImg from '../../common/images/default.jpg'
+import myImg from '../../common/images/myPic.jpg'
 import { useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";

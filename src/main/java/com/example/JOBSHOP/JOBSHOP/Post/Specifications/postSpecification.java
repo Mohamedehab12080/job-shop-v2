@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.domain.Specification;
 
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -55,13 +56,17 @@ public class postSpecification implements Specification<Post>{
 		//Filter by companyName
 		if(postSearch.getCompanyName()!=null &&!postSearch.getCompanyName().isEmpty())
 		{
-			predicatList.add(cb.equal(root.get("companyProfile"),searchHelper.findCompanyProfile(postSearch.getCompanyName())));
+			try {
+				predicatList.add(cb.equal(root.get("companyProfile"),searchHelper.findCompanyProfile(postSearch.getCompanyName())));
+			} catch (UserException e) {
+				System.out.println("user Exception...");
+			}
 		}
-		//Filter by postFieldName
-		if(postSearch.getFieldName()!=null &&!postSearch.getFieldName().isEmpty())
-		{
-			predicatList.add(cb.equal(root.get("postField"),searchHelper.findPostFieldWithFieldName(postSearch.getFieldName())));
-		}
+//		//Filter by postFieldName
+//		if(postSearch.getFieldName()!=null &&!postSearch.getFieldName().isEmpty())
+//		{
+//			predicatList.add(cb.equal(root.get("postField"),searchHelper.findPostFieldWithFieldName(postSearch.getFieldName())));
+//		}
 		
 		return cb.and(predicatList.toArray(new Predicate[0]));
 	}

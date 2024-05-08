@@ -1,4 +1,4 @@
-import { CREATE_EMPLOYER_FAILURE, CREATE_EMPLOYER_REQUEST, CREATE_EMPLOYER_SUCCCESS, CREATE_FIELD_FAILURE, CREATE_FIELD_REQUEST, CREATE_FIELD_SUCCCESS, DELETE_EMPLOYER_FAILURE, DELETE_EMPLOYER_REQUEST, GET_ALL_POSTS_FAILURE, GET_ALL_POSTS_REQUEST, GET_ALL_POSTS_SUCCESS, GET_EMPLOYERS_FAILURE, GET_EMPLOYERS_REQUEST, GET_EMPLOYERS_SUCCCESS, GET_FIELDS_FAILURE, GET_FIELDS_REQUEST, GET_FIELDS_SUCCCESS, UPDATE_EMPLOYER_FAILURE, UPDATE_EMPLOYER_REQUEST, UPDATE_FIELD_FAILURE, UPDATE_FIELD_REQUEST } from "./ActionType"
+import { CREATE_EMPLOYER_FAILURE, CREATE_EMPLOYER_REQUEST, CREATE_EMPLOYER_SUCCCESS, CREATE_FIELD_FAILURE, CREATE_FIELD_REQUEST, CREATE_FIELD_SUCCCESS, DELETE_EMPLOYER_FAILURE, DELETE_EMPLOYER_REQUEST, DELETE_FIELD_SUCCCESS, GET_ALL_POSTS_FAILURE, GET_ALL_POSTS_REQUEST, GET_ALL_POSTS_SUCCESS, GET_EMPLOYERS_FAILURE, GET_EMPLOYERS_REQUEST, GET_EMPLOYERS_SUCCCESS, GET_FIELDS_FAILURE, GET_FIELDS_REQUEST, GET_FIELDS_SUCCCESS, GIVE_EMPLOYER_FIELDS_FAILURE, GIVE_EMPLOYER_FIELDS_REQUEST, GIVE_EMPLOYER_FIELDS_SUCCCESS, UPDATE_EMPLOYER_FAILURE, UPDATE_EMPLOYER_REQUEST, UPDATE_FIELD_FAILURE, UPDATE_FIELD_REQUEST } from "./ActionType"
 
 const initialState={
     loading:false,
@@ -14,7 +14,7 @@ const initialState={
 export const companyReducer=(state=initialState,action)=>
 {
 
-    switch(action)
+    switch(action.type)
     {
         case CREATE_FIELD_REQUEST:
         case CREATE_EMPLOYER_REQUEST:
@@ -24,6 +24,7 @@ export const companyReducer=(state=initialState,action)=>
         case GET_EMPLOYERS_REQUEST:
         case GET_FIELDS_REQUEST:
         case GET_ALL_POSTS_REQUEST:
+        case GIVE_EMPLOYER_FIELDS_REQUEST:
             return {...state,loading:true,error:null};
         case CREATE_FIELD_FAILURE:
         case CREATE_EMPLOYER_FAILURE:
@@ -33,6 +34,7 @@ export const companyReducer=(state=initialState,action)=>
         case GET_EMPLOYERS_FAILURE:
         case GET_FIELDS_FAILURE:
         case GET_ALL_POSTS_FAILURE:
+        case GIVE_EMPLOYER_FIELDS_FAILURE:
             return {...state,loading:false,error:action.payload};
         
         case CREATE_FIELD_SUCCCESS:
@@ -54,6 +56,13 @@ export const companyReducer=(state=initialState,action)=>
                 response:action.payload
             };
 
+        case GIVE_EMPLOYER_FIELDS_SUCCCESS:
+            return {
+                ...state,
+                loading:false,
+                error:null,
+                response:action.payload
+            };
         case GET_EMPLOYERS_SUCCCESS:
             return {
                 ...state,
@@ -75,6 +84,13 @@ export const companyReducer=(state=initialState,action)=>
                 loading:false,
                 error:null,
                 posts:action.payload
+            };
+        case DELETE_FIELD_SUCCCESS:
+            return {
+                ...state,
+                loading:false,
+                error:null,
+                fields:state.fields.filter((field)=> field.id !== action.payload)
             };
         default:
             return state;

@@ -1,5 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.Registration.controllers;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -22,7 +23,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.security.jwtProvider;
@@ -66,7 +69,8 @@ public class authController {
 	
 	
 @PostMapping("/jobSeeker/signup")
-public ResponseEntity<AuthResponse> createJobSeekerHandler(@RequestBody registerUserRequest jobSeeker) throws UserException, ParseException{
+public ResponseEntity<AuthResponse> createJobSeekerHandler(
+		@RequestBody registerUserRequest jobSeeker) throws UserException, ParseException, IOException{
 		
 //		String email=jobSeeker.getEmail();
 //		String password=jobSeeker.getPassword();
@@ -87,7 +91,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(@RequestBody register
 		realJobSeeker.setEmail(jobSeeker.getEmail());
 		realJobSeeker.setUserName(jobSeeker.getUserName());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		realJobSeeker.setBirthDate(dateFormat.parse(jobSeeker.getBirthDate()));
+		realJobSeeker.setBirthDate(dateFormat.parse(jobSeeker.getBirthDate().substring(0,10)));
 		realJobSeeker.setUserType(Role.jobSeeker);
 		realJobSeeker.setExperience(jobSeeker.getExperience());
 		realJobSeeker.setEmploymentState(jobSeeker.getEmploymentState());
@@ -97,6 +101,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(@RequestBody register
 		contacts.add(jobSeeker.getContact());
 		realJobSeeker.setContacts(contacts);
 		realJobSeeker.setVerification(new varification());
+		realJobSeeker.setPicture(jobSeeker.getPicture());
 		jobSeeker savedJobSeeker=jobSeekerServiceI.insert(realJobSeeker);
 		Authentication authentication=new UsernamePasswordAuthenticationToken(jobSeeker.getEmail(), jobSeeker.getPassword());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -110,7 +115,8 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(@RequestBody register
 	
 	
 	@PostMapping("/company/signup")
-	public ResponseEntity<AuthResponse> createCompanyHandler(@RequestBody registerUserRequest companyAdmin) throws UserException{
+	public ResponseEntity<AuthResponse> createCompanyHandler(
+			@RequestBody registerUserRequest companyAdmin) throws UserException, IOException{
 		
 //		String email=jobSeeker.getEmail();
 //		String password=jobSeeker.getPassword();
@@ -135,7 +141,8 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(@RequestBody register
 		realCompanyAdmin.setVerification(new varification());
 		realCompanyAdmin.setCompanyName(companyAdmin.getCompanyName());
 		realCompanyAdmin.setVerification(new varification());
-		
+		realCompanyAdmin.setPicture(companyAdmin.getPicture());
+//		realCompanyAdmin.setPicture(picture.getBytes());
 		companyAdministrator savedCompany=companyAdminServiceI.insert(realCompanyAdmin);
 		
 		Authentication authentication=new UsernamePasswordAuthenticationToken(companyAdmin.getEmail(), companyAdmin.getPassword());

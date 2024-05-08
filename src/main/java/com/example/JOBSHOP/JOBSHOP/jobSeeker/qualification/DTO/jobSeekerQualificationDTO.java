@@ -1,14 +1,14 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO;
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 
 public class jobSeekerQualificationDTO extends baseEntityDTO<Long> {
 
 	private String qualificationName;
 	private Long qualificationId;
-	private qualification qualification;
+	private Qualification qualification;
 	private jobSeeker jobSeeker;
 	private Long jobSeekerId;
 	private String qualificationDegree;
@@ -38,10 +38,10 @@ public class jobSeekerQualificationDTO extends baseEntityDTO<Long> {
 	public void setQualificationId(Long qualificationId) {
 		this.qualificationId = qualificationId;
 	}
-	public qualification getQualification() {
+	public Qualification getQualification() {
 		return qualification;
 	}
-	public void setQualification(qualification qualification) {
+	public void setQualification(Qualification qualification) {
 		this.qualification = qualification;
 	}
 	public jobSeeker getJobSeeker() {

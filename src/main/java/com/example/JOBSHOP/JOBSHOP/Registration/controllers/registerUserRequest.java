@@ -1,7 +1,13 @@
 package com.example.JOBSHOP.JOBSHOP.Registration.controllers;
 
 import java.util.List;
-import java.util.Date;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class registerUserRequest {
 
 	 private String userName;
@@ -18,7 +24,15 @@ public class registerUserRequest {
 	 private String education;
 	 private String companyName;
 	 private String contact;
+	 private String picture;
 	 
+	 
+	public String getPicture() {
+		return picture;
+	}
+	public void setPicture(String picture) {
+		this.picture = picture;
+	}
 	public String getContact() {
 		return contact;
 	}

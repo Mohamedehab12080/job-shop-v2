@@ -12,6 +12,7 @@ import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldS
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.service.employerProfileServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
@@ -49,7 +50,7 @@ public class companyAdminService implements companyAdministratorServiceInterface
 		return companyAdminRepository.findByEmail(email); 
 	 }
 	 
-	 public companyProfile findcompanyProfileIdByCompanyName(String companyName)
+	 public companyProfile findcompanyProfileIdByCompanyName(String companyName) throws UserException
 	 {
 		 return companyProfileService.findByCompanyAdmin(companyAdminRepository.findByCompanyName(companyName));
 	 }
@@ -230,7 +231,7 @@ public class companyAdminService implements companyAdministratorServiceInterface
 			 return 0;
 		 }
 	 } 
-	 public companyAdministrator insertPicture(Long id,byte[] picture)
+	 public companyAdministrator insertPicture(Long id,String picture)
 	 {
 		try {
 			companyAdministrator companyAdminUpdate=companyAdminRepository.getReferenceById(id);

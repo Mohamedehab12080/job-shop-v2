@@ -1,7 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification;
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 
 import jakarta.persistence.Entity;
@@ -18,7 +18,7 @@ public class jobSeekerQualification extends baseEntity<Long>{
 	
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="qualification_id")
-	private qualification qualification;
+	private Qualification qualification;
 
 	private String qualificationDegree;
 	
@@ -38,11 +38,11 @@ public class jobSeekerQualification extends baseEntity<Long>{
 		this.jobSeeker = jobSeeker;
 	}
 
-	public qualification getQualification() {
+	public Qualification getQualification() {
 		return qualification;
 	}
 
-	public void setQualification(qualification qualification) {
+	public void setQualification(Qualification qualification) {
 		this.qualification = qualification;
 	}
 	

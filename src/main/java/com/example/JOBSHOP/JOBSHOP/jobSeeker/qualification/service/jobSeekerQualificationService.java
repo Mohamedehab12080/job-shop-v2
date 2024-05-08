@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.jobSeekerQualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualificationDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualificationMapper;
@@ -98,5 +98,25 @@ public class jobSeekerQualificationService implements jobSeekerQualificationServ
 		{
 			return "not found";
 		}
+	}
+
+	@Override
+	public jobSeekerQualification findByJobSeekerIdAndQualificationId(Long jobSeekerId, Long qualificationId) {
+		
+		if(jobSeekerQualificationRepo.findByJobSeekerIdAndQualificationId(jobSeekerId, qualificationId).isPresent())
+		{
+			return jobSeekerQualificationRepo.findByJobSeekerIdAndQualificationId(jobSeekerId, qualificationId).get();	
+		}else 
+		{
+			return null;
+		}
+		 
+	}
+
+	@Transactional
+	@Override
+	public void deleteAllForJobSeekerId(Long jobSeekerId) {
+		jobSeekerQualificationRepo.deleteAllForJobSeekerId(jobSeekerId);
+		
 	}
 }

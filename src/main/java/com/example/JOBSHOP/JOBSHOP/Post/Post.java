@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.Formula;
 
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
@@ -13,6 +14,7 @@ import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,9 +37,9 @@ public class Post extends baseEntity<Long>{
 	private String jobRequirments;
 	private String location;
 	private String employmentType;
-	 
+	private String experience;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="companyProfile_id")
 	private companyProfile companyProfile;
 	
@@ -45,8 +47,10 @@ public class Post extends baseEntity<Long>{
 	@JoinColumn(name="employer_id")
 	private Employer employer;
 	
+	private String image;
+	
 	@JsonIgnore
-	@OneToMany(mappedBy = "Post",cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
 	private List<postField> postFields=new ArrayList<postField>();
 	
 	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
@@ -62,6 +66,19 @@ public class Post extends baseEntity<Long>{
 	private Long applicationCount;
 	
 	
+	
+	public String getExperience() {
+		return experience;
+	}
+	public void setExperience(String experience) {
+		this.experience = experience;
+	}
+	public String getImage() {
+		return image;
+	}
+	public void setImage(String image) {
+		this.image = image;
+	}
 	public String getTitle() {
 		return Title;
 	}
@@ -109,6 +126,7 @@ public class Post extends baseEntity<Long>{
 	}
 	public void setPostFields(List<postField> postFields) {
 		this.postFields = postFields;
+		
 	}
 	public Long getFieldCount() {
 		return fieldCount;

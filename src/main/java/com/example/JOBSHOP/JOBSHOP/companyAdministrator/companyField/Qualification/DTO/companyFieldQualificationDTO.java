@@ -3,7 +3,7 @@ package com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualificat
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 
 public class companyFieldQualificationDTO extends baseEntityDTO<Long>{
 
@@ -14,7 +14,7 @@ public class companyFieldQualificationDTO extends baseEntityDTO<Long>{
 	private Long companyFieldId;
 	private String qualificationName;
 	private Long qualificationId;
-	private qualification qualification;
+	private Qualification qualification;
 	
 	
 	public Long getId() {
@@ -59,10 +59,10 @@ public class companyFieldQualificationDTO extends baseEntityDTO<Long>{
 	public void setQualificationId(Long qualificationId) {
 		this.qualificationId = qualificationId;
 	}
-	public qualification getQualification() {
+	public Qualification getQualification() {
 		return qualification;
 	}
-	public void setQualification(qualification qualification) {
+	public void setQualification(Qualification qualification) {
 		this.qualification = qualification;
 	}
 	

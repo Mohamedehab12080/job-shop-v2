@@ -12,7 +12,8 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFiel
 @Repository
 public interface companyFieldRepository extends /*baseRepo<companyField, Long>*/ JpaRepository<companyField, Long>{
  
-	List<companyField>findByCompanyAdministratorId(Long id);
+//	@Query("select f from companyField f where f.id=:id order by f.createdDate desc")
+	List<companyField>findByCompanyAdministratorIdOrderByCreatedDateDesc(Long id);
 	@Query("select f.id from companyField f where f.fieldName=:fieldName")
 	Long findIdByFieldName(@Param("fieldName") String fieldName);
 	companyField findByFieldName(String fieldName);

@@ -7,6 +7,8 @@ import java.util.List;
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.varification;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class UserDTO{
 	
@@ -16,7 +18,7 @@ public class UserDTO{
 		private String password;
 		protected Role role;
 		private String email;
-		protected byte[] picture;
+		protected String picture;
 		protected String Address;
 		protected List<String> contacts;
 		protected LocalDateTime createdDate;
@@ -99,10 +101,10 @@ public class UserDTO{
 		public void setCreatedDate(LocalDateTime createdDate) {
 			this.createdDate = createdDate;
 		}
-		public byte[] getPicture() {
+		public String getPicture() {
 			return picture;
 		}
-		public void setPicture(byte[] picture) {
+		public void setPicture(String picture) {
 			this.picture = picture;
 		}
 		public UserDTO() {

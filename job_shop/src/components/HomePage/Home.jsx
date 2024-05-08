@@ -13,7 +13,7 @@ export const Home = () => {
   return (
     <Grid container className='px-5 lg:px-36 justify-between'>
       {/* Left Navigation */}
-      <Grid item xs={12} lg={2.5} className='hidden lg:block w-full relative'>
+      <Grid item xs={12} lg={3} className='hidden lg:block w-full relative'>
         <Navigation />
       </Grid>
 

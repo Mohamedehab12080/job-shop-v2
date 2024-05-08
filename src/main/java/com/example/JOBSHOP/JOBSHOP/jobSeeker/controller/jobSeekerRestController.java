@@ -33,8 +33,10 @@ import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.userProfile;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
@@ -80,6 +82,8 @@ public class jobSeekerRestController {
 	private userServiceInterface userServiceI;
 	
 	@Autowired
+	private postServiceInterface postServiceI;
+	@Autowired
 	private followService followService;
 //	@PostMapping("/save-jobSeeker")
 //	public String saveJobSeeker(@ModelAttribute("jobSeeker") jobSeeker jobSeeker,@RequestParam("profileImage") MultipartFile profileImage) throws IOException
@@ -97,9 +101,9 @@ public class jobSeekerRestController {
 //		return jobSeekerSkillMapper.mapJobSeekerSkillToDTO(jobSeekerSkill);
 //	}
 	
-		@PostMapping("/save-skill")
+		@PostMapping("/save-skills-qualifications")
 		@ResponseBody
-		public ResponseEntity<ApiResponse> saveJobSeekerSkill(
+		public ResponseEntity<ApiResponse> saveJobSeekerQualificationsSkills(
 				@RequestBody saveSkillsRequest requestData,
 				@RequestHeader("Authorization") String jwt) throws UserException
 		{
@@ -175,6 +179,23 @@ public class jobSeekerRestController {
 		
 	}
 
+	@DeleteMapping("/delete-Application/{appId}") //(Tested)
+	public ResponseEntity<ApiResponse> deleteApplication(
+			@PathVariable("appId") Long id
+			,@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User reqUSer=userServiceI.findUserByJwt(jwt);
+		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
+		{
+				applicationServiceI.deleteById(id);
+				ApiResponse apiRes=new ApiResponse("deleted successfully",true);
+				return new ResponseEntity<>(apiRes,HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+		
+	}
 	@PostMapping("/apply")
 	public ResponseEntity<?>Apply(
 			@RequestBody applicationDTO app
@@ -185,7 +206,7 @@ public class jobSeekerRestController {
 		{
 			return new ResponseEntity<>
 			(jobSeekerServiceI.applyForPost(app)
-					,HttpStatus.CREATED);
+					,HttpStatus.CREATED);	
 		}else 
 		{
 			throw new UserException("user not found for this token");
@@ -208,13 +229,14 @@ public class jobSeekerRestController {
 		}
 	}
 	
-	@GetMapping("/findAllApp")
+	@GetMapping("/findAllApplications/{id}")
 	public ResponseEntity<List<applicationDTO>>
 	findAllApplicationsWithJobSeekerID(
+			@PathVariable("id") Long id,
 			@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
+		if(reqUSer!=null && reqUSer.getUserType().equals(Role.jobSeeker))
 		{
 			return new ResponseEntity<List<applicationDTO>>(
 					jobSeekerServiceI
@@ -231,19 +253,21 @@ public class jobSeekerRestController {
 	 
 	private applicationDTO convertApplications(Application app)
 	{
-		return applicationMapper.mapApplicationToDTO(app);
+		applicationMapper appMapper=new applicationMapper(postServiceI);
+		return appMapper.mapApplicationToDTOIncludingPostSkillsAndQualifications(app);
 	}
 	
-	@GetMapping("/findSkillsAndQualificationsForuserItself")
+	@GetMapping("/findSkillsAndQualificationsForuserItself/{id}")
 	private ResponseEntity<?> findSkillsAndQualifications
-	(	@RequestHeader("Authorization") String jwt) throws UserException
+	(		@PathVariable Long id,
+			@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
 		{
 			return ResponseEntity.ok(
 					jobSeekerServiceI
-					.getJobSeekerSkillsAndQualificaitonsByJobSeekerId(reqUSer.getId()));
+					.getJobSeekerSkillsAndQualificaitonsByJobSeekerId(id));
 		}else 
 		{
 			throw new UserException("user not found for this token");
@@ -268,10 +292,10 @@ public class jobSeekerRestController {
 	}
 	
 	@PutMapping("/insertPicture/{id}")
-	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody byte[] file) throws SQLException, IOException
+	public ResponseEntity<?> uploadFile(@PathVariable Long id,@RequestBody String picture) throws SQLException, IOException
 	{	
 		try {
-			return ResponseEntity.ok(jobSeekerServiceI.insertPicture(id,file));
+			return ResponseEntity.ok(jobSeekerServiceI.insertPicture(id,picture));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

@@ -1,8 +1,8 @@
 import React, { useState ,useRef} from "react";
 import RepeatIcon from '@mui/icons-material/Repeat'
 import { Avatar } from '@mui/material'
-import defaultImg from '../common/images/default.jpg'
-import myImg from '../common/images/myPic.jpg'
+import defaultImg from '../../common/images/default.jpg'
+import myImg from '../../common/images/myPic.jpg'
 import { useNavigate } from 'react-router-dom'
 import Button from '@mui/material/Button'
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
@@ -15,9 +15,10 @@ import { ErrorOutline } from '@mui/icons-material';
 import { LocationOn } from '@mui/icons-material';
 import FmdGoodIcon from '@mui/icons-material/FmdGood';
 import GroupIcon from '@mui/icons-material/Group';
-import ApplyModal from '../modals/JobSeekerModal/ApplyModal'
-import AddSkillsModal from '../modals/JobSeekerModal/AddSkillsModal'
-const PostCardJobSeeker = ({
+import ApplyModal from '../../modals/JobSeekerModal/ApplicationsModals/ApplyModal'
+import AddSkillsModal from '../../modals/JobSeekerModal/skillsModals/AddSkillsModal'
+
+const PostCardSocial = ({
     id,
     employerId,
     employerUserName,
@@ -78,7 +79,7 @@ const PostCardJobSeeker = ({
                     <div className='flex justify-between items-center'>
                         <div className='flex cursor-pointer items-center space-x-2'>
                             <span className='font-semibold'>{employerUserName}</span>
-                            <span className='text-gray-600'>{`@${companyName}`}</span>
+                            <span className='text-gray-600'>{`@${companyName.split(" ").join("_").toLowerCase()}`}</span>
                         </div>
                         <div>
                             <Button
@@ -225,4 +226,4 @@ const PostCardJobSeeker = ({
     )
 }
 
-export default PostCardJobSeeker;
+export default PostCardSocial;

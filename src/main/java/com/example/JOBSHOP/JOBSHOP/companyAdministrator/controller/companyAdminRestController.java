@@ -5,6 +5,7 @@ import java.io.IOException;
 
 
 
+
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,13 +17,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,12 +32,13 @@ import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.Employer.controller.employerInsertRequest;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
-import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldForInsert;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldMapper;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerService;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
+import com.example.JOBSHOP.JOBSHOP.Registration.security.jwtProvider;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.userProfile;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
@@ -53,6 +54,11 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.DTO.compa
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.DTO.companyProfileMapper;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdminService;
+import com.example.JOBSHOP.JOBSHOP.response.AuthResponse;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import jakarta.validation.Valid;
 
@@ -73,7 +79,10 @@ public class companyAdminRestController {
 	private companyFieldService companyFieldService;
 	@Autowired
 	private companyProfileService companyProfileService;
-	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	@Autowired
+	private jwtProvider jwtProvider;
 	@Autowired 
 	private userServiceInterface userServiceI;
 	@Autowired
@@ -85,12 +94,14 @@ public class companyAdminRestController {
 //	} 
 	
 	
+	
 	@GetMapping("/findComapnyFields/{compId}")//(Tested)
 	public ResponseEntity<List<companyFieldDTO>>
 	findllFieldsOfCompany(
 			@PathVariable Long compId,
 			@RequestHeader("Authorization") String jwt) throws UserException
 	{
+		System.out.printf("JWT FROM THE HEADER: ",jwt);
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
 		{
@@ -111,19 +122,19 @@ public class companyAdminRestController {
 	@PostMapping("/giveEmployerFields") //(Tested)
 	public ResponseEntity<?> 
 	giveEmployerFields(
-			@RequestBody /*@Valid*/ List<employerFieldForInsert> employerFields
+			@RequestBody /*@Valid*/ giveEmployerFieldsRequest giveEmployerFiedldsRequest
 			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+		if(reqUSer!=null && reqUSer.getUserType().equals(Role.Admin))
 		{
 			companyAdminService.giveEmployerFields(
-					employerFields
+					giveEmployerFiedldsRequest.getEmployerFields()
 					.stream()
 					.map(employerFieldMapper::mapDtoToInsertToEmployerField)
 					.collect(Collectors.toList()),10); // give employer Fields in batchs
-			
-			return ResponseEntity.ok("Employer has its fields now");
+				
+			return new ResponseEntity<>("Employer has its fields now",HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("user not found for this token");
@@ -155,22 +166,40 @@ public class companyAdminRestController {
 			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
+//		AuthResponse res=null;
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
 		{
-			employerDTO employerDto=null;
+			employerDTO employerDto=new employerDTO();
 			Employer employer=null;
 			List<employerField> employerFields=new ArrayList<employerField>();
 			
 			if(employerRequest!=null)
 			{
 
-				employerDto=employerRequest.getEmployerDto(); //getting employer From Request Body
+				  employerDto.setAddress(employerRequest.getAddress());
+				  companyAdministrator compAdm=new companyAdministrator();
+				  compAdm.setId(reqUSer.getId());
+				  employerDto.setCompanyAdmin(compAdm);
+				  employerDto.setCompanyAdministratorId(reqUSer.getId());
+				  employerDto.setContacts(employerRequest.getContacts());
+				  employerDto.setUserName(employerRequest.getUserName());
+				  employerDto.setEmail(employerRequest.getEmail());
+				  employerDto.setPassword(passwordEncoder.encode(employerRequest.getPassword()));
+				  employerDto.setUserType(Role.Employer);
+				  employerDto.setCreatedDate(LocalDateTime.now());
 				  employerFields=employerRequest
 						  .getEmployerFields()
 						  .stream()
 						  .map(employerFieldMapper::mapDtoToInsertToEmployerField)
 						  .collect(Collectors.toList()); //getting employerFields From Request Body
 				  employer=employerService.insert(employerDTOMapper.mapDTOToEmployer(employerDto));
+//				  Authentication authentication=new UsernamePasswordAuthenticationToken(employerDto.getEmail(),employerDto.getPassword());
+//				  SecurityContextHolder.getContext().setAuthentication(authentication);
+//					
+//					String token=jwtProvider.generateToken(authentication);
+//					
+//					res=new AuthResponse(token,true);
+					
 			}
 			 
 			 if(employer!=null)
@@ -192,7 +221,6 @@ public class companyAdminRestController {
 		}
 			
 	}
-	
 	
 	/**
 	 * 
@@ -226,30 +254,30 @@ public class companyAdminRestController {
 	 * @author BOB 
 	 * @function Create company Field  (Tested) with its skills and required qualifications
 	 */
-	@PostMapping("/createField")//(Tested)
-	public ResponseEntity<?> insertField(
-			@RequestBody @Valid companyFieldDTO companyField
-			,BindingResult bind,@RequestHeader("Authorization") String jwt) throws UserException
-	{
-		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+		@PostMapping("/createField")//(Tested)
+		public ResponseEntity<?> insertField(
+				@RequestBody @Valid companyFieldDTO companyField
+				,BindingResult bind,@RequestHeader("Authorization") String jwt) throws UserException
 		{
-				companyField insertedCompanyField=companyFieldService
-						.insertCompanyFieldAndSkillsAndQualifications(reqUSer.getId(),companyField);
-				if(insertedCompanyField!=null)
-				{
-					return ResponseEntity.ok(convertCompanyField(insertedCompanyField));
-				}else
-				{
-					return ResponseEntity.badRequest().body("Already exist");
-				}
+			User reqUSer=userServiceI.findUserByJwt(jwt);
+			if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+			{
+					companyField insertedCompanyField=companyFieldService
+							.insertCompanyFieldAndSkillsAndQualifications(reqUSer.getId(),companyField);
+					if(insertedCompanyField!=null)
+					{
+						return ResponseEntity.ok(convertCompanyField(insertedCompanyField));
+					}else
+					{
+						return ResponseEntity.badRequest().body("Already exist");
+					}
+				
+			}else
+			{
+				throw new UserException("User not found for this token");
+			}
 			
-		}else
-		{
-			throw new UserException("User not found for this token");
 		}
-		
-	}
 
 	/**
 	 * 

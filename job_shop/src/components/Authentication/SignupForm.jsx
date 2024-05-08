@@ -8,12 +8,21 @@ import * as Yup from 'yup';
 import { AddCircleOutline as AddCircleOutlineIcon, RemoveCircleOutline as RemoveCircleOutlineIcon } from '@mui/icons-material';
 import { useDispatch } from 'react-redux';
 import { registerJobSeekerUser, registrerCompanyUser } from '../../store/Auth/Action';
+import { uploadToCloudnary } from '../../Utils/UploadToCloudnary.';
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+library.add(faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt);
 const SignupForm = () => {
     const dispatch=useDispatch();
     const [showPassword, setShowPassword] = useState(false);
     const [userType, setUserType] = useState("jobSeeker"); // Default user type
-
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [selectedImage, setSelectedImage] = useState("");
+    const [uploadProgress, setUploadProgress] = useState(0);
+    const [uploadStatus, setUploadStatus] = useState(null); // 'uploading', 'success', 'error'
+  
     const validationSchema = Yup.object().shape({
         email: Yup.string().email("Invalid email").required("Email is Required"),
         password: Yup.string().required("Password is required"),
@@ -24,17 +33,63 @@ const SignupForm = () => {
         contacts: Yup.array().min(1, "At least one contact is required"),
         userName: Yup.string().required("Username is required"),
         address: Yup.string().required("Address is required"),
-        birthDate: Yup.object().shape({
-            day: Yup.string().required('Day is required'),
-            month: Yup.string().required('Month is required'),
-            year: Yup.string().required('Year is required')
-        }),
+     
         ...(userType === "company" && {
             companyName: Yup.string().required("company name is required"),
             description: Yup.string().required("description is required"),
+        }),
+        ...(userType==="jobSeeker" &&{
+            birthDate: Yup.object().shape({
+                day: Yup.string().required('Day is required'),
+                month: Yup.string().required('Month is required'),
+                year: Yup.string().required('Year is required')
+            }),
         })
     });
-
+    const [preview,setPreview]=useState("");
+    const handleFileUpload=(e)=>
+        {
+        setUploadProgress(0); // Reset progress when a new file is selected
+        setUploadStatus(null); // Reset status
+          const file=e.target.files[0];
+          var reader=new FileReader();
+          reader.onloadend=function(){
+            setPreview(reader.result);
+          };
+          reader.readAsDataURL(file);
+        }
+    const handleSelectImage = async () => {
+       try {
+        setUploadingImage(true);
+        setUploadStatus('uploading'); // Set status to 'uploading' before making the request
+        if(!preview) return;
+        const imgUrl = await uploadToCloudnary(preview ,{
+            onUploadProgress: (progressEvent) => {
+                const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                setUploadProgress(progress);
+              },
+        });
+        formik.setFieldValue("picture", imgUrl);
+        console.log("image url : ",imgUrl);
+        setSelectedImage(imgUrl);
+        setUploadingImage(false);
+        setUploadStatus('success'); // Set status to 'success' after successful upload
+       } catch (error) {
+        console.error('Error uploading file:', error);
+        setUploadStatus('error'); // Set status to 'error' if upload fails
+       }
+    };
+    const renderIcon = () => {
+        if (uploadStatus === 'uploading') {
+          return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
+        } else if (uploadStatus === 'success') {
+          return <FontAwesomeIcon icon="check-circle" />; // Display checkmark icon on successful upload
+        } else if (uploadStatus === 'error') {
+          return <FontAwesomeIcon icon="exclamation-circle" />; // Display error icon if upload fails
+        } else {
+          return <FontAwesomeIcon icon="cloud-upload-alt" />; // Default upload icon
+        }
+      };
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 100 }, (_, i) => currentYear - i);
     const days = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -53,25 +108,23 @@ const SignupForm = () => {
         { value: 12, label: "December" },
     ];
 
-    const handleSubmit = (values) => {
-        console.log("form values: ", values);
-        const { day, month, year } = values.birthDate;
-        const birthDate = `${year}-${month}-${day}`;
-        values.birthDate = birthDate;
-        const formData = { ...values, contacts: values.contacts.filter(contact => contact !== '') };
-        console.log("form values: ", formData);
-        console.log("condition of jobSeeker : A7A")
-        if(formData.userType==="jobSeeker")
+    const handleSubmit = async (values) => {
+        handleSelectImage();
+        if(uploadingImage === false)
         {
+                const { day, month, year } = values.birthDate;
+                const birthDate = `${year}-${month}-${day}`;
+                values.birthDate = birthDate;
+                const formData = { ...values, contacts: values.contacts.filter(contact => contact !== '') };
             
-            dispatch(registerJobSeekerUser(formData))
-        }else 
-        {
-            console.log("condition of admin : ",formData.userType)
-            dispatch(registrerCompanyUser(formData))
+                // Dispatch action based on userType
+                if (values.userType === 'jobSeeker') {
+                    await dispatch(registerJobSeekerUser(formData));
+                } else {
+                    await dispatch(registrerCompanyUser(formData));
+                }
         }
     };
-
     const formik = useFormik({
         initialValues: {
             userName: "",
@@ -91,8 +144,8 @@ const SignupForm = () => {
             description: "",
             education: "",
             companyName:""
-        },
-        // validationSchema: validationSchema,
+                },
+        validationSchema: validationSchema,
         onSubmit: handleSubmit
     });
     const handleUserTypeChange = (event) => {
@@ -129,6 +182,7 @@ const SignupForm = () => {
     return (
         <form onSubmit={formik.handleSubmit}>
             <Grid container spacing={2}>
+                
                 <Grid item xs={12}>
                     <Select
                         fullWidth
@@ -217,6 +271,36 @@ const SignupForm = () => {
                         helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
                     />
                 </Grid>
+                <Grid item xs={12}>
+                <input
+                    accept="image/*"
+                    id="upload-picture"
+                    name="picture"
+                    type="file"
+                    onChange={handleFileUpload}
+                />
+                 <Grid item>
+                    {preview && (
+                    <div
+                        style={{
+                        width: 100,
+                        height: 100,
+                        borderRadius: '50%',
+                        overflow: 'hidden',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        }}
+                    >
+                        <img
+                        src={preview}
+                        alt=""
+                        style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'cover' }}
+                        />
+                    </div>
+                    )}
+                </Grid>
+            </Grid>
                 <Grid item xs={12}>
                     <TextField
                         fullWidth
@@ -393,6 +477,12 @@ const SignupForm = () => {
                     >
                         Signup
                     </Button>
+                </Grid>
+                <Grid item xs={12}>
+                <div>
+                    {renderIcon()}
+                    {uploadStatus === 'uploading' && <span>Uploading: {uploadProgress}%</span>}
+                </div>
                 </Grid>
             </Grid>
         </form>

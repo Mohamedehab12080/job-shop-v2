@@ -3,6 +3,7 @@ package com.example.JOBSHOP.JOBSHOP.Application.service;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,7 @@ public interface applicationRepository extends /*baseRepo<Application, Long>*/ J
 //	
 	List<Application> findByJobSeekerIdOrderByCreatedDateDesc(Long id);
 	
-	@Query("select a from Application a where a.Post.id=:id")
+	@Query("select a from Application a where a.Post.id = :id")
 	List<Application> findByPostId(@Param("id") Long id);
 //	
 //	@Query("select a.applicationQualifications,a.apllicationSkills from Application a where a.Post.id=:id")
@@ -29,4 +30,11 @@ public interface applicationRepository extends /*baseRepo<Application, Long>*/ J
 	 	@Query("SELECT a FROM Application a WHERE a.Post.id = ?1 AND a.jobSeeker.id = ?2")
 	    Application findByPostIdAndJobSeekerId(Long postId, Long jobSeekerId);
 	
+	 	@Modifying
+	 	@Query("UPDATE Application a SET a.statusCode = 'Accepted' WHERE a.id = :id")
+	 	void acceptApplication(@Param("id") Long id);
+	 	
+	 	@Modifying
+	 	@Query("UPDATE Application a SET a.statusCode = 'Rejected' WHERE a.id = :id")
+	 	void rejectApplication(@Param("id") Long id);
 }

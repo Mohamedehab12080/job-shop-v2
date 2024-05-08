@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { KeyboardBackspace } from '@mui/icons-material'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Box, Tab } from '@mui/material';
 import { Button } from '@mui/material';
 import BussinessCetnerIcon from '@mui/icons-material/BusinessCenter'
@@ -9,6 +9,8 @@ import CalendarIcon from '@mui/icons-material/CalendarMonth'
 import SkillsIcon from '@mui/icons-material/Attractions';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import ProfileModal from './ProfileModal';
+import { useDispatch } from 'react-redux';
+import { getInfo } from '../../store/JobSeeker/Action';
 
 const Profile = () => { 
     const [tabValue,setTabValue]=useState("1")
@@ -17,6 +19,15 @@ const Profile = () => {
     const handleClose=()=>setOpenProfileModal(false);
     const navigate=useNavigate();
     const handleBack=()=>navigate(-1);
+    const {id}=useParams();
+    const dispatch=useDispatch();
+
+
+    React.useEffect(()=>
+    {
+        dispatch(getInfo(id));
+    },[dispatch,id])
+
     const handleFollowUser=()=>
     {
         console.log("Follow");

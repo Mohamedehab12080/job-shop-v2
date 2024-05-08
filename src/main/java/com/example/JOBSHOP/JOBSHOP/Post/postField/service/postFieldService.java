@@ -20,12 +20,12 @@ public class postFieldService implements postFieldServiceInterface{
 	@Autowired
 	private employerFieldServiceInterface employerFieldService;
 	
-	@Override
-	public postField findByEmployerField(Long id)
-	{
-		return postFieldRepository.findByEmployerFieldId(employerFieldService.findIdbyCompanyFieldId(id));
-	}
-	
+//	@Override
+//	public postField findByEmployerField(Long id)
+//	{
+//		return postFieldRepository.findByEmployerFieldId(employerFieldService.findIdbyCompanyFieldId(id));
+//	}
+//	
 	@Override
     public postField getReferenceById(Long id)
 	{
@@ -95,5 +95,10 @@ public class postFieldService implements postFieldServiceInterface{
 		{
 			postFieldRepository.deleteById(id);
 		}
+	}
+
+	@Override
+	public List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId) {
+		return postFieldRepository.findByEmployerFieldId(empFieldId);
 	}
 }

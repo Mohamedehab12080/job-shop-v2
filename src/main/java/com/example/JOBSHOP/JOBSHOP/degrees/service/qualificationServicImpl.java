@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.JOBSHOP.JOBSHOP.degrees.qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 
 import jakarta.transaction.Transactional;
 
@@ -17,18 +17,18 @@ public class qualificationServicImpl implements qualificationServiceInterface{
 	private qualificationRepository qualificationRepository;
 
 	@Override
-	public List<qualification> findByQualificationName(String qualificationName) {
+	public List<Qualification> findByQualificationName(String qualificationName) {
 		
 		return qualificationRepository.findByQualificationNameLike(qualificationName);
 	}
 
 	@Override
-	public qualification findByName(String qualificationName) {
+	public Qualification findByName(String qualificationName) {
 		return qualificationRepository.findByQualificationName(qualificationName);
 	}
 
 	@Override
-	public qualification insert(qualification qualification) {
+	public Qualification insert(Qualification qualification) {
 		return qualificationRepository.save(qualification);
 	}
 
@@ -46,24 +46,24 @@ public class qualificationServicImpl implements qualificationServiceInterface{
 	}
 
 	@Override
-	public Optional<qualification> findById(Long id) {
+	public Optional<Qualification> findById(Long id) {
 		return qualificationRepository.findById(id);
 	}
 
 	@Override
-	public List<qualification> findAll() {
+	public List<Qualification> findAll() {
 		return qualificationRepository.findAll();
 	}
 
 	@Transactional
 	@Override
-	public String updateQualification(Long id, qualification qualification) {
+	public String updateQualification(Long id, Qualification qualification) {
 		
-		Optional<qualification> oldQualification=findById(id);
+		Optional<Qualification> oldQualification=findById(id);
 		
 		if(oldQualification.isPresent())
 		{
-			qualification updated=oldQualification.get();
+			Qualification updated=oldQualification.get();
 			if(qualification.getQualificationName()!=null)
 			{
 				updated.setQualificationName(qualification.getQualificationName());
@@ -78,7 +78,7 @@ public class qualificationServicImpl implements qualificationServiceInterface{
 	}
 
 	@Override
-	public void insertAll(List<qualification> qualification) {
+	public void insertAll(List<Qualification> qualification) {
 		
 		qualificationRepository.saveAll(qualification);
 		
@@ -86,6 +86,6 @@ public class qualificationServicImpl implements qualificationServiceInterface{
 
 	@Override
 	public List<String> findAllDistinct() {
-		return qualificationRepository.findQualificationsDistinctNames();
+		return qualificationRepository.findAllQualificationName();
 	}
 }
