@@ -60,7 +60,8 @@ export const getInfo=(userId)=>async(dispatch)=>
     {
         try {
             const {data}=await api.get(`/api/jobSeekerProfile/getInfo/${userId}`);
-           dispatch({type:GET_JOBSEEKER_INFO_SUCCESS,payload:data});
+            console.log("Data Fetched Profile : ",data);
+            dispatch({type:GET_JOBSEEKER_INFO_SUCCESS,payload:data});
         } catch (error) {
             console.log("Error getting info : ",error);
             dispatch({type:GET_JOBSEEKER_INFO_FAILURE,payload:error});

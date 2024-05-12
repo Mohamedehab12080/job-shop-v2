@@ -93,6 +93,7 @@ const handleContactChange = (e, index) => {
 const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
 };
+
 const [showPassword, setShowPassword] = useState(false);
 
   const handleFieldSelect = (event) => {
@@ -104,9 +105,10 @@ const [showPassword, setShowPassword] = useState(false);
     }
   };
 
-  const handleSubmit = async (values) => {
+  const handleSubmit = async (values,actions) => {
     console.log("values : ",values);
-    dispatch(createEmployer(values));
+    await dispatch(createEmployer(values));
+    actions.resetFormik();
   };
 
   const validationSchema = Yup.object().shape({

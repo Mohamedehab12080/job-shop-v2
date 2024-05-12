@@ -1,5 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.Post.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.Specifications.postSearch;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postService;
+import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.userService;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
@@ -38,6 +40,8 @@ import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerService;
+
+import jakarta.mail.MessagingException;
 
 @RestController
 @RequestMapping("/api/Post")
@@ -64,6 +68,9 @@ public class postCotroller {
 	@Autowired 
 	private employerServiceInterface employerServiceI;
 	
+	@Autowired
+	private registrationCompleteEventListener registrationCompleteEventListener;
+	
 //	@GetMapping("/findByTitle/{title}")
 //	public List<postDTO> findAllPostsWithTitle(@PathVariable String title)
 //	{
@@ -89,6 +96,19 @@ public class postCotroller {
 				.map(this::convertPost)
 				.collect(Collectors.toList());
 	} 
+	@GetMapping("/findById/{postId}")
+	public ResponseEntity<postDTO> findPostById(@PathVariable("postId") Long postId,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null)
+		{
+			return new ResponseEntity<postDTO>(postMapper.mapPostTODTO(postService.findById(postId)),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("User not found for this token");
+		}
+	}
 	
 	@DeleteMapping("companyDeletePost/{postId}")
 	public ResponseEntity<?> deletePost(
@@ -154,12 +174,29 @@ public class postCotroller {
 	@PutMapping("/acceptApplication/{id}")
 	private ResponseEntity<applicationDTO> acceptApplication(
 			@PathVariable Long id,
-			@RequestHeader("Authorization") String jwt) throws UserException
+			@RequestHeader("Authorization") String jwt) throws UserException, UnsupportedEncodingException, MessagingException
 	{
 		User user=userServiceI.findUserByJwt(jwt);
 		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
 		{
-			return new ResponseEntity<>(convertApplicationsWithPostSkillsAndQualifications(applicationServiceI.accept(id)),HttpStatus.OK);
+			applicationDTO appDto=convertApplicationsWithPostSkillsAndQualifications(applicationServiceI.accept(id));
+			String title="";
+			if(appDto.getPostTitle().contains("{"))
+			{
+				title=appDto.getPostTitle()
+						.substring(0,appDto.getPostTitle().indexOf("{"));
+			}else 
+			{
+				title=appDto.getPostTitle();
+			}
+			registrationCompleteEventListener
+			.sendMailAcceptedApplicationToThejobSeeker(
+					user.getEmail(),
+					appDto.getJobSeekerr(),
+					"http://localhost:3000/postDetails/"+appDto.getPostId(),
+					""+appDto.getId(),
+					title);
+			return new ResponseEntity<>(appDto,HttpStatus.OK);
 		}else
 		{
 			throw new UserException("user not found for this token");

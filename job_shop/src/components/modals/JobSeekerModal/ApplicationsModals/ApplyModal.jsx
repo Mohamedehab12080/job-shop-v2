@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { MenuItem, Typography } from "@mui/material";
+import { MenuItem, Slide, Typography } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -17,7 +17,7 @@ import ShowApplicationResultsModal from "./ShowApplicationResults";
 import { applyForPost, showPostsAfterApply } from "../../../../store/Post/Action";
 const style = {
   position: "absolute",
-  top: "50%",
+  top: "10%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
@@ -29,8 +29,19 @@ const style = {
   borderRadius: 4,
   maxHeight: "80vh",
   overflowY: "auto", // Enable scrolling
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
 };
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function ApplyModal({
   field,
   postIdd,
@@ -306,6 +317,15 @@ const handleCloseAndDeleteAppliedPost=()=>{
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+         <Slide
+        direction="left"
+        in={openApplyModal}
+        mountOnEnter
+        unmountOnExit
+        timeout={{ enter: 500, exit: 300 }}
+        transitionTimingFunction="ease-in-out" 
+        style={slideStyle}
+      >
         <Box sx={style}>
           <div className="modal-content-container flex items-center justify-between mb-4">
             <div className="flex items-center space-x-1 space-y-1 text-gray-500">
@@ -466,6 +486,7 @@ const handleCloseAndDeleteAppliedPost=()=>{
             
           
         </Box>
+      </Slide>
       </Modal>
     </div>
   );

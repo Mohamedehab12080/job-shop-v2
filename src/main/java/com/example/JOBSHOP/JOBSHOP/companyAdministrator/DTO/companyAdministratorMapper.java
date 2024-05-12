@@ -33,7 +33,7 @@ public class companyAdministratorMapper {
 		dto.setFollowers(userDTOMapper.toUserDTos(companyAdmin.getFollowers()));
 		dto.setFollowings(userDTOMapper.toUserDTos(companyAdmin.getFollowings()));
 		dto.setDescription(companyAdmin.getDescription());
-//		dto.setPicture(companyAdmin.getPicture());
+		dto.setPicture(companyAdmin.getPicture());
 		for(int i=0;i<companyAdmin.getCompanyFields().size();i++)
 		{
 			companyFields.add(companyAdmin.getCompanyFields().get(i).getFieldName());

@@ -10,9 +10,37 @@ public class applicationReturnedSkillsAndQualifications {
 	private List<String> remainedSkills=new ArrayList<String>();
 	private List<String> remainedQualifications=new ArrayList<String>();
 	private Long postId;
+	private Long applicationId;
+	private String postTitle;
 	private boolean isMatched;
+	private String employerEmail;
+	private String employerUserName;
 	
 	
+	public String getEmployerEmail() {
+		return employerEmail;
+	}
+	public void setEmployerEmail(String employerEmail) {
+		this.employerEmail = employerEmail;
+	}
+	public String getEmployerUserName() {
+		return employerUserName;
+	}
+	public void setEmployerUserName(String employerUserName) {
+		this.employerUserName = employerUserName;
+	}
+	public String getPostTitle() {
+		return postTitle;
+	}
+	public void setPostTitle(String postTitle) {
+		this.postTitle = postTitle;
+	}
+	public Long getApplicationId() {
+		return applicationId;
+	}
+	public void setApplicationId(Long applicationId) {
+		this.applicationId = applicationId;
+	}
 	public boolean isMatched() {
 		return isMatched;
 	}

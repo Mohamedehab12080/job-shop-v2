@@ -27,8 +27,8 @@ import jakarta.validation.constraints.NotNull;
 @Table(name="employer")
 public class Employer extends User{
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     @JoinColumn(name = "companyAdministrator_id")
     //@NotNull
     private companyAdministrator companyAdministrator;

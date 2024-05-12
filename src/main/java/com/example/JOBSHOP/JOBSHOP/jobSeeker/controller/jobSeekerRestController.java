@@ -1,8 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.controller;
 
 import java.io.IOException;
-
-
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
@@ -10,6 +9,7 @@ import java.util.stream.Collectors;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,7 +33,13 @@ import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
+import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
+import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Registration.event.registrationCompleteEvent;
+import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
@@ -54,6 +60,7 @@ import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualific
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualificationMapper;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.service.jobSeekerQualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.requests.saveSkillsRequest;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.applicationReturnedSkillsAndQualifications;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.jobSeekerSkill;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillDTO;
@@ -61,6 +68,10 @@ import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillMapper;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
+
+import jakarta.mail.MessagingException;
+
+import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
 
 @RestController
 @RequestMapping("/api/jobSeekers")
@@ -77,6 +88,8 @@ public class jobSeekerRestController {
 	private applicationServiceInerface applicationServiceI;
 	@Autowired
 	private jobSeekerProfileService jobSeekerProfileService;
+	@Autowired
+	private registrationCompleteEventListener registrationCompleteEventListener;
 	
 	@Autowired
 	private userServiceInterface userServiceI;
@@ -85,6 +98,9 @@ public class jobSeekerRestController {
 	private postServiceInterface postServiceI;
 	@Autowired
 	private followService followService;
+	
+	@Autowired
+	private ApplicationEventPublisher applicationPublisher; //application publisher that publish the event for specific class
 //	@PostMapping("/save-jobSeeker")
 //	public String saveJobSeeker(@ModelAttribute("jobSeeker") jobSeeker jobSeeker,@RequestParam("profileImage") MultipartFile profileImage) throws IOException
 //	{
@@ -199,14 +215,37 @@ public class jobSeekerRestController {
 	@PostMapping("/apply")
 	public ResponseEntity<?>Apply(
 			@RequestBody applicationDTO app
-			,@RequestHeader("Authorization") String jwt) throws UserException
+			,@RequestHeader("Authorization") String jwt) throws UserException, UnsupportedEncodingException, MessagingException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
 		{
+			
+			applicationReturnedSkillsAndQualifications applicationReturnedSkillsAndQualifications=jobSeekerServiceI.applyForPost(app);
+			
+			if(applicationReturnedSkillsAndQualifications.isMatched())
+			{
+//				postDTO postApplied=postMapper.mapPostTODTO(postServiceI.findById(app.getPostId()));
+//				
+//				if(postApplied !=null)
+//				{
+					User sendToUser=new User();
+					sendToUser.setEmail(applicationReturnedSkillsAndQualifications.getEmployerEmail());
+					sendToUser.setUserName(applicationReturnedSkillsAndQualifications.getEmployerUserName());
+					registrationCompleteEventListener
+							.sendMailAfterAcceptedApplyToTheCompany(
+									sendToUser,
+									"http://localhost:3000/postDetails/"+applicationReturnedSkillsAndQualifications.getPostId(),
+									""+applicationReturnedSkillsAndQualifications.getApplicationId(),
+									applicationReturnedSkillsAndQualifications.getPostTitle());
+//				}
+			}
+			
 			return new ResponseEntity<>
-			(jobSeekerServiceI.applyForPost(app)
+			(
+					applicationReturnedSkillsAndQualifications
 					,HttpStatus.CREATED);	
+		
 		}else 
 		{
 			throw new UserException("user not found for this token");

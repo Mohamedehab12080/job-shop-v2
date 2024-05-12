@@ -103,7 +103,7 @@ public class companyAdminRestController {
 	{
 		System.out.printf("JWT FROM THE HEADER: ",jwt);
 		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+		if(reqUSer!=null)
 		{
 			return new ResponseEntity<List<companyFieldDTO>>(companyFieldService.findCompanyFieldsWithAdminId(compId)
 				.stream().map(this::convertCompanyField).collect(Collectors.toList()),HttpStatus.OK);

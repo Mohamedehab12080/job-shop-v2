@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import {  Avatar, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import {  Avatar, Grid, MenuItem, Slide, TextField, Typography } from '@mui/material';
 import Menu from "@mui/material/Menu";
 import { useNavigate } from 'react-router-dom';
 import { acceptApplication, deleteApplication, fetchBestPostApplications, fetchPostApplications, rejectApplication } from '../../../../store/Post/Action';
@@ -13,6 +13,14 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function ShowApplicationsModal(
     {openShowApplicationsModal,handleCloseShowApplicationsModal,postId}
 ) {
@@ -151,10 +159,19 @@ export default function ShowApplicationsModal(
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+         <Slide
+          direction="left"
+          in={openShowApplicationsModal}
+          mountOnEnter
+          unmountOnExit
+          timeout={{ enter: 500, exit: 300 }}
+          transitionTimingFunction="ease-in-out" 
+          style={slideStyle}
+      >
         <Box  sx={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
+          top: "1%",
+          left: "40%",
           transform: "translate(-50%, -50%)",
           width: 800,
           bgcolor: "background.paper",
@@ -163,8 +180,12 @@ export default function ShowApplicationsModal(
           p: 4,
           outline: "none",
           borderRadius: 4,
-          maxHeight: "80vh",
+          maxHeight: "95vh",
           overflowY: "auto",
+          scrollbarWidth: 'none', // Hide scrollbar for Firefox
+          '&::-webkit-scrollbar': {
+            display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+          },
         }}
         >
   <Grid item key={1} xs={12}>
@@ -184,7 +205,7 @@ export default function ShowApplicationsModal(
             <div><hr></hr></div>
            <div key={app.id} className='flex'>
             <Avatar
-                  onClick={() => navigate(`/profile/${app.id}`)}
+                  onClick={() => navigate(`/profile/${app.jobSeekerId}`)}
                   className='cursor-pointer'
                   alt="userName"
                   src={app.jobSeekerPicture}
@@ -280,6 +301,12 @@ export default function ShowApplicationsModal(
 <div className='flex space-x-5'>
   {/* Left Column */}
   <div className='flex flex-col'>
+  <div className='flex'>
+      <Typography variant="subtitle1" fontWeight="bold" mb={1}>
+     # Application ID:
+      </Typography>
+        <p className='text-xl'>{app.id}</p>
+  </div>
     <div className='ml-10'>
       <div className='flex'>
       <Typography variant="subtitle1" fontWeight="bold" mb={1}>
@@ -404,6 +431,7 @@ export default function ShowApplicationsModal(
           ))}
            </section>
         </Box>
+      </Slide>
       </Modal>
     </div>
   );

@@ -81,7 +81,7 @@ public class registrationCompleteEventListener
 							"<p> Thank you for your registration on JOB SHOP.</p>"+
 							"<a href=\""+url+"\">Verify your email to activate your account</a>"+
 							"<p>Thank you <br> Users verification Service";
-		emailMessage(subject,senderName,mailContent,mailSender,theUser);
+		emailMessage("",subject,senderName,mailContent,mailSender,theUser);
 	}
 	public void sendVerificationEmailPasswordReset(User resetuser,String url) throws UnsupportedEncodingException, MessagingException
 	{
@@ -91,14 +91,57 @@ public class registrationCompleteEventListener
 							"<p> please follow the link below to reset password verification.</p>"+
 							"<a href=\""+url+"\">Reset password</a>"+
 							"<p>Thank you <br> Users verification Service";
-		emailMessage(subject,senderName,mailContent,mailSender,theUser);
+		emailMessage("",subject,senderName,mailContent,mailSender,theUser);
 	}
-	private static void emailMessage(String subject,String senderName,String mailContent,JavaMailSender mailSender,User user) throws UnsupportedEncodingException, MessagingException
+	public void sendMailAfterAcceptedApplyToTheCompany(User resetuser,String url,String applicationId,String postTitle) throws UnsupportedEncodingException, MessagingException
+	{
+		String subject="Apply for jobs";
+		String senderName="Apply for jobs service";
+		String mailContent="<p> Hi, "+resetuser.getUserName()+", </p>"+
+							"<p> please follow the link below to show the application with Application Id :"+applicationId+" on post : "+postTitle+".</p>"+
+							"<a href=\""+url+"\">Show Application</a>"+
+							"<p>Thank you <br> Apply for jobs service...";
+		System.out.println("User for sending mail : "+resetuser.getEmail());
+		emailMessage("",subject,senderName,mailContent,mailSender,resetuser);
+	}
+	public void sendMailAcceptedApplicationToThejobSeeker(String fromMail,User resetuser,String url,String applicationId,String postTitle) throws UnsupportedEncodingException, MessagingException
+	{
+		String subject="Apply for jobs";
+		String senderName="Apply for jobs service";
+		String mailContent="<p> Hi, "+resetuser.getUserName()+", </p>"+
+						    "<p><strong>congratulations for your application acceptance...</strong></p>"+
+							"<p> please follow the link below to show the application with Application Id :"+applicationId+" on post : "+postTitle+".</p>"+
+							"<a href=\""+url+"\">Show Application</a>"+
+							"<p>Thank you <br> Apply for jobs service...";
+		System.out.println("User for sending mail : "+resetuser.getEmail());
+		emailMessage(fromMail,subject,senderName,mailContent,mailSender,resetuser);
+	}
+	
+	public void sendMailRejectedApplicationToTheJobSeeker(String fromMail,User resetuser,String url,String applicationId,String postTitle) throws UnsupportedEncodingException, MessagingException
+	{
+		String subject="Apply for jobs";
+		String senderName="Apply for jobs service";
+		String mailContent="<p> Hi, "+resetuser.getUserName()+", </p>"+
+						    "<p><strong>congratulations for your applications acceptance...</strong></p>"+
+							"<p> please follow the link below to show the application with Application Id :"+applicationId+" on post : "+postTitle+".</p>"+
+							"<a href=\""+url+"\">Show Application</a>"+
+							"<p>Thank you <br> Apply for jobs service...";
+		System.out.println("User for sending mail : "+resetuser.getEmail());
+		emailMessage(fromMail,subject,senderName,mailContent,mailSender,resetuser);
+	}
+	
+	private static void emailMessage(String fromMail,String subject,String senderName,String mailContent,JavaMailSender mailSender,User user) throws UnsupportedEncodingException, MessagingException
 	{
 		MimeMessage message=mailSender.createMimeMessage();
 		var messageHelper=new MimeMessageHelper(message);
 		
-		messageHelper.setFrom("mohamedehab12080@gmail.com",senderName);
+		if(fromMail !=null && !fromMail.equals(""))
+		{
+			messageHelper.setFrom(fromMail,senderName);
+		}else
+		{
+			messageHelper.setFrom("mohamedehab12080@gmail.com",senderName);
+		}
 		messageHelper.setTo(user.getEmail());
 		messageHelper.setSubject(subject);
 		messageHelper.setText(mailContent,true);

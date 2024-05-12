@@ -60,6 +60,31 @@ export const Navigation = () => {
     handleClose()
     dispatch(Logout())
   }
+
+  // Define a separate function to handle item click navigation
+const handleItemClick = (item) => {
+  if (auth.user.userType === "jobSeeker") {
+    if (item.title === "Profile") {
+      navigate(`/profile/${auth.user.id}`);
+    } else {
+      navigate(item.path);
+    }
+  } else  if(auth.user.userType==="Admin"){
+    if (item.title === "companyProfile") {
+      navigate(`/companyProfile/${auth.user.id}`);
+    } else {
+      navigate(item.path);
+    }
+  }else if(auth.user.userType==="Employer")
+    {
+      if (item.title === "employerProfile") {
+        navigate(`/employerProfile/${auth.user.id}`);
+      } else {
+        navigate(item.path);
+      }
+    }
+};
+
   return (
     <div className="h-screen sticky overflowY top-0">
       <div>
@@ -70,26 +95,44 @@ export const Navigation = () => {
           </div>
           <hr className="relative"></hr>
         </div>
-        <div className="space-y-6">
+        <div className="space-y-2">
           {navigation.map((item, index) => (
             <div
               key={index} // Use a unique key (e.g., index) or a specific identifier from the item object
               className="cursor-pointer flex space-x-1 space-y-0 items-center"
-              onClick={() =>
-                item.title === "Profile"
-                  ? navigate(`/profile/${auth.user.id}`)
-                  : navigate(item.path)
-              }
+              onClick={() => handleItemClick(item)}
             >
               {item.title === "Recommend me" && auth.user.userType === "jobSeeker" ? (
                 <>
                   {item.icon}
                   <p className="text-xl">{item.title}</p>
                 </>
-              ) : item.title !== "Recommend me" &&(
+              ):item.title !== "Recommend me" && item.title !== "employerProfile" && item.title !== "companyProfile" && auth.user.userType === "jobSeeker" ?(
                 <>
-                  {item.icon}
-                  <p className="text-xl">{item.title}</p>
+                {item.icon}
+                <p className="text-xl">{item.title}</p>
+               </>
+              ): item.title !== "Recommend me" && auth.user.userType === "Admin" ?(
+                <>
+                  {item.title !=="Profile" && item.title !=="employerProfile"  ? (
+                    <>
+                      {item.icon}
+                     <p className="text-xl">{item.title}</p>
+                    </>
+                  ):(
+                   <></>
+                  )}
+                </>
+              ):(
+                <>
+                   {item.title !=="Profile" && auth.user.userType === "Employer" ? (
+                    <>
+                      {item.icon}
+                     <p className="text-xl">{item.title}</p>
+                    </>
+                  ):(
+                   <></>
+                  )}
                 </>
               )}
             </div>
@@ -108,7 +151,7 @@ export const Navigation = () => {
                   bgcolor: "#1e88e5",
                 }}
               >
-                POST
+                JOB POST
           </Button>
           </div>
        )}
@@ -129,7 +172,7 @@ export const Navigation = () => {
                   CREATE FIELD
             </Button>
             </div>
-            <div className="py-2">
+            <div className="py-1">
                 <Button
                   onClick={handleOpenGiveEmployerFields}
                   variant="contained"  
@@ -163,7 +206,7 @@ export const Navigation = () => {
 
 {auth.user?.userType==="jobSeeker" &&(   
           <>
-          <div className="py-5">
+          <div className="py-1">
               <Button
                 onClick={handleOpenAddSkillsModal}
                 variant="contained"  
@@ -194,14 +237,14 @@ export const Navigation = () => {
           </>
        )}
 
-        <div className="mt-4 flex items-center py-2 space-x-5">
+        <div className="mt-3 flex items-center py-1 space-x-5">
           <Avatar 
             onClick={() => navigate(`/profile/${auth.user.id}`)}
             alt="username" 
             src={auth.user.picture}  
           />
          
-          <div className="py-2 items-center" >
+          <div className="py-1 items-center" >
             <p className="mb-0">{auth.user?.userName}</p>
             <div>
               <span className="mt-1 opacity-70">@{auth.user?.email.split(" ").join("_").toLowerCase()}</span>

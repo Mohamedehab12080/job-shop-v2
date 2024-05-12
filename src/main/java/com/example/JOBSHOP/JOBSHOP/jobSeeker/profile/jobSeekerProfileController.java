@@ -13,17 +13,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.User.DTO.UserDTO;
+import com.example.JOBSHOP.JOBSHOP.User.DTO.userDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.User.service.userUtils;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerDTO;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerMapper;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.controller.skillsAndQualificationsRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerService;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerServiceInterface;
 @RestController
 @RequestMapping("/api/jobSeekerProfile")
 public class jobSeekerProfileController {
 
 
 	@Autowired
-	private jobSeekerService jobSeekerService;
+	private jobSeekerServiceInterface jobSeekerService;
 	@Autowired
 	private followService followService;
 	
@@ -37,10 +45,11 @@ public class jobSeekerProfileController {
 			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User user=userServiceI.findUserByJwt(jwt);
-		if(user!=null && user.getUserType().equals(Role.jobSeeker))
+		if(user!=null)
 		{
 			boolean isrequestUser=false;
-			jobSeekerProfile profile=new jobSeekerProfile(jobSeekerService.findById(jobSeekerId),followService);
+			jobSeeker jobSeekerFetched=jobSeekerService.findById(jobSeekerId);
+			jobSeekerProfile profile=new jobSeekerProfile(jobSeekerFetched,followService);
 			System.out.println("Jobseeker Followers:"+profile.getFollowers()+"\n Followings: "+profile.getFollowings());
 			if(user.getId() == jobSeekerId){
 				isrequestUser=true;
@@ -48,8 +57,12 @@ public class jobSeekerProfileController {
 			{
 				isrequestUser=false;
 			}
+			jobSeekerDTO dtoJobSeeker=jobSeekerMapper.mapJobSeekerToDTO(jobSeekerFetched);
 			
-			profileResponse response=new profileResponse(profile, isrequestUser);
+			dtoJobSeeker.setReq_user(userUtils.isReqUser(user,jobSeekerFetched));
+			dtoJobSeeker.setFollowed(userUtils.isFollowedByReqUser(user, jobSeekerFetched));
+//			skillsAndQualificationsRequest skillsAndQualificationsRequest=jobSeekerService.getJobSeekerSkillsAndQualificaitonsByJobSeekerId(jobSeekerId);
+			profileResponse response=new profileResponse(profile, isrequestUser,dtoJobSeeker);
 			return new ResponseEntity<profileResponse>(response,HttpStatus.OK);
 		}else 
 		{

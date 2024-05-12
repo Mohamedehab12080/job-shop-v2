@@ -7,9 +7,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteEmployer, deleteField, getAllFields, getEmployers, giveEmployerFields } from '../../../../store/company/Action';
 import {  Avatar, Grid, MenuItem, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useFormik } from 'formik';
+import { Formik, useFormik } from 'formik';
 import { Close } from "@mui/icons-material";
 import {IconButton} from "@mui/material";
+import MessageModal from '../../../../responses/MessageModal';
 export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGiveEmployerFields}) {
   
   var [filteredEmployers,setFilteredEmployers] = React.useState([]);
@@ -27,6 +28,10 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
   const [selectedField, setSelectedField] =React.useState([]);
   var [filteredFields, setFilteredFields] =React.useState([]);
   const [filterInputFields, setFilterInputField] = React.useState("");
+  const [openMessageModal,setOpenMessageModal]=React.useState(false);
+  const handleOpenMessageModal=()=>setOpenMessageModal(true);
+  const handleCloseMessageModal=()=>setOpenMessageModal(false);
+  const [responseMessage,setResponseMessage]=React.useState("");
   const handleFilterFields=(input)=>
     {
       const filtered=fetchedCompanyFields.filter((field)=>
@@ -38,7 +43,7 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
     }
   const handleSelecteEmployer=(value)=>{
     setSelectedEmployer(value);
-    formik.setFieldValue("employerId",value.id);
+    // setFilteredEmployers(value);
   }
   
   const handleCancelSelecteEmployer=()=>{
@@ -60,7 +65,13 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
   const handleSubmit = async (values) => {
     console.log("values : ",values);
     dispatch4(giveEmployerFields(values));
+    setResponseMessage(comp.response);
+    handleOpenMessageModal();
+    setSelectedEmployer(null);
+    setSelectedField([]);
+    formik.resetForm();
   };
+
   const handleRemoveField = (fieldToRemove) => {
     const updatedFields = selectedField.filter(
       (field) => field.id !== fieldToRemove.id
@@ -72,7 +83,7 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
       }));
     
       if (objectofSetFields) {
-        setSelectedField(fieldToRemove);
+        setSelectedField(updatedFields);
         formik.setFieldValue("employerFields", objectofSetFields);
       }
   };
@@ -107,7 +118,7 @@ React.useEffect(() => {
   const handleAddField = (fieldToAdd) => {
     if (!selectedField.some((field) => field.id === fieldToAdd.id)) {
       const updatedFields = [...selectedField, fieldToAdd];
-      setSelectedField(fieldToAdd.id);
+      setSelectedField(updatedFields);
       const objectofSetFields = updatedFields.map((field) => ({
         id: field.id,
         employerId: selectedEmployer.id
@@ -160,6 +171,7 @@ React.useEffect(() => {
           overflowY: "auto",
         }}
         >
+
   <Grid item xs={12}>
       <TextField
         fullWidth
@@ -170,8 +182,65 @@ React.useEffect(() => {
         onChange={(e) => handleFilterEmployers(e.target.value)}
       />
     </Grid>
+    <form onSubmit={formik.handleSubmit}>
+        <Grid item container justifyContent="center">
+            <Button type="submit" variant="contained"
+                color="primary">
+              Save
+            </Button>
+      </Grid>
+  
         <section>
-           {(selectedEmployer !== null ? selectedEmployer : filterInputEmployer==="" ? fetchedEmployers : filteredEmployers).map((emp, index) => (
+          {selectedEmployer !== null ? (
+               <>
+               <div><hr></hr></div>
+               <div key={selectedEmployer.id} className='flex space-x-5'>
+               <Avatar
+                    onClick={() => navigate(`/profile/${selectedEmployer.id}`)}
+                    className='cursor-pointer'
+                    alt="userName"
+                    src={selectedEmployer.picture}
+               />
+                <div className='w-full'>
+    
+                <div className='flex justify-between items-center'>
+                        <div className='flex cursor-pointer items-center space-x-2'>
+                            <span className='font-semibold'>{selectedEmployer.userName}</span>
+                            <span className='text-gray-600'>@{selectedEmployer.email}</span>
+                        </div>
+                        
+                        <div>
+                                <Button
+                                    id="basic-button"
+                                    onClick={() => handleCancelSelecteEmployer()}
+                                >
+                                    Diselect
+                                </Button>
+                        </div>
+                       
+                    </div>
+                    <div className='flex'>
+                    <p className='font-semibold text-gray-500'> Fields :</p>
+                    <ul>
+                    {selectedEmployer.fieldsNames && selectedEmployer.fieldsNames.length > 0 ? (
+                      selectedEmployer.fieldsNames.map((empField, index) => (
+                        <>
+                        <li className='ml-2 text-gray-600'>- {empField}</li>
+                        </>
+                      ))
+                    ) : (
+                      <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
+                    )}  
+                    </ul>
+                    </div>
+                    
+                </div>
+                
+               </div>
+               </>
+          ):(
+            <>
+        {(filterInputEmployer==="" ? fetchedEmployers : filteredEmployers).map((emp, index) => (
            <>
            <div><hr></hr></div>
            <div key={emp.id} className='flex space-x-5'>
@@ -190,40 +259,30 @@ React.useEffect(() => {
                     </div>
                     
                     <div>
-
-                        {selectedEmployer !==null ? (
                             <Button
                             id="basic-button"
                             onClick={() => handleSelecteEmployer(emp)}
                         >
                             Select
                         </Button>
-                        ):(
-                            <Button
-                                id="basic-button"
-                                onClick={() => handleCancelSelecteEmployer()}
-                            >
-                                Select
-                            </Button>
-                        )}
+                        
                     </div>
                    
                 </div>
                 <div className='flex'>
                 <p className='font-semibold text-gray-500'> Fields :</p>
-                {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
+                  <ul>
+                  {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
                   emp.fieldsNames.map((empField, index) => (
                     <>
-                    <div className='flex'> 
-                    <p className='ml-2'>{index > 0 && " , "}</p>
-                    <p className='ml-2 text-gray-600'>{empField}</p>
-                    </div>
+                    <li className='text-gray-600'>- {empField}</li>
                     </>
-                    
-                  ))
-                ) : (
-                  <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
-                )}  
+                        
+                      ))
+                    ) : (
+                      <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
+                    )}  
+                  </ul>
                 </div>
                 
             </div>
@@ -231,13 +290,10 @@ React.useEffect(() => {
            </div>
            </>
           ))}
+            </>
+          )}
+
            </section>
-
-
-
-          <section>
-            
-          </section>
         <section>
         <Grid item xs={12}>
                 <TextField
@@ -304,6 +360,14 @@ React.useEffect(() => {
               </div>
               </Grid>
         </section>
+  </form>
+  <section>
+    <MessageModal 
+          openMessageModal={openMessageModal} 
+          handleCloseMessageModal={handleCloseMessageModal} 
+          response={responseMessage} 
+          Title={"Give Employer Fields"}/>
+  </section>
         </Box>
       </Modal>
     </div>

@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, MenuItem } from "@mui/material";
+import { IconButton, MenuItem, Slide } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -19,7 +19,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const style = {
   position: "absolute",
-  top: "50%",
+  top: "10%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
@@ -124,7 +124,10 @@ const renderIcon = () => {
     setFilteredQualifications(field.qualifications);
     formik.setFieldValue("field",field.id);
   };
+  
+    
   const [preview,setPreview]=React.useState("");
+
   const handleFileUpload=(e)=>
       {
       setUploadProgress(0); // Reset progress when a new file is selected
@@ -138,7 +141,6 @@ const renderIcon = () => {
       }
         const handleSelectImage = async () => {
           try {
-  // Set status to 'uploading' before making the request
           if(!preview){
             return; 
           }else {
@@ -305,7 +307,14 @@ const renderIcon = () => {
     setFilterInputSkills("");
     setFilterInputQualifications("");
   };
-
+  const slideStyle = {
+    height: '100%',
+    overflowY: 'auto',
+    scrollbarWidth: 'none', // Hide scrollbar for Firefox
+    '&::-webkit-scrollbar': {
+      display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+    },
+  };
   return (
     <div>
       <Modal
@@ -313,6 +322,15 @@ const renderIcon = () => {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+      >
+      <Slide
+          direction="left"
+          in={openPostModal}
+          mountOnEnter
+          unmountOnExit
+          timeout={{ enter: 500, exit: 300 }}
+          transitionTimingFunction="ease-in-out" 
+          style={slideStyle}
       >
         <Box sx={style}>
           <div className="modal-content-container flex items-center justify-between mb-4">
@@ -650,6 +668,7 @@ const renderIcon = () => {
             </Grid>
           </form>
         </Box>
+        </Slide>
       </Modal>
     </div>
   );

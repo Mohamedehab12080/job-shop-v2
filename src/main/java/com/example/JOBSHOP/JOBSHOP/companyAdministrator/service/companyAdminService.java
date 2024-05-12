@@ -73,6 +73,7 @@ public class companyAdminService implements companyAdministratorServiceInterface
 		}
 		
 		
+		@Override
 		public companyAdministrator findById(Long id)
 		{
 			Optional<companyAdministrator> finded=companyAdminRepository.findById(id);
@@ -172,8 +173,8 @@ public class companyAdminService implements companyAdministratorServiceInterface
 	 
 	 public void giveEmployerFields(List<employerField> employerFields,int batchSize)
 	 {
+		 
 		 for (int i = 0; i < employerFields.size(); i++) {
-			
 			 int endIndex=Math.min(i+batchSize, employerFields.size());
 			 List<employerField> batch=employerFields.subList(i, endIndex);
 			 employerFieldService.insertAll(batch);

@@ -10,15 +10,13 @@ import SkillsIcon from '@mui/icons-material/Attractions';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import ProfileModal from './ProfileModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { getInfo } from '../../store/JobSeeker/Action';
-import MessageModal from '../../responses/MessageModal'
-import ShowSkillsmodal from './ShowSkillsModal';
-import { getCompanyInfo } from '../../store/company/Action';
 import ContactsModal from '../../responses/CotactsModal';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';  
 import ShowFieldsModal from '../modals/companyModals/FieldsModals/ShowFieldsModal';
+import { getEmployerProfile } from '../../store/company/Employer/Action';
+import ShowEmployerFieldsModal from '../modals/companyModals/FieldsModals/ShowEmployerFieldsModal';
 
-const CompanyProfile = () => { 
+const EmployerProfile = () => { 
     const [tabValue,setTabValue]=useState("1")
     const [openProfileModal,setOpenProfileModal]=useState(false);
     const handleOpenProfileModel=()=>setOpenProfileModal(true);
@@ -27,18 +25,13 @@ const CompanyProfile = () => {
     const handleBack=()=>navigate(-1);
     const {id}=useParams();
     const dispatch=useDispatch();
-    const comp=useSelector(state=>state.comp);
-    const [companyData,setCompanyData]=useState(null);
-    const [fieldsNames,setFieldsNames]=useState([]);
-    const [employersUserNames,setEmployersUserNames]=useState([]);
+    const emp=useSelector(state=>state.emp);
+    const [employerData,setEmployerData]=useState(null);
     const [contactList,setContactList]=useState([]);
     const [isRequestUser,setIsRequestUser]=useState(false);
-    const [openShowFieldsModal,setOpenShowFieldsModal]=useState(false);
-    const  handleOpenShowFieldsModal=()=>setOpenShowFieldsModal(true);
-    const handleCloseShowFieldsModal=()=>setOpenShowFieldsModal(false);
-    const [openShowSkillsModal,setOpenShowSkillsModal]=useState(false);
-    const  handleOpenShowSkillsModal=()=>setOpenShowSkillsModal(true);
-    const handleCloseShowSkillsModal=()=>setOpenShowSkillsModal(false);
+    const [openShowEmployerFieldsModal,setOpenShowEmployerFieldsModal]=useState(false);
+    const  handleOpenShowEmployerFieldsModal=()=>setOpenShowEmployerFieldsModal(true);
+    const handleCloseShowEmployerFields=()=>setOpenShowEmployerFieldsModal(false);
     const [openContactsModal,setOpenContactsModal]=useState(false);
     const  handleOpenContactsModal=()=>setOpenContactsModal(true);
     const handleCloseContactsModal=()=>setOpenContactsModal(false);
@@ -48,33 +41,30 @@ const CompanyProfile = () => {
     
   useEffect(() => {
     
-        dispatch(getCompanyInfo(id));
+        dispatch(getEmployerProfile(id));
     
   }, [dispatch, id]); // Dependency array ensures this effect runs only when id or dispatch changes
 
   // Log jobSeeker state changes
   useEffect( () => {
    
-        setCompanyData(comp.companyData);
+        setEmployerData(emp.employerData);
     
-  }, [comp.companyData]); // Dependency array ensures this effect runs only when jobSeeker changes
+  }, [emp.employerData]); // Dependency array ensures this effect runs only when jobSeeker changes
 
   useEffect(()=>
 {
 
-        setFieldsNames(comp.fields);
-        setEmployersUserNames(comp.employers);
-        if(companyData !== null )
-           {
-               setProfileImage(companyData.picture); 
-               setContactList(companyData.contacts);
-           }
-        setIsRequestUser(comp.isRequestUser);
+        if(employerData !== null )
+        {
+            setProfileImage(employerData.picture); 
+            setContactList(employerData.contacts);
+        }
+        setIsRequestUser(emp.isRequestUser);
 },[
-    comp.fields,
-    comp.employers,
-    comp.isRequestUser,
-    companyData])
+    emp.fields,
+    emp.isRequestUser,
+    employerData])
 
     const handleFollowUser=()=>
     {
@@ -100,7 +90,7 @@ const CompanyProfile = () => {
         
         <section className={`z-50 flex items-center sticky top-0 bg-opacity-95`}>
             <KeyboardBackspace className='cursor-pointer' onClick={handleBack} />
-            <h1 className='py-5 text-xl font-bold opacity-90 ml-5'>{companyData !== null && companyData.userName}</h1>
+            <h1 className='py-5 text-xl font-bold opacity-90 ml-5'>{employerData !== null && employerData.userName}</h1>
         </section>
 
         <section>
@@ -112,7 +102,7 @@ const CompanyProfile = () => {
             <div className='flex justify-between items-start mt-5 h-[5rem]'>
                 <Avatar className='transform -translate-y-24' alt='BOB' src={profileImage}
                 sx={{width:"10rem",height:"10rem",border:"4px solid white"}}/> 
-             {companyData !==null && companyData.req_user ? (<Button
+             {employerData !==null && employerData.req_user ? (<Button
              onClick={handleOpenProfileModel}
              variant='contained' sx={{borderRadius:"20px"}}
             >Edit Profile</Button>
@@ -120,31 +110,36 @@ const CompanyProfile = () => {
             <Button
              onClick={handleFollowUser}
              variant='contained' sx={{borderRadius:"20px"}}
-            >{companyData !==null && companyData.followed ? "Unfollow":"follow"}</Button>)}
+            >{employerData !==null && employerData.followed ? "Unfollow":"follow"}</Button>)}
             </div>
             <div>
                     <div className='flex item-center'>
-                        <h1 className='font-bold text-lg'>{companyData !== null && companyData.userName}</h1>
+                        <h1 className='font-bold text-lg'>{employerData !== null && employerData.userName}</h1>
             <div className='flex items-center space-x-20'>
                 <div className='ml-10 flex items-center space-x-1 font-semibold'>
-                        <span>{companyData!==null && companyData.followers.length > 0 ? companyData.followers.length : 0}</span>
+                        <span>{employerData!==null && employerData.followers.length > 0 ? employerData.followers.length : 0}</span>
                         <span className='text-gray-500'>Followers</span>
                     </div>
                     <div className='flex items-center space-x-1 font-semibold'>
-                    <span>{companyData!==null && companyData.followings.length > 0 ? companyData.followings.length : 0}</span>
+                    <span>{employerData!==null && employerData.followings.length > 0 ? employerData.followings.length : 0}</span>
                         <span className='text-gray-500'>Following</span>
                     </div>
                 </div>
                     </div>
-                    <p className='text-gray-500'>{companyData !== null && companyData.email}</p>
+                   <div className='flex space-x-2'>
+                         <p className='text-lg font-bold'> Email :</p> <p className='text-gray-500'>{employerData !== null && employerData.email}</p>
+                   </div>
+                   <div className='flex space-x-2'>
+                         <p className='text-lg font-bold'> Company :</p> <p className='text-gray-500'>{employerData !== null && employerData.companyName}</p>
+                   </div>
             </div>
 
             <div className='mt-2 space-y-2'>
 
                     <>
-                        <p>{companyData!==null && companyData.description}</p>
+                        <p>{employerData!==null && employerData.description}</p>
                         <div className='flex space-x-5 cursor-pointer'>
-                            <div className='flex items-center text-gray-500' onClick={handleOpenShowFieldsModal}>
+                            <div className='flex items-center text-gray-500' onClick={handleOpenShowEmployerFieldsModal}>
                                 <SkillsIcon />
                                 <p className='ml-2 mt-3'>Fields</p>
                             </div>
@@ -160,7 +155,7 @@ const CompanyProfile = () => {
 
                             <div className='flex items-center text-gray-500'>
                                 <LocationIcon />
-                                <p className='ml-2 mt-3'>{companyData !== null && companyData.address}</p>
+                                <p className='ml-2 mt-3'>{employerData !== null && employerData.address}</p>
                             </div>
 
                             <div className='flex items-center text-gray-500'>
@@ -182,7 +177,7 @@ const CompanyProfile = () => {
                     <Box sx={{borderBottom:1,borderColor:'divider'}}>
                         <TabList onChange={handleChange} aria-label="lab API tabs example">
                             <Tab label="Fields" value="1" />
-                            <Tab label="Posts" value="2" />
+                            <Tab label={`Posts (${employerData !==null && employerData.postCount})`} value="2" />
                             <Tab label="Employers" value="3" />
                         </TabList> 
                     </Box>
@@ -202,7 +197,7 @@ const CompanyProfile = () => {
         </section>
 
         <section>
-            <ShowFieldsModal openShowFieldsModal = {openShowFieldsModal} handleCloseShowFieldsModal={handleCloseShowFieldsModal} isRequestUser={isRequestUser} userId={id}/>
+            <ShowEmployerFieldsModal openShowEmployerFieldsModal = {openShowEmployerFieldsModal} handleCloseShowEmployerFields={handleCloseShowEmployerFields} isRequestUser={isRequestUser} userId={id}/>
         </section>
         {/* <section> 
             <MessageModal openMessageModal={openEductationModal} handleCloseMessageModal={handleCloseEducationModal} response={jobSeekerData !==null && jobSeekerData.education} Title={"Education"}/>
@@ -214,4 +209,4 @@ const CompanyProfile = () => {
   )
 }
 
-export default CompanyProfile;
+export default EmployerProfile;

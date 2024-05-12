@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { useFormik } from 'formik';
-import { IconButton } from '@mui/material';
+import { IconButton, Slide } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import logo from '../common/images/myPic.jpg';
 import {Avatar} from '@mui/material';
@@ -12,7 +12,6 @@ import TextField from '@mui/material/TextField';
 import './ProfileModal.css'
 const style = {
   position: 'absolute',
-  top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
   width: 600,
@@ -21,9 +20,19 @@ const style = {
   boxShadow: 24,
   outline:'none',
   p: 4,
-  borderRadius:4
+  borderRadius:4,
+  maxHeight: '110vh',
+  overflowY: 'auto',
+  height: '100%',  // Ensure modal takes up full height for scrolling
 };
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function ProfileModal({open,handleClose}) {
   // const [open, setOpen] = React.useState(false);
   const [uploading,setUploading]=React.useState(false);
@@ -62,6 +71,15 @@ export default function ProfileModal({open,handleClose}) {
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+      >
+         <Slide
+        direction="left"
+        in={open}
+        mountOnEnter
+        unmountOnExit
+        timeout={{ enter: 500, exit: 300 }}
+        transitionTimingFunction="ease-in-out" 
+        style={slideStyle}
       >
         <Box sx={style}>
           <form onSubmit={formik.handleSubmit}>
@@ -167,6 +185,7 @@ export default function ProfileModal({open,handleClose}) {
             </div>
           </form>
         </Box>
+        </Slide>
       </Modal>
     </div>
   );

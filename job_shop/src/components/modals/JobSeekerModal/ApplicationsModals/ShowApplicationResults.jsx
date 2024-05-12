@@ -32,6 +32,10 @@ export default function ShowApplicationResultsModal({
           borderRadius: 8,
           maxHeight: '80vh',
           overflowY: 'auto',
+          scrollbarWidth: 'none', // Hide scrollbar for Firefox
+          '&::-webkit-scrollbar': {
+            display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+          },
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>

@@ -31,6 +31,16 @@ export const navigation=[
         path:"/profile"
     },
     {
+        title:"companyProfile",
+        icon:<AccountCircleIcon/>,
+        path:"/companyProfile"
+    },
+    {
+        title:"employerProfile",
+        icon:<AccountCircleIcon/>,
+        path:"/employerProfile"
+    },
+    {
         title:"More",
         icon:<PendingIcon/>,
         path:"/more"

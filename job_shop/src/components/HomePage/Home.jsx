@@ -8,6 +8,8 @@ import RightSection from '../RightPart/RightSection';
 import { Route, Routes } from 'react-router-dom';
 import PostDetails from '../PostDetails/PostDetails';
 import Authentication from '../Authentication/Authentication';
+import CompanyProfile from '../Profile/CompanyProfile';
+import EmployerProfile from '../Profile/EmployerProfile';
 
 export const Home = () => {
   return (
@@ -23,6 +25,8 @@ export const Home = () => {
           <Route path="/" element={<HomeSection />} />
           <Route path="/home" element={<HomeSection />} />
           <Route path="/profile/:id" element={<Profile />} />
+          <Route path="/companyProfile/:id" element={<CompanyProfile />} />
+          <Route path="/employerProfile/:id" element={<EmployerProfile />} />
           <Route path="/postDetails/:id" element={<PostDetails />} />
         </Routes>
       </Grid>

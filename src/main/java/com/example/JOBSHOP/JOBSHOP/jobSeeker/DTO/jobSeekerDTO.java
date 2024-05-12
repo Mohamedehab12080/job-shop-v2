@@ -20,10 +20,12 @@ public class jobSeekerDTO extends UserDTO{
 	
 	private List<String> skills;
 	
+	private List<String> qualifications;
 	private List<jobSeekerSkill> jobSeekerSkills=new ArrayList<jobSeekerSkill>();
 	
 	private List<jobSeekerQualification> jobSeekerQualifications=new ArrayList<jobSeekerQualification>();
-	
+	private String description;
+
 	@JsonIgnore
 	private List<Application> applications=new ArrayList<Application>();
 	
@@ -54,6 +56,18 @@ public class jobSeekerDTO extends UserDTO{
 		return education;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	public List<String> getQualifications() {
+		return qualifications;
+	}
+	public void setQualifications(List<String> qualifications) {
+		this.qualifications = qualifications;
+	}
 	public List<jobSeekerQualification> getJobSeekerQualifications() {
 		return jobSeekerQualifications;
 	}

@@ -12,6 +12,7 @@ import { uploadToCloudnary } from '../../Utils/UploadToCloudnary.';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { image } from '@cloudinary/url-gen/qualifiers/source';
 
 library.add(faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt);
 const SignupForm = () => {
@@ -22,7 +23,7 @@ const SignupForm = () => {
     const [selectedImage, setSelectedImage] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const [uploadStatus, setUploadStatus] = useState(null); // 'uploading', 'success', 'error'
-  
+    const [imageUrl,setImageUrl]=useState("");
     const validationSchema = Yup.object().shape({
         email: Yup.string().email("Invalid email").required("Email is Required"),
         password: Yup.string().required("Password is required"),
@@ -58,27 +59,33 @@ const SignupForm = () => {
           };
           reader.readAsDataURL(file);
         }
-    const handleSelectImage = async () => {
-       try {
-        setUploadingImage(true);
-        setUploadStatus('uploading'); // Set status to 'uploading' before making the request
-        if(!preview) return;
-        const imgUrl = await uploadToCloudnary(preview ,{
-            onUploadProgress: (progressEvent) => {
-                const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-                setUploadProgress(progress);
-              },
-        });
-        formik.setFieldValue("picture", imgUrl);
-        console.log("image url : ",imgUrl);
-        setSelectedImage(imgUrl);
-        setUploadingImage(false);
-        setUploadStatus('success'); // Set status to 'success' after successful upload
-       } catch (error) {
-        console.error('Error uploading file:', error);
-        setUploadStatus('error'); // Set status to 'error' if upload fails
-       }
-    };
+        
+        const handleSelectImage = async () => {
+            try {
+            if(!preview){
+              return; 
+            }else {
+              setUploadingImage(true);
+              setUploadStatus('uploading');
+              const imgUrl = await uploadToCloudnary(preview ,{
+                onUploadProgress: (progressEvent) => {
+                    const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                    setUploadProgress(progress);
+                  },
+            });
+            setImageUrl(imgUrl);
+            console.log("image url : ",imgUrl);
+            setSelectedImage(imgUrl);
+            setUploadingImage(false);
+            setUploadStatus('success'); 
+            return imgUrl;// Set status to 'success' after successful upload
+            }
+           
+            } catch (error) {
+            console.error('Error uploading file:', error);
+            setUploadStatus('error'); // Set status to 'error' if upload fails
+            }
+        };
     const renderIcon = () => {
         if (uploadStatus === 'uploading') {
           return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
@@ -109,20 +116,25 @@ const SignupForm = () => {
     ];
 
     const handleSubmit = async (values) => {
-        handleSelectImage();
-        if(uploadingImage === false)
+        const imageUrl = await handleSelectImage();
+        if( imageUrl !=="")
         {
-                const { day, month, year } = values.birthDate;
-                const birthDate = `${year}-${month}-${day}`;
-                values.birthDate = birthDate;
-                const formData = { ...values, contacts: values.contacts.filter(contact => contact !== '') };
-            
-                // Dispatch action based on userType
-                if (values.userType === 'jobSeeker') {
-                    await dispatch(registerJobSeekerUser(formData));
-                } else {
-                    await dispatch(registrerCompanyUser(formData));
-                }
+            console.log("KSOM EL IMAge : ",imageUrl)
+          const updatedValues = {
+            ...values,
+            picture: imageUrl
+          };
+          const { day, month, year } = updatedValues.birthDate;
+          const birthDate = `${year}-${month}-${day}`;
+          updatedValues.birthDate = birthDate;
+          const formData = { ...updatedValues, contacts: updatedValues.contacts.filter(contact => contact !== '') };
+      
+          // Dispatch action based on userType
+          if (updatedValues.userType === 'jobSeeker') {
+               dispatch(registerJobSeekerUser(formData));
+          } else {
+               dispatch(registrerCompanyUser(formData));
+          }
         }
     };
     const formik = useFormik({

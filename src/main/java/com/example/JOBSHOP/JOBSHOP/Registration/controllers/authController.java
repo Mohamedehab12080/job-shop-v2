@@ -91,7 +91,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realJobSeeker.setEmail(jobSeeker.getEmail());
 		realJobSeeker.setUserName(jobSeeker.getUserName());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		realJobSeeker.setBirthDate(dateFormat.parse(jobSeeker.getBirthDate().substring(0,10)));
+		realJobSeeker.setBirthDate(dateFormat.parse(jobSeeker.getBirthDate().substring(0,9)));
 		realJobSeeker.setUserType(Role.jobSeeker);
 		realJobSeeker.setExperience(jobSeeker.getExperience());
 		realJobSeeker.setEmploymentState(jobSeeker.getEmploymentState());
@@ -142,6 +142,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realCompanyAdmin.setCompanyName(companyAdmin.getCompanyName());
 		realCompanyAdmin.setVerification(new varification());
 		realCompanyAdmin.setPicture(companyAdmin.getPicture());
+		realCompanyAdmin.setDescription(companyAdmin.getDescription());
 //		realCompanyAdmin.setPicture(picture.getBytes());
 		companyAdministrator savedCompany=companyAdminServiceI.insert(realCompanyAdmin);
 		

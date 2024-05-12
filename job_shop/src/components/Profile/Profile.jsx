@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { KeyboardBackspace } from '@mui/icons-material'
 import { useNavigate, useParams } from 'react-router-dom';
 import { Avatar, Box, Tab } from '@mui/material';
@@ -9,9 +9,12 @@ import CalendarIcon from '@mui/icons-material/CalendarMonth'
 import SkillsIcon from '@mui/icons-material/Attractions';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import ProfileModal from './ProfileModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getInfo } from '../../store/JobSeeker/Action';
-
+import MessageModal from '../../responses/MessageModal'
+import ShowSkillsmodal from './ShowSkillsModal';
+import ContactsModal from '../../responses/CotactsModal';
+import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';  
 const Profile = () => { 
     const [tabValue,setTabValue]=useState("1")
     const [openProfileModal,setOpenProfileModal]=useState(false);
@@ -20,13 +23,57 @@ const Profile = () => {
     const navigate=useNavigate();
     const handleBack=()=>navigate(-1);
     const {id}=useParams();
+    const auth=useSelector(state=>state.auth);
     const dispatch=useDispatch();
+    const jobSeeker=useSelector(state=>state.jobSeeker);
+    const [skills,setSkills]=useState([]);
+    const [qualifications,setQualifications]=useState([]);
+    const [jobSeekerData,setJobSeekerData]=useState(null);
+    const [contactList,setContactList]=useState([]);
+    const [isRequestUser,setIsRequestUser]=useState(false);
+    const [openEductationModal,setOpenEducationModal]=useState(false);
+    const  handleOpenEducationModal=()=>setOpenEducationModal(true);
+    const handleCloseEducationModal=()=>setOpenEducationModal(false);
+    const [openShowSkillsModal,setOpenShowSkillsModal]=useState(false);
+    const  handleOpenShowSkillsModal=()=>setOpenShowSkillsModal(true);
+    const handleCloseShowSkillsModal=()=>setOpenShowSkillsModal(false);
+    const [openContactsModal,setOpenContactsModal]=useState(false);
+    const  handleOpenContactsModal=()=>setOpenContactsModal(true);
+    const handleCloseContactsModal=()=>setOpenContactsModal(false);
+       
+    const [coverImage,setCoverImage]=useState("");
+    const [profileImage,setProfileImage]=useState("");
+    
+  useEffect(() => {
 
-
-    React.useEffect(()=>
-    {
         dispatch(getInfo(id));
-    },[dispatch,id])
+    
+  }, [auth.user.userType,dispatch, id]); // Dependency array ensures this effect runs only when id or dispatch changes
+
+  // Log jobSeeker state changes
+  useEffect( () => {
+        setJobSeekerData(jobSeeker.jobSeekerData);
+        console.log("Job Seeker Data From profile : ",jobSeeker.jobSeekerData);
+    
+  }, [auth.user.userType,jobSeeker.jobSeekerData]); // Dependency array ensures this effect runs only when jobSeeker changes
+
+  useEffect(()=>
+{
+
+        setSkills(jobSeeker.skills);
+        setQualifications(jobSeeker.qualifications);
+        if(jobSeekerData !==null )
+        {
+            setProfileImage(jobSeekerData.picture);
+            setContactList(jobSeekerData.contacts);
+        }
+        setIsRequestUser(jobSeeker.isRequestUser);
+    
+},[jobSeeker.skills,
+    jobSeeker.qualifications,
+    jobSeekerData,
+    jobSeeker.isRequestUser,
+    ])
 
     const handleFollowUser=()=>
     {
@@ -51,19 +98,19 @@ const Profile = () => {
         
         <section className={`z-50 flex items-center sticky top-0 bg-opacity-95`}>
             <KeyboardBackspace className='cursor-pointer' onClick={handleBack} />
-            <h1 className='py-5 text-xl font-bold opacity-90 ml-5'>Mohamed Ehab</h1>
+            <h1 className='py-5 text-xl font-bold opacity-90 ml-5'>{jobSeekerData !== null && jobSeekerData.userName}</h1>
         </section>
 
         <section>
-            <img className='w-[100%] h-[15rem] object-cover' src="https://cdn.pixabay.com/photo/2024/03/08/16/06/building-8621170_1280.jpg" alt="" />
+            <img className='w-[100%] h-[15rem] object-cover' src={coverImage} alt="Cover Image" />
         </section>
 
         <section className='pl-6'>
             
             <div className='flex justify-between items-start mt-5 h-[5rem]'>
-                <Avatar className='transform -translate-y-24' alt='BOB' src=''
+                <Avatar className='transform -translate-y-24' alt='BOB' src={profileImage}
                 sx={{width:"10rem",height:"10rem",border:"4px solid white"}}/> 
-             {true ? (<Button
+             {jobSeekerData !==null && jobSeekerData.req_user ? (<Button
              onClick={handleOpenProfileModel}
              variant='contained' sx={{borderRadius:"20px"}}
             >Edit Profile</Button>
@@ -71,71 +118,88 @@ const Profile = () => {
             <Button
              onClick={handleFollowUser}
              variant='contained' sx={{borderRadius:"20px"}}
-            >{true ? "Follow":"Unfollow"}</Button>)}
+            >{jobSeekerData !==null && jobSeekerData.followed ? "Unfollow":"follow"}</Button>)}
             </div>
             <div>
                     <div className='flex item-center'>
-                        <h1 className='font-bold text-lg'> Mohamed Ehab</h1>
+                        <h1 className='font-bold text-lg'>{jobSeekerData !== null && jobSeekerData.userName}</h1>
             <div className='flex items-center space-x-20'>
                 <div className='ml-10 flex items-center space-x-1 font-semibold'>
-                        <span>500</span>
+                        <span>{jobSeekerData!==null && jobSeekerData.followers.length > 0 ? jobSeekerData.followers.length : 0}</span>
                         <span className='text-gray-500'>Followers</span>
                     </div>
                     <div className='flex items-center space-x-1 font-semibold'>
-                        <span>500</span>
+                    <span>{jobSeekerData!==null && jobSeekerData.followings.length > 0 ? jobSeekerData.followings.length : 0}</span>
                         <span className='text-gray-500'>Following</span>
                     </div>
                 </div>
                     </div>
-                    <p className='text-gray-500'>@BOB</p>
+                    <p className='text-gray-500'>{jobSeekerData !== null && jobSeekerData.email}</p>
             </div>
 
             <div className='mt-2 space-y-2'>
-                <p>Hello, i am Mohamed ,yor will find the full stack project here</p>
-                <div className='flex space-x-5'>
-                    <div className='flex items-center text-gray-500'>
-                        <SkillsIcon />
-                        <p className='ml-2 mt-3'>Skills</p>
-                    </div>
-                    <div className='flex items-center text-gray-500'>
-                        <BussinessCetnerIcon />
-                        <p className='ml-2 mt-3'>Education</p>
-                    </div>
+                    <>
+                        <p>{jobSeekerData!==null && jobSeekerData.description}</p>
+                        <div className='flex space-x-5 cursor-pointer'>
+                            <div className='flex items-center text-gray-500' onClick={handleOpenShowSkillsModal}>
+                                <SkillsIcon />
+                                <p className='ml-2 mt-3'>Skills</p>
+                            </div>
+                            <div className='flex items-center text-gray-500 cursor-pointer' onClick={handleOpenEducationModal}>
+                            <BussinessCetnerIcon />
+                                <p className='ml-2 mt-3'>Education</p>
+                            </div>
 
-                    <div className='flex items-center text-gray-500'>
-                        <LocationIcon />
-                        <p className='ml-2 mt-3'>Egypt</p>
-                    </div>
+                            <div className='flex items-center text-gray-500 cursor-pointer' onClick={handleOpenContactsModal}>
+                                 <ConnectWithoutContactIcon/>
+                                <p className='ml-2 mt-3' sx={{color:'blue'}}>Contacts Info</p>
+                            </div>
 
-                    <div className='flex items-center text-gray-500'>
-                        <CalendarIcon />
-                        <p className='ml-2 mt-3'>Joined Jun 2024</p>
-                    </div>
-                </div>
-                
+                            <div className='flex items-center text-gray-500'>
+                                <LocationIcon />
+                                <p className='ml-2 mt-3'>{jobSeekerData !== null && jobSeekerData.address}</p>
+                            </div>
+
+                            <div className='flex items-center text-gray-500'>
+                                <CalendarIcon />
+                                <p className='ml-2 mt-3'>Joined Jun 2024</p>
+                            </div>
+                        </div>
+                        
+                    </>
+               
             </div>
         </section>
-
+        <section>
+            <ShowSkillsmodal openShowSkillsModal={openShowSkillsModal} handleCloseShowSkillsModal={handleCloseShowSkillsModal} skills={skills} qualifications={qualifications}/>
+        </section>
         <section className='py-5'>
             <Box sx={{width:'100%',typography:'body1' }}>
-                <TabContext value={tabValue}>
-                    <Box sx={{borderBottom:1,borderColor:'divider'}}>
-                        <TabList onChange={handleChange} aria-label="lab API tabs example">
-                            <Tab label="Skills" value="1" />
-                            <Tab label="Applications" value="2" />
-                            <Tab label="Courses" value="3" />
-                        </TabList> 
-                    </Box>
-                    <TabPanel value='1'>Skills</TabPanel>
-                    <TabPanel value='2'>Applications</TabPanel>
-                    <TabPanel value='3'>Courses</TabPanel>
-                </TabContext>
+            <TabContext value={tabValue}>
+                 <Box sx={{borderBottom:1,borderColor:'divider'}}>
+                     <TabList onChange={handleChange} aria-label="lab API tabs example">
+                         <Tab label="Skills" value="1" />
+                         <Tab label="Posts" value="2" />
+                         <Tab label="Courses" value="3" />
+                     </TabList> 
+                 </Box>
+                 <TabPanel value='1'>Skills</TabPanel>
+                 <TabPanel value='2'>Posts</TabPanel>
+                 <TabPanel value='3'>Courses</TabPanel>
+             </TabContext>
             </Box>
         </section>
 
         <section>
             <ProfileModal open={openProfileModal} handleClose={handleClose}/>
         </section>
+
+        <section> 
+            <MessageModal openMessageModal={openEductationModal} handleCloseMessageModal={handleCloseEducationModal} response={jobSeekerData !==null && jobSeekerData.education} Title={"Education"}/>
+        </section>
+      <section>
+        <ContactsModal openContactsModal={openContactsModal} handleCloseContactsModal={handleCloseContactsModal} contactsList={contactList} isRequestUser={isRequestUser}/>
+      </section>
     </div>
   )
 }

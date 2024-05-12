@@ -79,6 +79,7 @@ public class postMapper {
 	    dto.setLocation(post.getLocation());
 	    dto.setEmploymentType(post.getEmploymentType());
 	    dto.setPostImage(post.getImage());
+	    dto.setEmployerEmail(post.getEmployer().getEmail());
 	    // Map Company Profile data
 	    companyProfile compF = post.getCompanyProfile();
 	    if (compF != null) {

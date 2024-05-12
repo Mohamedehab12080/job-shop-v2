@@ -8,6 +8,7 @@ import { deleteField, getAllFields } from '../../../../store/company/Action';
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import {  Grid, MenuItem, Slide, TextField } from '@mui/material';
 import Menu from "@mui/material/Menu";
+import { getEmployerFields } from '../../../../store/company/Employer/Action';
 const slideStyle = {
   height: '100%',
   overflowY: 'auto',
@@ -16,16 +17,14 @@ const slideStyle = {
     display: 'none', // Hide scrollbar for Chrome, Safari, Edge
   },
 };
-export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFieldsModal,isRequestUser,userId}) {
+export default function ShowEmployerFieldsModal({openShowEmployerFieldsModal,handleCloseShowEmployerFields,isRequestUser,userId}) {
   
   var [filteredFields,setFilteredFields] = React.useState([]);
   const [filterInputField, setFilterInputField] = React.useState("");
   const auth=useSelector(state=>state.auth);
   const dispatch=useDispatch();
-  const dispatch2=useDispatch();
-  const comp=useSelector(state=>state.comp);
+  const emp=useSelector(state=>state.emp);
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const openMenu = Boolean(anchorEl);
   const [fetchedFields,setFetchedFields]=React.useState([])
 
   const handleFilterFields=(input)=>
@@ -46,36 +45,27 @@ export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFiel
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
 
   React.useEffect(() => {
-    if (openShowFieldsModal && isRequestUser) {
-      dispatch(getAllFields(auth.user.id));
-    }else if(openShowFieldsModal){
-      dispatch(getAllFields(userId));
+    if (openShowEmployerFieldsModal && isRequestUser) {
+      dispatch(getEmployerFields(auth.user.id));
+    }else if(openShowEmployerFieldsModal){
+      dispatch(getEmployerFields(userId));
     }
-  }, [openShowFieldsModal, dispatch, auth.user.id,userId]);
+  }, [openShowEmployerFieldsModal, dispatch, auth.user.id,userId]);
   
   // Add comp as a dependency to useEffect to ensure that the log executes 
   // with the updated value. 
   React.useEffect(() => {
-    if (openShowFieldsModal && comp.fields) {
-      setFetchedFields(comp.fields); // Set your fields with the updated value here
+    if (openShowEmployerFieldsModal && emp.fields) {
+      setFetchedFields(emp.fields); // Set your fields with the updated value here
     }
-  }, [comp.fields, openShowFieldsModal]);
+  }, [emp.fields, openShowEmployerFieldsModal]);
 
-  const handleDeleteField=(fieldId)=>
-  {
-    // console.log("Field For Delete : ",fieldId)
-    dispatch2(deleteField(fieldId));
-    setFetchedFields(prevFields => prevFields.filter(field => field.id !== fieldId));
-  };
 
 //  React.useEffect(()=>
 // {
-//     if(openShowFieldsModal)
+//     if(openShowEmployerFieldsModal)
 //     {
 //       dispatch(getAllFields(auth.user.id));
 //       console.log("fields : ",comp.fields.length)
@@ -83,7 +73,7 @@ export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFiel
 //     }
 
 // },[
-//   openShowFieldsModal,
+//   openShowEmployerFieldsModal,
 //   dispatch
 //  ]);
 
@@ -92,14 +82,14 @@ export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFiel
   return (
     <div>
       <Modal
-        open={openShowFieldsModal}
-        onClose={handleCloseShowFieldsModal}
+        open={openShowEmployerFieldsModal}
+        onClose={handleCloseShowEmployerFields}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
     <Slide
           direction="up"
-          in={openShowFieldsModal}
+          in={openShowEmployerFieldsModal}
           mountOnEnter
           unmountOnExit
           timeout={{ enter: 1000, exit: 1000 }}
@@ -143,35 +133,6 @@ export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFiel
                      <span className='font-bold text-xl'>{field.fieldName}</span>
                    
                  </div>
-                 {isRequestUser && (
-                  
-                 <div>
-
-                 <Button
-                     id="basic-button"
-                     aria-controls={openMenu ? 'basic-menu' : undefined}
-                     aria-haspopup="true"
-                     aria-expanded={openMenu ? 'true' : undefined}
-                     onClick={handleClick}
-                 >
-         
-                     <MoreHorizIcon />
-
-                 </Button>
-                  <Menu
-                         id="basic-menu"
-                         anchorEl={anchorEl}
-                         open={openMenu}
-                         onClose={handleClose}
-                         MenuListProps={{
-                         'aria-labelledby': 'basic-button',
-                         }}
-                 >
-                         <MenuItem onClick={() => handleDeleteField(field.id)}>Delete</MenuItem>
-                         <MenuItem onClick={()=>handleEditField()}>Edit</MenuItem>
-                 </Menu>
-                 </div>
-                 )}
              </div>
              <div className="mt-2">
              <div className='mt-2 flex items-center space-x-2 overflow-auto'>

@@ -1,4 +1,4 @@
-import {ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_REQUEST, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, ADD_JOBSEEKER_SKILLS_REQUEST, ADD_JOBSEEKER_SKILLS_SUCCESS, DELETE_JOBSEEKER_APPLICATION_FAILURE, DELETE_JOBSEEKER_APPLICATION_REQUEST, DELETE_JOBSEEKER_APPLICATION_SUCCESS, GET_JOBSEEKER_APPLICATIONS_FAILURE, GET_JOBSEEKER_APPLICATIONS_REQUEST, GET_JOBSEEKER_APPLICATIONS_SUCCESS, GET_JOBSEEKER_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_QUALIFICATIONS_REQUEST, GET_JOBSEEKER_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_REQUEST, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_REQUEST, GET_JOBSEEKER_SKILLS_SUCCESS } from "./ActionType"
+import {ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_REQUEST, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, ADD_JOBSEEKER_SKILLS_REQUEST, ADD_JOBSEEKER_SKILLS_SUCCESS, DELETE_JOBSEEKER_APPLICATION_FAILURE, DELETE_JOBSEEKER_APPLICATION_REQUEST, DELETE_JOBSEEKER_APPLICATION_SUCCESS, GET_JOBSEEKER_APPLICATIONS_FAILURE, GET_JOBSEEKER_APPLICATIONS_REQUEST, GET_JOBSEEKER_APPLICATIONS_SUCCESS, GET_JOBSEEKER_INFO_FAILURE, GET_JOBSEEKER_INFO_REQUEST, GET_JOBSEEKER_INFO_SUCCESS, GET_JOBSEEKER_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_QUALIFICATIONS_REQUEST, GET_JOBSEEKER_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_REQUEST, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_REQUEST, GET_JOBSEEKER_SKILLS_SUCCESS } from "./ActionType"
 
 
 const initialState={
@@ -10,7 +10,9 @@ const initialState={
     qualifications:[],
     applications:[],
     response:null,
-    data:null
+    data:null,
+    jobSeekerData:null,
+    isRequestUser:false
 }
 
 export const jobSeekerReducer=(state=initialState,action)=>
@@ -22,11 +24,13 @@ export const jobSeekerReducer=(state=initialState,action)=>
         case GET_JOBSEEKER_APPLICATIONS_REQUEST:
         case ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_REQUEST:
         case DELETE_JOBSEEKER_APPLICATION_REQUEST:
+        case GET_JOBSEEKER_INFO_REQUEST:
             return {...state,loading:true,error:null};
         case GET_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE:
         case GET_JOBSEEKER_APPLICATIONS_FAILURE:
         case ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE: 
         case DELETE_JOBSEEKER_APPLICATION_FAILURE:
+        case GET_JOBSEEKER_INFO_FAILURE:
             return {...state,loading:false,error:action.payload};
         case GET_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS:
             return {
@@ -38,6 +42,18 @@ export const jobSeekerReducer=(state=initialState,action)=>
                 skills:action.payload.skills,
                 qualifications:action.payload.qualifications,
                 response:action.payload};
+        case GET_JOBSEEKER_INFO_SUCCESS:
+            return {
+                ...state,
+                loading:false,
+                error:null,
+                skillsObjects:action.payload.jobSeekerDto.jobSeekerSkills,
+                qualificationsObjects:action.payload.jobSeekerDto.jobSeekerQualifications,
+                skills:action.payload.jobSeekerDto.skills,
+                qualifications:action.payload.jobSeekerDto.qualifications,
+                response:action.payload,
+                isRequestUser:action.payload.requestUser,
+                jobSeekerData:action.payload.jobSeekerDto};
         case ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS:
             return {
                 ...state,

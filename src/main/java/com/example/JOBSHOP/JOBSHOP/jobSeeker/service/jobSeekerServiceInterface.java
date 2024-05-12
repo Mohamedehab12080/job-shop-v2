@@ -26,7 +26,7 @@ public interface jobSeekerServiceInterface {
 
 	List<Application> findAllApplicationsForJobSeeker(Long id);
 
-	Object applyForPost(applicationDTO app);
+	applicationReturnedSkillsAndQualifications applyForPost(applicationDTO app);
 
 	String insertJobSeekerSkillsAndQualificationsOptimized(saveSkillsRequest skillsRequest);
 

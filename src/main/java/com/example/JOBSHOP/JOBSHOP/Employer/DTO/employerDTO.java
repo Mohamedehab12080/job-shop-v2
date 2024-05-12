@@ -9,17 +9,22 @@ import com.example.JOBSHOP.JOBSHOP.User.DTO.UserDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotNull;
-
+@JsonInclude(JsonInclude.Include.NON_NULL) // Include only non-null properties in serialization
+@JsonIgnoreProperties(ignoreUnknown = true) // Ignore unknown properties during deserialization
 public class employerDTO extends UserDTO{
 	
 	
-		@JsonBackReference
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 		//@NotNull
 	    private companyAdministrator companyAdministrator;
-	    
+		
+		@JsonProperty("companyAdministratorId")
 		private Long companyAdministratorId;
 		private String companyName;
 	    

@@ -1,4 +1,4 @@
-import { GET_EMPLOYER_FIELDS_FAILURE, GET_EMPLOYER_FIELDS_REQUEST, GET_EMPLOYER_FIELDS_SUCCESS, GET_EMPLOYER_POSTS_FAILURE, GET_EMPLOYER_POSTS_REQUEST, GET_EMPLOYER_POSTS_SUCCESS, UPDATE_POST_FAILURE, UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS } from "./ActionType"
+import { GET_EMPLOYER_FIELDS_FAILURE, GET_EMPLOYER_FIELDS_REQUEST, GET_EMPLOYER_FIELDS_SUCCESS, GET_EMPLOYER_POSTS_FAILURE, GET_EMPLOYER_POSTS_REQUEST, GET_EMPLOYER_POSTS_SUCCESS, GET_EMPLOYER_PROFILE_FAILURE, GET_EMPLOYER_PROFILE_REQUEST, GET_EMPLOYER_PROFILE_SUCCESS, UPDATE_POST_FAILURE, UPDATE_POST_REQUEST, UPDATE_POST_SUCCESS } from "./ActionType"
 
 const initialState={
     loading:false,
@@ -8,7 +8,9 @@ const initialState={
     post:null,
     fields:[],
     field:null,
-    response:null
+    response:null,
+    employerData:null,
+    isRquestUser:false
 }
 
 export const employerReducer=(state=initialState,action)=>
@@ -17,9 +19,11 @@ export const employerReducer=(state=initialState,action)=>
     {
         case GET_EMPLOYER_POSTS_FAILURE:
         case GET_EMPLOYER_FIELDS_FAILURE:
+        case GET_EMPLOYER_PROFILE_FAILURE:
             return {...state,loading:false,error:action.payload};
         case GET_EMPLOYER_POSTS_REQUEST:
         case GET_EMPLOYER_FIELDS_REQUEST:
+        case GET_EMPLOYER_PROFILE_REQUEST:
             return {...state,loading:true,error:null};
         case GET_EMPLOYER_POSTS_SUCCESS:
             return {
@@ -36,6 +40,15 @@ export const employerReducer=(state=initialState,action)=>
                 error:null,
                 fields:action.payload,
                 response:action.payload
+            }
+        case GET_EMPLOYER_PROFILE_SUCCESS:
+            return {
+                ...state,
+                loading:false,
+                error:null,
+                response:action.payload,
+                employerData:action.payload.employerDto,
+                isRquestUser:action.payload.isRquestUser
             }
         default:
             return state;

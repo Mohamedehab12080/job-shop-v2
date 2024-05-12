@@ -336,6 +336,11 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 					 System.out.println("Application Skills For insert List Size : "+appSkillListForInsert.size());
 
 					 applicationReturnedSkillsAndQualifications returnedWithApply=applicationService.getApplicationReturnedSkillsAndQualifications();
+					 returnedWithApply.setApplicationId(insertedApp.getId());
+					 returnedWithApply.setPostId(postDto.getId());
+					 returnedWithApply.setPostTitle(postDto.getTitle());
+					 returnedWithApply.setEmployerEmail(postDto.getEmployerEmail());
+					 returnedWithApply.setEmployerUserName(postDto.getEmployerUserName());
 					 returnedWithApply.setMatched(true);
 					 returnedWithApply.setPostId(app.getPostId());
 					 return returnedWithApply;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, Box,Tab } from "@mui/material";
+import { Avatar, Box,Grid,Tab, TextField } from "@mui/material";
 import logo from "../common/images/default.jpg";
 import { useFormik } from "formik";
 import * as Yup from "yup";
@@ -19,7 +19,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
 // import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
 // import { responseUploadUrl } from "../../Utils/Server";
-
+import SearchIcon from '@mui/icons-material/Search'
 
 const validationSchema = Yup.object().shape({
   content: Yup.string().required("Info is required"),
@@ -37,28 +37,52 @@ const HomeSection = () => {
   const [companyPostsUserPosts,setCompanyPostsUserPosts]=useState([]);
   const [preview,setPreview]=useState("");
   const [statusOfPosts,setStatusOfPosts]=useState(false);
+  const [filteredJobSeekerPosts,setFilteredJobSeekerPosts]=useState([]);
+  const [filteredCompanyPosts,setFilteredCompanyPosts]=useState([]);
+  const [filterInputPost, setFilterInputPost] = React.useState("");
+
   const handleChange = (event,newValue)=>
     {
         setTabValue(newValue)
        
-        // if (newValue === '2') {
-        //   console.log("Clicked ")
-        //   handleFetchPosts();
-        //   // Call handleFetchPosts when the second tab is clicked
-        //   if(auth.user.userType ==="jobSeeker")
-        //     {
-        //       dispatch2()
-        //       // setJobSeekerPostsUserPosts(post.posts);
-        //     }else 
-        //     {
-        //       if(auth.user.userType==="Employer")
-        //       {
-        //         dispatch2(fetchEmployerPosts(auth.user.id));
-        //         setCompanyPostsUserPosts(post.userPosts);
-        //       }
-        //     }
-        // }
+        if (newValue === '2') {
+          console.log("Clicked ")
+          handleFetchPosts();
+          // Call handleFetchPosts when the second tab is clicked
+          if(auth.user.userType ==="jobSeeker")
+            {
+              // dispatch2()
+              // setJobSeekerPostsUserPosts(post.posts);
+            }else 
+            {
+              if(auth.user.userType==="Employer")
+              {
+                dispatch2(fetchEmployerPosts(auth.user.id));
+                setCompanyPostsUserPosts(post.userPosts);
+              }
+            }
+        }
     }
+    const handleFilterPosts=(input)=>
+      {
+        if(auth.user.userType==="jobSeeker")
+          {
+            const filtered=jobSeekerPosts.filter((post)=>
+              {
+                return post.title.toLowerCase().includes(input.toLowerCase());
+              });
+                setFilteredJobSeekerPosts(filtered);
+                setFilterInputPost(input);
+          }else {
+            const filtered=companyPosts.filter((post)=>
+              {
+                return post.title.toLowerCase().includes(input.toLowerCase());
+              });
+                setFilteredCompanyPosts(filtered);
+                setFilterInputPost(input);
+          }
+        
+      }
   const handleFetchPosts = () => {
     setStatusOfPosts(true); // Set statusOfPosts to true on button click
   };
@@ -201,6 +225,23 @@ React.useEffect(()=>
           </div>
         </div>
       </section>
+      <div className='relative flex items-center'>
+
+      <Grid item xs={12}>
+      <TextField
+            fullWidth
+            id="filterInputPost"
+            name="filterInputPost"
+            label="Filter Posts"
+            value={filterInputPost}
+            onChange={(e) => handleFilterPosts(e.target.value)}
+          />
+    </Grid>
+    {/* <div className='absolute top-0 left-0 pl-3 pt-3'>
+        <SearchIcon className='text-gray-500'/>
+    </div>         */}
+    </div>
+      
       <section className='py-5'>
             <Box sx={{width:'100%',typography:'body1' }}>
                 <TabContext value={tabValue}>
@@ -212,73 +253,74 @@ React.useEffect(()=>
                     </Box>
    <TabPanel key="1" value='1'>    
             <section>
-             {jobSeekerPosts.length > 1 ?(jobSeekerPosts.map((p)=>(
-            (p.companyName !== "" &&(
-              <PostCardJobSeeker
-              key={p.id}
-              id={p.id}
-              employerId={p.employerId}
-              employerUserName={p.employerUserName}
-              Title={p.title}
-              description={p.description}
-              jobRequirements={p.jobRequirements} 
-              location={p.location}
-              employmentType={p.employmentType}
-              companyName={p.companyName}
-              profileId={p.profileId}
-              skills={p.skills}
-              qualifications={p.qualifications}
-              field={p.field}
-              employerpicture={p.employerpicture}
-              fieldName={p.fieldName}
-              createdDate={p.createdDate}
-              remainedSkills={p.remainedSkills}
-              remainedQualifications={p.remainedQualifications}
-              state={p.state}
-              matchedQulifications={p.matchedQulifications}
-              matchedSkills={p.matchedSkills}
-              applicationCount={p.applicationCount}
-              jobSeekerId={auth.user.id}
-              Experience={p.experience}
-              postImage={p.postImage}
+            {((filterInputPost === "" ? jobSeekerPosts : filteredJobSeekerPosts).length > 0) ? (
+              (filterInputPost === "" ? jobSeekerPosts : filteredJobSeekerPosts).map((p) => (
+               p.companyName !== "" && (
+                <PostCardJobSeeker
+                key={p.id}
+                id={p.id}
+                employerId={p.employerId}
+                employerUserName={p.employerUserName}
+                Title={p.title}
+                description={p.description}
+                jobRequirements={p.jobRequirements}
+                location={p.location}
+                employmentType={p.employmentType}
+                companyName={p.companyName}
+                profileId={p.profileId}
+                skills={p.skills}
+                qualifications={p.qualifications}
+                field={p.field}
+                employerpicture={p.employerpicture}
+                fieldName={p.fieldName}
+                createdDate={p.createdDate}
+                remainedSkills={p.remainedSkills}
+                remainedQualifications={p.remainedQualifications}
+                state={p.state}
+                matchedQulifications={p.matchedQulifications}
+                matchedSkills={p.matchedSkills}
+                applicationCount={p.applicationCount}
+                jobSeekerId={auth.user.id}
+                Experience={p.experience}
+                postImage={p.postImage}
             />
-            ))
-        ))):companyPosts.length > 0 ? (
-          companyPosts.map((p)=>(
-            <>
-              <PostCardCompany
-                  key={p.id}
-                  id={p.id}
-                  employerId={p.employerId}
-                  employerUserName={p.employerUserName}
-                  Title={p.title}
-                  description={p.description}
-                  jobRequirements={p.jobRequirements} 
-                  location={p.location}
-                  employmentType={p.employmentType}
-                  companyName={p.companyName}
-                  profileId={p.profileId}
-                  skills={p.skills}//p.postField.skills
-                  qualifications={p.qualifications}//p.postField.qualifications
-                  field={p.field}
-                  employerpicture={p.employerpicture}
-                  fieldName={p.fieldName}//p.postField.employerField.companyField.fieldName
-                  createdDate={p.createdDate}
-                  remainedSkills={p.remainedSkills}
-                  remainedQualifications={p.remainedQualifications}
-                  state={p.state}
-                  matchedQulifications={p.matchedQulifications}
-                  matchedSkills={p.matchedSkills}
-                  applicationCount={p.applicationCount}
-                  Experience={p.experience}
-                  postImage={p.postImage}
-                />
-            </>
-          ))
-        ):(
-          <></>
-        )}
-
+        )
+    ))
+) : (
+    ((filterInputPost === "" ? companyPosts : filteredCompanyPosts).length > 0) ? (
+        (filterInputPost === "" ? companyPosts : filteredCompanyPosts).map((p) => (
+            <PostCardCompany
+                key={p.id}
+                id={p.id}
+                employerId={p.employerId}
+                employerUserName={p.employerUserName}
+                Title={p.title}
+                description={p.description}
+                jobRequirements={p.jobRequirements}
+                location={p.location}
+                employmentType={p.employmentType}
+                companyName={p.companyName}
+                profileId={p.profileId}
+                skills={p.skills}
+                qualifications={p.qualifications}
+                field={p.field}
+                employerpicture={p.employerpicture}
+                fieldName={p.fieldName}
+                createdDate={p.createdDate}
+                remainedSkills={p.remainedSkills}
+                remainedQualifications={p.remainedQualifications}
+                state={p.state}
+                matchedQulifications={p.matchedQulifications}
+                matchedSkills={p.matchedSkills}
+                applicationCount={p.applicationCount}
+                Experience={p.experience}
+                postImage={p.postImage}
+            />
+        ))
+    ) : (
+        <></> // Render nothing if there are no company posts to display
+    )
+)}
 
         {/* {post.posts.length > 0 ? (
           post.posts.map(p => (
@@ -315,43 +357,44 @@ React.useEffect(()=>
       </section>
         </TabPanel>
   <TabPanel key="2" value='2'>
-        {setStatusOfPosts && (
-            <section key="2">
-            {jobSeekerPostsUserPosts.length > 1 ?(jobSeekerPostsUserPosts.map((p)=>(
-           (p.companyName !== "" &&(
-             <PostCardJobSeeker
-             key={p.id}
-             id={p.id}
-             employerId={p.employerId}
-             employerUserName={p.employerUserName}
-             Title={p.title}
-             description={p.description}
-             jobRequirements={p.jobRequirements} 
-             location={p.location}
-             employmentType={p.employmentType}
-             companyName={p.companyName}
-             profileId={p.profileId}
-             skills={p.skills}
-             qualifications={p.qualifications}
-             field={p.field}
-             employerpicture={p.employerpicture}
-             fieldName={p.fieldName}
-             createdDate={p.createdDate}
-             remainedSkills={p.remainedSkills}
-             remainedQualifications={p.remainedQualifications}
-             state={p.state}
-             matchedQulifications={p.matchedQulifications}
-             matchedSkills={p.matchedSkills}
-             applicationCount={p.applicationCount}
-             jobSeekerId={auth.user.id}
-             Experience={p.experience}
-             postImage={p.postImage}
-           />
-           ))
-       ))):companyPosts.length > 0 ? (
-        companyPosts.map((p)=>(
-           p.employerId===auth.user.id && auth.user.userType==="Employer" &&(
-            <>
+        {statusOfPosts && (
+             <section key={2}>
+             {((filterInputPost === "" ? jobSeekerPostsUserPosts : filteredJobSeekerPosts).length > 0) ? (
+               (filterInputPost === "" ? jobSeekerPosts : filteredJobSeekerPosts).map((p) => (
+                p.companyName !== "" && (
+                 <PostCardJobSeeker
+                 key={p.id}
+                 id={p.id}
+                 employerId={p.employerId}
+                 employerUserName={p.employerUserName}
+                 Title={p.title}
+                 description={p.description}
+                 jobRequirements={p.jobRequirements}
+                 location={p.location}
+                 employmentType={p.employmentType}
+                 companyName={p.companyName}
+                 profileId={p.profileId}
+                 skills={p.skills}
+                 qualifications={p.qualifications}
+                 field={p.field}
+                 employerpicture={p.employerpicture}
+                 fieldName={p.fieldName}
+                 createdDate={p.createdDate}
+                 remainedSkills={p.remainedSkills}
+                 remainedQualifications={p.remainedQualifications}
+                 state={p.state}
+                 matchedQulifications={p.matchedQulifications}
+                 matchedSkills={p.matchedSkills}
+                 applicationCount={p.applicationCount}
+                 jobSeekerId={auth.user.id}
+                 Experience={p.experience}
+                 postImage={p.postImage}
+             />
+         )
+     ))
+ ) : (
+     ((filterInputPost === "" ? companyPostsUserPosts : filteredCompanyPosts).length > 0) ? (
+         (filterInputPost === "" ? companyPostsUserPosts : filteredCompanyPosts).map((p) => (
              <PostCardCompany
                  key={p.id}
                  id={p.id}
@@ -359,16 +402,16 @@ React.useEffect(()=>
                  employerUserName={p.employerUserName}
                  Title={p.title}
                  description={p.description}
-                 jobRequirements={p.jobRequirements} 
+                 jobRequirements={p.jobRequirements}
                  location={p.location}
                  employmentType={p.employmentType}
                  companyName={p.companyName}
                  profileId={p.profileId}
-                 skills={p.skills}//p.postField.skills
-                 qualifications={p.qualifications}//p.postField.qualifications
+                 skills={p.skills}
+                 qualifications={p.qualifications}
                  field={p.field}
                  employerpicture={p.employerpicture}
-                 fieldName={p.fieldName}//p.postField.employerField.companyField.fieldName
+                 fieldName={p.fieldName}
                  createdDate={p.createdDate}
                  remainedSkills={p.remainedSkills}
                  remainedQualifications={p.remainedQualifications}
@@ -378,50 +421,48 @@ React.useEffect(()=>
                  applicationCount={p.applicationCount}
                  Experience={p.experience}
                  postImage={p.postImage}
-               />
-           </>
-           )
+             />
          ))
-       ):(
-         <></>
-       )
-        }
-
-
-       {/* {post.posts.length > 0 ? (
-         post.posts.map(p => (
-           auth.user?.userType==="Admin" ? <PostCard key={p.id} /> :(
-               <PostCardJobSeeker
-                 key={p.id}
-                 id={p.id}
-                 employerId={p.employerId}
-                 employerUserName={p.employerUserName}
-                 Tit le={p.title}
-                 description={p.description}
-                 jobRequirements={p.jobRequirements} 
-                 location={p.location}
-                 employmentType={p.employmentType}
-                 companyName={p.companyName}
-                 profileId={p.profileId}
-                 skills={p.postField.skills}
-                 qualifications={p.postField.qualifications}
-                 field={p.field}
-                 employerpicture={p.employerpicture}
-                 fieldName={p.postField.employerField.companyField.fieldName}
-                 createdDate={p.createdDate}
-                 remainedSkills={p.remainedSkills}
-                 remainedQualifications={p.remainedQualifications}
-                 state={p.state}
-                 matchedQulifications={p.matchedQulifications}
-                 matchedSkills={p.matchedSkills}
-                 applicationCount={p.applicationCount}
-               />
-             ))
-         )) : (
-           <p>No posts found.</p>
-         )} */}
-     </section>
-              )}
+     ) : (
+         <></> // Render nothing if there are no company posts to display
+     )
+ )}
+ 
+         {/* {post.posts.length > 0 ? (
+           post.posts.map(p => (
+             auth.user?.userType==="Admin" ? <PostCard key={p.id} /> :(
+                 <PostCardJobSeeker
+                   key={p.id}
+                   id={p.id}
+                   employerId={p.employerId}
+                   employerUserName={p.employerUserName}
+                   Tit le={p.title}
+                   description={p.description}
+                   jobRequirements={p.jobRequirements} 
+                   location={p.location}
+                   employmentType={p.employmentType}
+                   companyName={p.companyName}
+                   profileId={p.profileId}
+                   skills={p.postField.skills}
+                   qualifications={p.postField.qualifications}
+                   field={p.field}
+                   employerpicture={p.employerpicture}
+                   fieldName={p.postField.employerField.companyField.fieldName}
+                   createdDate={p.createdDate}
+                   remainedSkills={p.remainedSkills}
+                   remainedQualifications={p.remainedQualifications}
+                   state={p.state}
+                   matchedQulifications={p.matchedQulifications}
+                   matchedSkills={p.matchedSkills}
+                   applicationCount={p.applicationCount}
+                 />
+               ))
+           )) : (
+             <p>No posts found.</p>
+           )} */}
+       </section>
+      
+      )}
  
              </TabPanel>
       </TabContext>

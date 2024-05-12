@@ -9,5 +9,6 @@ public interface companyAdministratorServiceInterface {
 	 companyAdministrator insert(companyAdministrator company);
 	 Optional<companyAdministrator> findByEmail(String email);
 	companyAdministrator update(Long id, companyAdministrator req);
-	 
+	companyAdministrator findById(Long id);
+	
 }

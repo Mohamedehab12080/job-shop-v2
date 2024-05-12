@@ -224,13 +224,14 @@ public class employerController {
 	}
 	
 	@GetMapping("/findFields/{id}")
-	public ResponseEntity<List<employerFieldShowDTO>> findEmployerFieldsById(@PathVariable Long id,
+	public ResponseEntity<List<employerFieldShowDTO>> findEmployerFieldsById(
+			@PathVariable Long id,
 			@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		
 		User user=userServiceI.findUserByJwt(jwt);
 				
-		if(user!=null && user.getUserType().name().equals("Employer"))
+		if(user!=null)
 		{
 			List <employerField> listFields=employerFieldService.findAllEmployerFieldsWithId(id);
 			return new ResponseEntity<>(listFields.stream()

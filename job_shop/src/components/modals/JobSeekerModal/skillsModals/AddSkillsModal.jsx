@@ -6,7 +6,7 @@ import { useFormik } from "formik";
 import { Close } from "@mui/icons-material";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
-import { IconButton, InputAdornment, TextField } from '@mui/material';
+import { IconButton, InputAdornment, Slide, TextField } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useDispatch, useSelector } from "react-redux";
 import { findAllSkills } from "../../../../store/skills/Action";
@@ -17,7 +17,7 @@ import { addSkillsQualifications, findJobSeekerSkills, findJobSeekerSkillsQualif
 
 const style = {
   position: "absolute",
-  top: "50%",
+  top: "10%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
@@ -29,8 +29,19 @@ const style = {
   borderRadius: 4,
   maxHeight: "80vh",
   overflowY: "auto", // Enable scrolling
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
 };
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function AddSkillsModal({
   openAddSkillsModal,
   handleCloseAddSkillsModal,
@@ -215,7 +226,17 @@ const handleAddManualSkill=(value)=>
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
+           <Slide
+        direction="left"
+        in={openAddSkillsModal}
+        mountOnEnter
+        unmountOnExit
+        timeout={{ enter: 500, exit: 300 }}
+        transitionTimingFunction="ease-in-out" 
+        style={slideStyle}
+      >
+
+<Box sx={style}>
           <div className="modal-content-container flex items-center justify-between mb-4">
             <div className="flex items-center space-x-1 space-y-1 text-gray-500">
               <IconButton
@@ -376,6 +397,8 @@ const handleAddManualSkill=(value)=>
             </form>
           
         </Box>
+      </Slide>
+    
       </Modal>
     </div>
   );

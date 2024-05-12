@@ -10,6 +10,7 @@ import com.example.JOBSHOP.JOBSHOP.User.DTO.UserDTO;
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.jobSeekerQualification;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.jobSeekerSkill;
 import java.util.List;
 public class jobSeekerMapper {
@@ -36,6 +37,7 @@ public class jobSeekerMapper {
 		dto.setLogin_with_google(jobSeeker.isIs_signin_with_google());
 		dto.setReq_user(jobSeeker.isReq_user());
 		dto.setEmploymentState(jobSeeker.getEmploymentState()); 
+		dto.setDescription(jobSeeker.getDescription());
 		return dto;
 	}
 	
@@ -43,6 +45,7 @@ public class jobSeekerMapper {
 	{
 		jobSeekerDTO dto=new jobSeekerDTO();
 		List<String> namesOfSkills=new ArrayList<>();
+		List<String> namesOfQual=new ArrayList<String>();
 		dto.setId(jobSeeker.getId());
 		dto.setAddress(jobSeeker.getAddress());
 		dto.setContacts(jobSeeker.getContacts());
@@ -57,14 +60,21 @@ public class jobSeekerMapper {
 		{
 			namesOfSkills.add(jobSeekerSkill.getSkill().getSkillName());
 		}
+		for(jobSeekerQualification jobSeekerQual:jobSeeker.getJobSeekerQualifications())
+		{
+			namesOfQual.add(jobSeekerQual.getQualification().getQualificationName());
+		}
 		dto.setSkills(namesOfSkills);
+		dto.setQualifications(namesOfQual);
+		dto.setJobSeekerSkills(jobSeeker.getJobSeekerSkills());
+		dto.setJobSeekerQualifications(jobSeeker.getJobSeekerQualifications());
 		dto.setEmploymentState(jobSeeker.getEmploymentState()); 
 		dto.setPicture(jobSeeker.getPicture());
 		dto.setFollowers(toUserDtos(jobSeeker.getFollowers()));
 		dto.setFollowings(toUserDtos(jobSeeker.getFollowings()));
 		dto.setIs_signin_with_google(jobSeeker.isLogin_with_google());
 		dto.setReq_user(jobSeeker.isReq_user());
-		
+		dto.setDescription(jobSeeker.getDescription());
 		return dto;
 	}
 

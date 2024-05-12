@@ -27,6 +27,7 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String employmentType;
 	private String employerpicture;
 	private String employerUserName;
+	private String employerEmail;
 	public String format;
 //	private companyProfile companyProfile;
 //	
@@ -51,6 +52,16 @@ public class postDTO extends baseEntityDTO<Long>{
 
     public String getFieldName() {
 		return fieldName;
+	}
+
+
+	public String getEmployerEmail() {
+		return employerEmail;
+	}
+
+
+	public void setEmployerEmail(String employerEmail) {
+		this.employerEmail = employerEmail;
 	}
 
 
