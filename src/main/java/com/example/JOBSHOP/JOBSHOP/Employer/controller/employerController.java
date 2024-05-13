@@ -50,11 +50,13 @@ import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.exception.postException;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postService;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.userService;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.DTO.companyAdministratorDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
@@ -62,7 +64,6 @@ import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
 
 @RestController
 @RequestMapping("/api/employer")
-@CrossOrigin(origins = "http://localhost:3000")
 public class employerController {
 
 	@Autowired
@@ -78,6 +79,7 @@ public class employerController {
 	private userServiceInterface userServiceI;
 	@Autowired
 	private companyProfileService companyProfileService;
+	
 	@GetMapping("/findProfile/{id}")
 	public ResponseEntity<employerProfileDTO> findProfile(@PathVariable Long id
 			,@RequestHeader("Authorization") String jwt) throws UserException
@@ -106,7 +108,35 @@ public class employerController {
 
 	}
 	
-	
+	@PutMapping("/update")
+	public ResponseEntity<employerDTO> updateCompanyUser(
+			@RequestBody registerUserRequest req,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User reqUSer=userServiceI.findUserByJwt(jwt);
+		if(reqUSer!=null && reqUSer.getUserType().name().equals("Employer"))
+		{
+			employerDTO returnedUser=employerService.update(reqUSer.getId(),req);
+			
+			if(returnedUser!=null)
+			{
+
+				return new ResponseEntity<>(returnedUser,HttpStatus.OK);
+			}
+			
+			else 
+			{
+				throw new UserException("User can't be updated");
+			}
+			
+		}
+		
+		else 
+		{
+			throw new UserException("user not found for this token");
+		}
+		
+	}
 	@GetMapping("/findAll/{compId}")
 	public ResponseEntity<List<employerDTO> >
 	findAllEmployersWithCompanyAdminId(

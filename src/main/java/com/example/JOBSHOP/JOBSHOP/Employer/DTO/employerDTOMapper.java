@@ -33,6 +33,9 @@ public class employerDTOMapper {
 		emp.setEmployerFields(dto.getEmployerFields());
 		emp.setRole(dto.getRole());
 		emp.setPassword(dto.getPassword());
+		emp.setGender(dto.getGender());
+		emp.setCoverImage(dto.getCoverImage());
+
 		return emp;
 	}
 	public static employerDTO mapEmployerToDTO(Employer emp)
@@ -54,12 +57,15 @@ public class employerDTOMapper {
 		dto.setRole(emp.getRole());
 		dto.setPassword(emp.getPassword());
 		dto.setCompanyName(emp.getCompanyAdmin().getCompanyName());
+		dto.setGender(emp.getGender());
 		for(employerField field: emp.getEmployerFields())
 		{
 			fieldsString.add(field.getCompanyField().getFieldName());
 		}
 		dto.setCompanyAdministratorId(emp.getCompanyAdmin().getId());
 		dto.setFieldsNames(fieldsString);
+		dto.setCoverImage(emp.getCoverImage());
+		dto.setPicture(emp.getPicture());
 		return dto;
 	}
 }

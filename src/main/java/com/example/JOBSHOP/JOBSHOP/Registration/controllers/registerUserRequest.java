@@ -25,8 +25,22 @@ public class registerUserRequest {
 	 private String companyName;
 	 private String contact;
 	 private String picture;
+	 private String gender;
+	 private String coverImage;
+ 
 	 
-	 
+	public String getCoverImage() {
+		return coverImage;
+	}
+	public void setCoverImage(String coverImage) {
+		this.coverImage = coverImage;
+	}
+	public String getGender() {
+		return gender;
+	}
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
 	public String getPicture() {
 		return picture;
 	}

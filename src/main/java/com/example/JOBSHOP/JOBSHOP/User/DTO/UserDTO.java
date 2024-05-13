@@ -23,7 +23,7 @@ public class UserDTO{
 		protected List<String> contacts;
 		protected LocalDateTime createdDate;
 		protected boolean isEnabled;
-		protected String image;
+		protected String coverImage;
 		protected varification verification;
 		protected List<UserDTO> followers=new ArrayList<UserDTO>();
 		
@@ -32,15 +32,24 @@ public class UserDTO{
 		protected boolean Followed;
 		protected boolean req_user;
 		protected boolean is_signin_with_google;
+		protected String gender;
 		
 		
 		
-		public String getImage() {
-			return image;
+		
+		public String getCoverImage() {
+			return coverImage;
 		}
-		public void setImage(String image) {
-			this.image = image;
+		public void setCoverImage(String coverImage) {
+			this.coverImage = coverImage;
 		}
+		public String getGender() {
+			return gender;
+		}
+		public void setGender(String gender) {
+			this.gender = gender;
+		}
+		
 		public varification getVerification() {
 			return verification;
 		}

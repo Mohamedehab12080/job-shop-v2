@@ -114,7 +114,7 @@ public class userController {
 	}
 	
 	@PutMapping("/follow/{userId}")
-	public ResponseEntity<UserDTO> SearchUsers(@PathVariable Long userId,
+	public ResponseEntity<UserDTO> followUnfollow(@PathVariable Long userId,
 			@RequestHeader("Authorization") String jwt) throws UserException
 	{
 		User reqUSer=userServiceI.findUserByJwt(jwt);
@@ -137,60 +137,6 @@ public class userController {
 		}
 	}
 	
-	@PutMapping("/jobSeeker/update")
-	public ResponseEntity<jobSeekerDTO> updateJobSeekerUser(@RequestBody jobSeeker req,
-			@RequestHeader("Authorization") String jwt) throws UserException
-	{
-		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null)
-		{
-			jobSeeker returnedUser=jobSeekerServiceI.update(reqUSer.getId(), req);
-			
-			if(returnedUser!=null)
-			{
-				jobSeekerDTO userDto=jobSeekerMapper.mapJobSeekerToDTO(returnedUser); // i will map like this for jobSeeker
-				
-				return new ResponseEntity<>(userDto,HttpStatus.ACCEPTED);
-			}else 
-			{
-				throw new UserException("User can't be updated");
-			}
-		}else 
-		{
-			throw new UserException("user not found for this token");
-		}
-	}
 	
 	
-	@PutMapping("/company/update")
-	public ResponseEntity<companyAdministratorDTO> updateCompanyUser(@RequestBody companyAdministrator req,
-			@RequestHeader("Authorization") String jwt) throws UserException
-	{
-		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
-		{
-			companyAdministrator returnedUser=companyAdminServiceI.update(reqUSer.getId(),req);
-			
-			if(returnedUser!=null)
-			{
-				companyAdministratorDTO userDto=
-						companyAdministratorMapper
-						.mapCompanyAdminToDTO(returnedUser); // i will map like this for company Admin
-				
-				return new ResponseEntity<>(userDto,HttpStatus.ACCEPTED);
-			}
-			
-			else 
-			{
-				throw new UserException("User can't be updated");
-			}
-			
-		}
-		
-		else 
-		{
-			throw new UserException("user not found for this token");
-		}
-		
-	}
 }

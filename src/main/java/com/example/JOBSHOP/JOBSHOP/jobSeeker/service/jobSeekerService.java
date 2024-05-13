@@ -1,5 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
@@ -34,10 +37,13 @@ import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postRepository;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
 import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerDTO;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerMapper;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.controller.skillsAndQualificationsRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.jobSeekerProfile;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.jobSeekerProfileService;
@@ -80,6 +86,9 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	 
 	 @Autowired
 	 private applicationSkillServiceInterface applicationSkillServiceI;
+	 
+	 @Autowired
+	 private PasswordEncoder passwordEncoder;
 	 
 	 @Autowired
 	 private applicationServiceInerface applicationServiceI;
@@ -132,7 +141,7 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 //		}
 		@Transactional
 		@Override
-		public jobSeeker update(Long jobSeekerId,jobSeeker user)
+		public jobSeekerDTO update(Long jobSeekerId,registerUserRequest user) throws ParseException
 		{
 			jobSeeker oldJobSeeker=findById(jobSeekerId);
 			if(user.getUserName()!=null)
@@ -145,9 +154,14 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				oldJobSeeker.setAddress(user.getAddress());
 			}
 			
-			if(!user.getContacts().isEmpty())
+			if(user.getGender() !=null)
 			{
-				oldJobSeeker.setContacts(user.getContacts());
+				oldJobSeeker.setGender(user.getGender());
+			}
+			
+			if(user.getPassword() !=null)
+			{
+				oldJobSeeker.setPassword(passwordEncoder.encode(user.getPassword()));
 			}
 			
 			if(user.getPicture()!=null)
@@ -162,7 +176,8 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 			
 			if(user.getBirthDate()!=null)
 			{
-				oldJobSeeker.setBirthDate(user.getBirthDate());
+				SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+				oldJobSeeker.setBirthDate(dateFormat.parse(user.getBirthDate().substring(0,10)));
 			}
 			
 			if(user.getEmploymentState()!=null)
@@ -175,7 +190,15 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				oldJobSeeker.setExperience(user.getExperience());
 			}
 			
-			return insert(oldJobSeeker);
+			if(user.getCoverImage() !=null)
+			{
+				oldJobSeeker.setCoverImage(user.getCoverImage());
+			}
+				
+			jobSeeker insertedJobSeeker= jobSeekerRepository.save(oldJobSeeker);
+			jobSeekerDTO dto=jobSeekerMapper.mapJobSeekerToDTO(oldJobSeeker);
+			dto.setReq_user(true);
+			return dto;
 			
 		}
 		@Transactional

@@ -1,5 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.service;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -8,7 +9,9 @@ import com.example.JOBSHOP.JOBSHOP.Application.Application;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.controller.skillsAndQualificationsRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.requests.saveSkillsRequest;
 
@@ -34,5 +37,5 @@ public interface jobSeekerServiceInterface {
 	
 	skillsAndQualificationsRequest getJobSeekerSkillsAndQualificaitonsByJobSeekerId(Long jobSeekerId);
 
-	jobSeeker update(Long jobSeekerId, jobSeeker user);
+	jobSeekerDTO update(Long jobSeekerId, registerUserRequest user) throws ParseException;
 } 

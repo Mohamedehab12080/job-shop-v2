@@ -1,5 +1,5 @@
 import { api } from "../../config/api";
-import { ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, DELETE_APPLICATION_SUCCESS, DELETE_JOBSEEKER_APPLICATION_FAILURE, DELETE_JOBSEEKER_APPLICATION_SUCCESS, GET_JOBSEEKER_APPLICATIONS_FAILURE, GET_JOBSEEKER_APPLICATIONS_SUCCESS, GET_JOBSEEKER_INFO_FAILURE, GET_JOBSEEKER_INFO_SUCCESS, GET_JOBSEEKER_SKILLS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_SUCCESS } from "./ActionType";
+import { ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, ADD_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, DELETE_APPLICATION_SUCCESS, DELETE_JOBSEEKER_APPLICATION_FAILURE, DELETE_JOBSEEKER_APPLICATION_SUCCESS, GET_JOBSEEKER_APPLICATIONS_FAILURE, GET_JOBSEEKER_APPLICATIONS_SUCCESS, GET_JOBSEEKER_INFO_FAILURE, GET_JOBSEEKER_INFO_SUCCESS, GET_JOBSEEKER_SKILLS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_FAILURE, GET_JOBSEEKER_SKILLS_QUALIFICATIONS_SUCCESS, GET_JOBSEEKER_SKILLS_SUCCESS, UPDATE_JOBSEEKER_INFO_FAILURE, UPDATE_JOBSEEKER_INFO_SUCCESS } from "./ActionType";
 
 
 export const findJobSeekerSkillsQualifications=(userId)=>async(dispatch)=>
@@ -57,13 +57,24 @@ export const addSkillsQualifications=(skillsQualificationsData)=>async(dispatch)
 }
 
 export const getInfo=(userId)=>async(dispatch)=>
-    {
-        try {
-            const {data}=await api.get(`/api/jobSeekerProfile/getInfo/${userId}`);
-            console.log("Data Fetched Profile : ",data);
-            dispatch({type:GET_JOBSEEKER_INFO_SUCCESS,payload:data});
-        } catch (error) {
-            console.log("Error getting info : ",error);
-            dispatch({type:GET_JOBSEEKER_INFO_FAILURE,payload:error});
-        }
+{
+    try {
+        const {data}=await api.get(`/api/jobSeekerProfile/getInfo/${userId}`);
+        console.log("Data Fetched Profile : ",data);
+        dispatch({type:GET_JOBSEEKER_INFO_SUCCESS,payload:data});
+    } catch (error) {
+        console.log("Error getting info : ",error);
+        dispatch({type:GET_JOBSEEKER_INFO_FAILURE,payload:error});
     }
+}
+
+export const updateProfile=(formData)=>async(dispatch)=>
+{
+try {
+    const {data}=await api.put(`/api/jobSeekers/update`,formData);
+    console.log("Data Fetched Profile : ",data);
+    dispatch({type:UPDATE_JOBSEEKER_INFO_SUCCESS,payload:data});
+} catch (error) {
+    dispatch({type:UPDATE_JOBSEEKER_INFO_FAILURE,payload:error});
+}
+}

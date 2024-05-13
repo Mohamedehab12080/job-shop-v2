@@ -12,8 +12,11 @@ import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldS
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.service.employerProfileServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.DTO.companyAdministratorDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.DTO.companyAdministratorMapper;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 
@@ -99,43 +102,45 @@ public class companyAdminService implements companyAdministratorServiceInterface
 		 */
 		@Transactional
 		@Override
-		public companyAdministrator update(Long id,companyAdministrator newC)
+		public companyAdministratorDTO update(Long id,registerUserRequest req)
 		{
 			companyAdministrator old=getReferenceById(id);
 			if(old!=null)
 			{
-				if(newC.getUserName()!=null)
+				
+				if(req.getUserName()!=null)
 				{
-					old.setUserName(newC.getUserName());
+					old.setUserName(req.getUserName());
 				}
 				
-				if(newC.getCompanyName()!=null)
+				if(req.getCompanyName()!=null)
 				{
-					old.setCompanyName(newC.getCompanyName()); 
+					old.setCompanyName(req.getCompanyName()); 
 				} 
 				
-			   if(newC.getContacts()!=null)
+				if(req.getAddress() !=null)
 				{
-					old.setContacts(newC.getContacts()); 
+					old.setAddress(req.getAddress());
 				}
-			   
-			    if(newC.getEmail()!=null)
-				{
-			    	old.setEmail(newC.getEmail()); 
-				} 
 			    
-			    if(newC.getUserName()!=null)
+				if(req.getDescription() !=null)
 				{
-			    	old.setUserName(newC.getUserName()); 
-				} 
-			    
-			    if(newC.getImage()!=null)
+					old.setDescription(req.getDescription());
+				}
+				
+			    if(req.getPicture()!=null)
 			    {
-			    	old.setImage(newC.getImage());
+			    	old.setCoverImage(req.getCoverImage());
 			    }
-				
-//				logInfo("Employer Updated Successfully");
-				return companyAdminRepository.save(old);
+			    
+			    if(req.getPicture() != null)
+			    {
+			    	old.setPicture(req.getPicture());
+			    }
+			    companyAdministrator inserted= companyAdminRepository.save(old);
+			    companyAdministratorDTO dto=companyAdministratorMapper.mapCompanyAdminToDTO(old);
+			    dto.setReq_user(true);
+				return dto;
 			}
 			
 			else 

@@ -73,13 +73,7 @@ const PostCardJobSeeker = ({
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const uint8Array = new Uint8Array(employerpicture);
-
-    // Convert the Uint8Array to a Blob
-    const blob = new Blob([uint8Array]);
     const postRef = useRef(null);
-    // Create a URL for the Blob
-    const imageUrl = URL.createObjectURL(blob);
     return (
       <div ref={postRef} className=''>
       {companyName &&(
@@ -88,7 +82,7 @@ const PostCardJobSeeker = ({
             onClick={() => navigate(`/profile/${profileId}`)}
             className='cursor-pointer'
             alt="userName"
-            src={imageUrl}
+            src={employerpicture}
             />
         
             <div className='w-full'>

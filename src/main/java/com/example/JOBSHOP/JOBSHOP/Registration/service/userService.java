@@ -110,6 +110,7 @@ public class userService implements userServiceInterface{
 			dto.setEmail(companyAdmin.getEmail());
 			dto.setPassword(passwordEncoder.encode(companyAdmin.getPassword()));
 			dto.setUserName(companyAdmin.getUserName());
+			dto.setGender(companyAdmin.getGender());
 //			dto.setCompanyFields(companyAdmin.getCompanyFields());
 //			dto.setEmployers(companyAdmin.getEmployers());
 			dto.setUserType(companyAdmin.getUserType());
@@ -132,6 +133,7 @@ public class userService implements userServiceInterface{
 		dto.setApplications(jobSeeker.getApplications());
 		dto.setApplicationCount(jobSeeker.getApplicationCount());
 		dto.setEmploymentState(jobSeeker.getEmploymentState()); 
+		dto.setGender(jobSeeker.getGender());
 		dto.setPicture(jobSeeker.getPicture());
 		return dto;
 	

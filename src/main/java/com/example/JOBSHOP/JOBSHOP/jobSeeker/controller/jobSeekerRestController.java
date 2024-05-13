@@ -1,8 +1,10 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.controller;
 
 import java.io.IOException;
+
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,29 +18,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationDTO;
 import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
-import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
-import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
-import com.example.JOBSHOP.JOBSHOP.Post.Post;
-import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
-import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
+
 import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
-import com.example.JOBSHOP.JOBSHOP.Registration.event.registrationCompleteEvent;
 import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
@@ -46,32 +40,22 @@ import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.userProfile;
 import com.example.JOBSHOP.JOBSHOP.User.userProfile.follow.service.followService;
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.DTO.companyProfileDTO;
-import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
+import com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO.jobSeekerDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.jobSeekerProfile;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.jobSeekerProfileService;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.DTO.jobSeekerProfileDTO;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.profile.DTO.jobSeekerProfileMapper;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.jobSeekerQualification;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualificationDTO;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.DTO.jobSeekerQualificationMapper;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.qualification.service.jobSeekerQualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.requests.saveSkillsRequest;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.applicationReturnedSkillsAndQualifications;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerServiceInterface;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.jobSeekerSkill;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillDTO;
-import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.DTO.jobSeekerSkillMapper;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
-import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
 
 import jakarta.mail.MessagingException;
 
-import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 
 @RestController
 @RequestMapping("/api/jobSeekers")
@@ -144,6 +128,22 @@ public class jobSeekerRestController {
 			}
 			
 		}
+		
+	@PutMapping("/update")
+	public ResponseEntity<jobSeekerDTO> updateJobSeeker(
+			@RequestBody  registerUserRequest registerUserRequest,
+			@RequestHeader("Authorization") String jwt) throws UserException, ParseException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null && user.getUserType().name().equals("jobSeeker"))
+		{
+			return new ResponseEntity<jobSeekerDTO>(jobSeekerServiceI.update(user.getId(), registerUserRequest),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user not found for this token");
+		}
+	}
+	
 	
 	@DeleteMapping("/delete-skill/{jobSeekerSkillId}") //(Tested)
 	public ResponseEntity<ApiResponse> deleteSkill(

@@ -120,7 +120,8 @@ const [showPassword, setShowPassword] = useState(false);
     userType: Yup.string().required("User type is required"),
     userName: Yup.string().required("Username is required"),
     address: Yup.string().required("Address is required"),
-});
+    gender:Yup.string().required("Gender is required")
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -131,6 +132,7 @@ const [showPassword, setShowPassword] = useState(false);
         confirmPassword: "",
         contacts: [''],
         address:'',
+        gender:'',
         employerFields: [
           { companyFieldId: 0 }
         ]
@@ -197,6 +199,29 @@ const [showPassword, setShowPassword] = useState(false);
                   helperText={formik.touched.userName && formik.errors.userName}
                 />
               </Grid>
+              <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          select
+                          id="gender"
+                          name="gender"
+                          label="Gender"
+                          value={formik.values.gender}
+                          onChange={formik.handleChange}
+                          variant="outlined"
+                          error={
+                            formik.touched.gender &&
+                            Boolean(formik.errors.gender)
+                          }
+                          helperText={
+                            formik.touched.gender &&
+                            formik.errors.gender
+                          }
+                        >
+                          <MenuItem value="Male">Male</MenuItem>
+                          <MenuItem value="Female">Female</MenuItem>
+                        </TextField>
+                      </Grid>
               <Grid item xs={12}>
                     <TextField
                         fullWidth

@@ -86,31 +86,13 @@ const PostCardCompany = ({
     {
       // dispatch(deletePost(postId));
     };
-    const getDynamicImageUrl = (picture) => {
-        if (picture && picture.length > 0) {
-          // Determine image type based on magic number (file signature)
-          const signature = picture.slice(0, 4); // Read the first 4 bytes
-    
-          // Check for known image file signatures (magic numbers)
-          if (signature[0] === 0x89 && signature[1] === 0x50 && signature[2] === 0x4E && signature[3] === 0x47) {
-            // PNG file
-            return `data:image/png;base64,${btoa(String.fromCharCode(...picture))}`;
-          } else if (signature[0] === 0xFF && signature[1] === 0xD8) {
-            // JPEG file
-            return `data:image/jpeg;base64,${btoa(String.fromCharCode(...picture))}`;
-          } else {
-            // Default to treating as a generic binary file (may not render as an image)
-            return `data:application/octet-stream;base64,${btoa(String.fromCharCode(...picture))}`;
-          }
-        }
-        return ''; // Return empty string if no picture or invalid data
-      };
+
       const postRef = useRef(null);
     return (
         <div ref={postRef} className=''>
             <div className='flex space-x-5'>
             <Avatar
-                onClick={() => navigate(`/profile/${profileId}`)}
+                onClick={() => navigate(`/employerProfile/${employerId}`)}
                 className='cursor-pointer'
                 alt="userName"
                 src={employerpicture}

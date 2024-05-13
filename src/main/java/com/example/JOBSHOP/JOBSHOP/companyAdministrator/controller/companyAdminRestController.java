@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,6 +36,7 @@ import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldForInsert;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldMapper;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerService;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.security.jwtProvider;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
@@ -114,6 +116,35 @@ public class companyAdminRestController {
 					
 	}
 	
+	@PutMapping("/update")
+	public ResponseEntity<companyAdministratorDTO> updateCompanyUser(
+			@RequestBody registerUserRequest req,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User reqUSer=userServiceI.findUserByJwt(jwt);
+		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+		{
+			companyAdministratorDTO returnedUser=companyAdminService.update(reqUSer.getId(),req);
+			
+			if(returnedUser!=null)
+			{
+
+				return new ResponseEntity<>(returnedUser,HttpStatus.OK);
+			}
+			
+			else 
+			{
+				throw new UserException("User can't be updated");
+			}
+			
+		}
+		
+		else 
+		{
+			throw new UserException("user not found for this token");
+		}
+		
+	}
 	/**
 	 * 
 	 * @Author BOB

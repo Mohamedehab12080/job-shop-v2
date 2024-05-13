@@ -54,7 +54,6 @@ const Profile = () => {
   useEffect( () => {
         setJobSeekerData(jobSeeker.jobSeekerData);
         console.log("Job Seeker Data From profile : ",jobSeeker.jobSeekerData);
-    
   }, [auth.user.userType,jobSeeker.jobSeekerData]); // Dependency array ensures this effect runs only when jobSeeker changes
 
   useEffect(()=>
@@ -66,6 +65,7 @@ const Profile = () => {
         {
             setProfileImage(jobSeekerData.picture);
             setContactList(jobSeekerData.contacts);
+            setCoverImage(jobSeekerData.coverImage);
         }
         setIsRequestUser(jobSeeker.isRequestUser);
     
@@ -191,7 +191,7 @@ const Profile = () => {
         </section>
 
         <section>
-            <ProfileModal open={openProfileModal} handleClose={handleClose}/>
+            <ProfileModal open={openProfileModal} handleClose={handleClose} data={jobSeekerData} Type={"jobSeeker"}/>
         </section>
 
         <section> 

@@ -1,6 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.DTO;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.example.JOBSHOP.JOBSHOP.Application.Application;
@@ -25,6 +26,7 @@ public class jobSeekerDTO extends UserDTO{
 	
 	private List<jobSeekerQualification> jobSeekerQualifications=new ArrayList<jobSeekerQualification>();
 	private String description;
+	private String birthDate;
 
 	@JsonIgnore
 	private List<Application> applications=new ArrayList<Application>();
@@ -56,6 +58,12 @@ public class jobSeekerDTO extends UserDTO{
 		return education;
 	}
 
+	public String getBirthDate() {
+		return birthDate;
+	}
+	public void setBirthDate(String birthDate) {
+		this.birthDate = birthDate;
+	}
 	public String getDescription() {
 		return description;
 	}

@@ -1,5 +1,5 @@
 import axios from "axios"
-import { CREATE_EMPLOYER_FAILURE, CREATE_EMPLOYER_SUCCCESS, CREATE_FIELD_FAILURE, CREATE_FIELD_SUCCCESS, DELETE_EMPLOYER_FAILURE, DELETE_EMPLOYER_SUCCCESS, DELETE_FIELD_FAILURE, DELETE_FIELD_SUCCCESS, GET_COMPANY_INFO_FAILURE, GET_COMPANY_INFO_SUCCCESS, GET_EMPLOYERS_FAILURE, GET_EMPLOYERS_SUCCCESS, GET_FIELDS_FAILURE, GET_FIELDS_SUCCCESS, GIVE_EMPLOYER_FIELDS_FAILURE, GIVE_EMPLOYER_FIELDS_SUCCCESS } from "./ActionType"
+import { CREATE_EMPLOYER_FAILURE, CREATE_EMPLOYER_SUCCCESS, CREATE_FIELD_FAILURE, CREATE_FIELD_SUCCCESS, DELETE_EMPLOYER_FAILURE, DELETE_EMPLOYER_SUCCCESS, DELETE_FIELD_FAILURE, DELETE_FIELD_SUCCCESS, GET_COMPANY_INFO_FAILURE, GET_COMPANY_INFO_SUCCCESS, GET_EMPLOYERS_FAILURE, GET_EMPLOYERS_SUCCCESS, GET_FIELDS_FAILURE, GET_FIELDS_SUCCCESS, GIVE_EMPLOYER_FIELDS_FAILURE, GIVE_EMPLOYER_FIELDS_SUCCCESS, UPDATE_COMPANY_INFO_FAILURE, UPDATE_COMPANY_INFO_SUCCCESS } from "./ActionType"
 import { API_BASE_URL, api } from "../../config/api"
 import { type } from "@testing-library/user-event/dist/type"
 
@@ -59,6 +59,17 @@ export const getCompanyInfo=(compId)=>async(dispatch)=>
             dispatch({type:GET_COMPANY_INFO_FAILURE,payload:error.message})
         }
     }
+    export const updateCompanyProfile=(formData)=>async(dispatch)=>
+        {
+            try {
+                const {data}=await api.get(`/api/company/update`,formData)
+                console.log("updated Company Profile : ",data)
+                dispatch({type:UPDATE_COMPANY_INFO_SUCCCESS,payload:data})
+            } catch (error) {
+                console.error("error : ",error)
+                dispatch({type:UPDATE_COMPANY_INFO_FAILURE,payload:error.message})
+            }
+        }
     
 export const createField=(fieldData)=>async(dispatch)=>
 {

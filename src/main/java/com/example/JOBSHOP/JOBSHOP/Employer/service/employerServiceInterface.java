@@ -3,9 +3,11 @@ package com.example.JOBSHOP.JOBSHOP.Employer.service;
 import java.util.List;
 
 import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 
 public interface employerServiceInterface {
 
@@ -17,7 +19,7 @@ public interface employerServiceInterface {
 
 	Employer findById(Long id);
 
-	Employer update(Long id,Employer t);
+	employerDTO update(Long id,registerUserRequest t);
 
 	void deleteById(Long id);
 

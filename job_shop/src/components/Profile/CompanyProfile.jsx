@@ -198,7 +198,7 @@ const CompanyProfile = () => {
         </section>
 
         <section>
-            <ProfileModal open={openProfileModal} handleClose={handleClose}/>
+            <ProfileModal open={openProfileModal} handleClose={handleClose} data={companyData} Type={"company"}/>
         </section>
 
         <section>

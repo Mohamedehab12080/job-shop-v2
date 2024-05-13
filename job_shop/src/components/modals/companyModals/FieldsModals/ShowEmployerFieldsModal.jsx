@@ -13,7 +13,7 @@ const slideStyle = {
   height: '100%',
   overflowY: 'auto',
   scrollbarWidth: 'none', // Hide scrollbar for Firefox
-  '&::-webkit-scrollbar': {
+  '&::WebkitScrollbar': {
     display: 'none', // Hide scrollbar for Chrome, Safari, Edge
   },
 };

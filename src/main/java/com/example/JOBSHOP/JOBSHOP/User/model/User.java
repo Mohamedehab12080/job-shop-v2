@@ -38,7 +38,7 @@ public class User{
 	
     private	String picture;
     
-    protected String image;
+    protected String coverImage;
     
 	@Column(nullable=false)
 //	@Convert(converter=PasswordConverter.class)
@@ -70,15 +70,28 @@ public class User{
 	@Embedded
 	protected varification verification;
 
+	protected String gender;
 	
 	
-	public String getImage() {
-		return image;
+	public String getGender() {
+		return gender;
 	}
 
 
-	public void setImage(String image) {
-		this.image = image;
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+
+
+
+	public String getCoverImage() {
+		return coverImage;
+	}
+
+
+	public void setCoverImage(String coverImage) {
+		this.coverImage = coverImage;
 	}
 
 

@@ -44,7 +44,8 @@ public class companyAdministratorMapper {
 			employersUserNames.add(companyAdmin.getEmployers().get(i).getUserName());
 		}
 		dto.setEmployersUserName(employersUserNames);
-		dto.setImage(companyAdmin.getImage());
+		dto.setCoverImage(companyAdmin.getCoverImage());
+		dto.setGender(companyAdmin.getGender());
 		return dto;
 	}
 	
@@ -67,6 +68,8 @@ public class companyAdministratorMapper {
 //		dto.setCompanyFields(companyAdmin.getCompanyFields());
 //		dto.setEmployers(companyAdmin.getEmployers());
 		dto.setUserType(companyAdmin.getUserType());
+		dto.setGender(companyAdmin.getGender());
+		dto.setCoverImage(companyAdmin.getCoverImage());
 		return dto;
 	}
 }

@@ -34,7 +34,7 @@ const SignupForm = () => {
         contacts: Yup.array().min(1, "At least one contact is required"),
         userName: Yup.string().required("Username is required"),
         address: Yup.string().required("Address is required"),
-     
+        gender:Yup.string().required("Gender is required"),
         ...(userType === "company" && {
             companyName: Yup.string().required("company name is required"),
             description: Yup.string().required("description is required"),
@@ -119,14 +119,16 @@ const SignupForm = () => {
         const imageUrl = await handleSelectImage();
         if( imageUrl !=="")
         {
-            console.log("KSOM EL IMAge : ",imageUrl)
           const updatedValues = {
             ...values,
             picture: imageUrl
           };
-          const { day, month, year } = updatedValues.birthDate;
-          const birthDate = `${year}-${month}-${day}`;
-          updatedValues.birthDate = birthDate;
+          if(userType === "jobSeeker")
+            {
+                const { day, month, year } = updatedValues.birthDate;
+                const birthDate = `${year}-${month}-${day}`;
+                updatedValues.birthDate = birthDate;
+            }
           const formData = { ...updatedValues, contacts: updatedValues.contacts.filter(contact => contact !== '') };
       
           // Dispatch action based on userType
@@ -155,7 +157,8 @@ const SignupForm = () => {
             employmentState: "",
             description: "",
             education: "",
-            companyName:""
+            companyName:"",
+            gender:""
                 },
         validationSchema: validationSchema,
         onSubmit: handleSubmit
@@ -226,7 +229,29 @@ const SignupForm = () => {
                         helperText={formik.touched.userName && formik.errors.userName}
                     />
                 </Grid>
-
+                <Grid item xs={12}>
+                        <TextField
+                          fullWidth
+                          select
+                          id="gender"
+                          name="gender"
+                          label="Gender"
+                          value={formik.values.gender}
+                          onChange={formik.handleChange}
+                          variant="outlined"
+                          error={
+                            formik.touched.gender &&
+                            Boolean(formik.errors.gender)
+                          }
+                          helperText={
+                            formik.touched.gender &&
+                            formik.errors.gender
+                          }
+                        >
+                          <MenuItem value="Male">Male</MenuItem>
+                          <MenuItem value="Female">Female</MenuItem>
+                        </TextField>
+                      </Grid>
                 <Grid item xs={12}>
                     <TextField
                         fullWidth
@@ -329,18 +354,34 @@ const SignupForm = () => {
                 </Grid>
                {formik.values.userType==="jobSeeker" ? (
                     <>
-                    <Grid item xs={12}>
-                    <TextField
-                        fullWidth
-                        label="Experience"
-                        variant='outlined'
-                        size='large'
-                        name="experience"
-                        value={formik.values.experience}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                    />
-                </Grid>
+        <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  select
+                  id="experience"
+                  name="experience"
+                  label="Experience"
+                  value={formik.values.experience}
+                  onChange={formik.handleChange}
+                  variant="outlined"
+                  error={
+                    formik.touched.experience &&
+                    Boolean(formik.errors.experience)
+                  }
+                  helperText={
+                    formik.touched.experience &&
+                    formik.errors.experience
+                  }
+                >
+                  <MenuItem value="No">No</MenuItem>
+                  <MenuItem value="1-2">1-2</MenuItem>
+                  <MenuItem value="2-5">2-5</MenuItem>
+                  <MenuItem value="5-8">5-8</MenuItem>
+                  <MenuItem value="8-10">8-10</MenuItem>
+                  <MenuItem value="more than 10">more than 10</MenuItem>
+                </TextField>
+              </Grid>
+
                 <Grid item xs={12}>
                     <TextField
                         fullWidth

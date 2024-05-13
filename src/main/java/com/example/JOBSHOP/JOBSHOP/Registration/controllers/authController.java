@@ -72,13 +72,6 @@ public class authController {
 public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		@RequestBody registerUserRequest jobSeeker) throws UserException, ParseException, IOException{
 		
-//		String email=jobSeeker.getEmail();
-//		String password=jobSeeker.getPassword();
-//		String userName=jobSeeker.getUserName();
-//		String userType=jobSeeker.getUserType().name();
-//		Date birthDate=jobSeeker.getBirthDate();
-//		List<String> contacts=jobSeeker.getContacts();
-		
 		Optional<User> isEmailExists=userRepository.findByEmail(jobSeeker.getEmail());
 		if(isEmailExists.isPresent())
 		{
@@ -102,6 +95,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realJobSeeker.setContacts(contacts);
 		realJobSeeker.setVerification(new varification());
 		realJobSeeker.setPicture(jobSeeker.getPicture());
+		realJobSeeker.setGender(jobSeeker.getGender());
 		jobSeeker savedJobSeeker=jobSeekerServiceI.insert(realJobSeeker);
 		Authentication authentication=new UsernamePasswordAuthenticationToken(jobSeeker.getEmail(), jobSeeker.getPassword());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -143,6 +137,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realCompanyAdmin.setVerification(new varification());
 		realCompanyAdmin.setPicture(companyAdmin.getPicture());
 		realCompanyAdmin.setDescription(companyAdmin.getDescription());
+		realCompanyAdmin.setGender(companyAdmin.getGender());
 //		realCompanyAdmin.setPicture(picture.getBytes());
 		companyAdministrator savedCompany=companyAdminServiceI.insert(realCompanyAdmin);
 		

@@ -21,6 +21,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTO;
+import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
@@ -31,6 +33,7 @@ import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldMapper;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.service.postFieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
@@ -99,36 +102,38 @@ public class employerService implements employerServiceInterface{
 	
 	@Override
 	@Transactional
-	public Employer update(Long id,Employer t)
+	public employerDTO update(Long id,registerUserRequest t)
 	{
 		Employer oldEmployer=findById(id);
 		if(oldEmployer!=null)
 		{
+			if(t.getUserName() !=null )
+			{
+				oldEmployer.setUserName(t.getUserName());
+			}
+			
 			if(t.getAddress()!=null)
 			{
 				oldEmployer.setAddress(t.getAddress());
 			}
-			if(t.getContacts()!=null)
-			{
-				oldEmployer.setContacts(t.getContacts());
-			}
-			if(t.getEmail()!=null)
-			{
-				oldEmployer.setEmail(t.getEmail());
-			}
-			if(t.getEmployerFields()!=null)
-			{
-				oldEmployer.setEmployerFields(t.getEmployerFields());
-			}
+
 			if(t.getPicture()!=null)
 			{
 				oldEmployer.setPicture(t.getPicture());
 			}
-			if(t.getUserName()!=null)
+			
+			if(t.getCoverImage()!=null)
 			{
-				oldEmployer.setUserName(t.getUserName());
+				oldEmployer.setCoverImage(t.getCoverImage());
 			}
-			return employerRepository.save(oldEmployer);
+			
+			if(t.getGender()!=null)
+			{
+				oldEmployer.setGender(t.getGender());
+			}
+			Employer inserted =employerRepository.save(oldEmployer);
+			employerDTO dto=employerDTOMapper.mapEmployerToDTO(oldEmployer);
+			return dto;
 		}else 
 		{
 			return null;

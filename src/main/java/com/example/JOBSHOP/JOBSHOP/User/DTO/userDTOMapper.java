@@ -20,6 +20,7 @@ public class userDTOMapper {
 		dto.setFollowers(toUserDTos(user.getFollowers()));
 		dto.setFollowings(toUserDTos(user.getFollowings()));
 		dto.setUserType(user.getUserType());
+		dto.setGender(user.getGender());
 		return dto;
 	}
 	
@@ -36,6 +37,7 @@ public class userDTOMapper {
 		user.setFollowers(toUsers(dto.getFollowers()));
 		user.setFollowings(toUsers(dto.getFollowers()));
 		user.setUserType(dto.getUserType());
+		user.setGender(dto.getGender());
 		return user;
 	}
 	
@@ -53,6 +55,7 @@ public class userDTOMapper {
 			usertype.setUserName(user.getUserName());
 			usertype.setLogin_with_google(user.isIs_signin_with_google());
 			usertype.setReq_user(user.isReq_user());	
+			usertype.setGender(user.getGender());
 			users.add(usertype);
 		}
 		return users;
@@ -72,6 +75,7 @@ public class userDTOMapper {
 			dto.setUserName(user.getUserName());
 			dto.setIs_signin_with_google(user.isLogin_with_google());
 			dto.setReq_user(user.isReq_user());	
+			dto.setGender(user.getGender());
 			userDtos.add(dto);
 		}
 		return userDtos;
