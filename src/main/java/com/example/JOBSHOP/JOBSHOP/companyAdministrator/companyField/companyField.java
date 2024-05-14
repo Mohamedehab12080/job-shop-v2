@@ -7,6 +7,7 @@ import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -18,15 +19,21 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class companyField extends baseEntity<Long>{
 
-	//@NotBlank
-	@Column(unique = true)
-	private String fieldName;
+//	//@NotBlank
+//	@Column(unique = true)
+//	private String fieldName;
+//	
+	
+	@OneToOne
+	@JoinColumn(name="field_id")
+	private Field field;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference
@@ -44,15 +51,21 @@ public class companyField extends baseEntity<Long>{
 	
 	
 	
+	public Field getField() {
+		return field;
+	}
+	public void setField(Field field) {
+		this.field = field;
+	}
 	public List<companyFieldQualification> getCompanyFieldQualifications() {
 		return companyFieldQualifications;
 	}
 	public void setCompanyFieldQualifications(List<companyFieldQualification> companyFieldQualifications) {
 		this.companyFieldQualifications = companyFieldQualifications;
 	}
-	public String getFieldName() {
-		return fieldName;
-	}
+//	public String getFieldName() {
+//		return fieldName;
+//	}
 	public companyAdministrator getCompanyAdministrator() {
 		return companyAdministrator;
 	}
@@ -65,9 +78,9 @@ public class companyField extends baseEntity<Long>{
 	public void setCompanyFieldSkills(List<companyFieldSkill> companyFieldSkills) {
 		this.companyFieldSkills = companyFieldSkills;
 	}
-	public void setFieldName(String fieldName) {
-		this.fieldName = fieldName;
-	}
+//	public void setFieldName(String fieldName) {
+//		this.fieldName = fieldName;
+//	}
 	public companyAdministrator getCompanyAdmin() {
 		return companyAdministrator;
 	}

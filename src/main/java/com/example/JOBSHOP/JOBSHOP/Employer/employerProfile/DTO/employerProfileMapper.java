@@ -25,7 +25,7 @@ public class employerProfileMapper {
 		dto.setEmployerEmail(emp.getEmployer().getEmail());
 		for(employerField empField:emp.getEmployer().getEmployerFields())
 		{
-			employerFields.add(empField.getCompanyField().getFieldName());
+			employerFields.add(empField.getCompanyField().getField().getFieldName());
 		}
 		dto.setEmployerFields(employerFields);
 		dto.setEmployerId(emp.getEmployer().getId());

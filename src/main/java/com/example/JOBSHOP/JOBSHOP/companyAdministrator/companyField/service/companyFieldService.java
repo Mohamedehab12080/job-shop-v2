@@ -28,6 +28,8 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.compa
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.service.companyFieldSkillsServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
+import com.example.JOBSHOP.JOBSHOP.fields.service.fieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.skills.Skill;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
 
@@ -61,6 +63,9 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 
 	 @Autowired
 	 private postServiceInterface postServiceI;
+	 
+	 @Autowired
+	 private fieldServiceInterface fieldServiceI;
 //	 public postField findPostFieldWithFieldName(String fieldName)
 //	 {
 //		 return postFieldService.findByEmployerField(companyFieldRepository.findIdByFieldName(fieldName));
@@ -158,10 +163,21 @@ public class companyFieldService implements companyFieldServiceInterface{
 		    
 		    //companyField object
 		    companyField com = new companyField();
-		    com.setFieldName(dto.getFieldName());
+		    Field field=fieldServiceI.findByName(dto.getFieldName());
+		    if(field!=null)
+		    {
+		    	com.setField(field);
+		    }else 
+		    {
+		    	Field field2=new Field();
+		    	field2.setFieldName(dto.getFieldName());
+		    	Field insertedField=fieldServiceI.insertForCompanyOperation(field2);
+		    	field=insertedField;
+		    	com.setField(insertedField);
+		    } 
 		    com.setCompanyAdministrator(companyAdmin);
 //		    com.setRequiredQualifications(dto.getRequiredQualifications());
-		   if(findByFieldName(dto.getFieldName())==null)
+		   if(findByFieldIdAndCompanyId(field.getId(),companyAdmin.getId())==null)
 		   {
 			   companyField returnedcompanyField=companyFieldRepository.save(com); //insert the companyField containing fieldName and companyAdmin.   
 			// Batch insert new skills
@@ -360,9 +376,9 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 {
 		 companyField oldCompanyField=getReferenceById(id);
 		 
-		 if(newCompanyField.getFieldName()!=null)
+		 if(newCompanyField.getField()!=null)
 		 {
-			 oldCompanyField.setFieldName(newCompanyField.getFieldName());
+			 oldCompanyField.setField(newCompanyField.getField());
 		 }
 		  companyFieldRepository.save(oldCompanyField); 
 		  return "updated";
@@ -377,144 +393,148 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 {
 		 return companyFieldRepository.findByCompanyAdministratorIdOrderByCreatedDateDesc(Id);
 	 }
-
 	@Override
-	public Long findIdByFieldName(String fieldName) {
-		
-		return companyFieldRepository.findIdByFieldName(fieldName);
+	public companyField findByFieldIdAndCompanyId(Long fieldId, Long companyId) {
+		return companyFieldRepository.findByFieldIdAndCompanyAdministratorId(fieldId,companyId);
 	}
 
-	@Override
-	public companyField findByFieldName(String fieldName) {
-		return companyFieldRepository.findByFieldName(fieldName);
-	}
+//	@Override
+//	public Long findIdByFieldName(String fieldName) {
+//		
+//		return companyFieldRepository.findIdByFieldName(fieldName);
+//	}
+//
+//	@Override
+//	public companyField findByFieldName(String fieldName) {
+//		return companyFieldRepository.findByFieldName(fieldName);
+//	}
 
-	@Override
-	public companyField insertCompanyFieldAndSkillsAndQualifications(companyFieldDTO dto) {
-		 // Create companyAdmin 
-	    companyAdministrator companyAdmin = new companyAdministrator();
-	    companyAdmin.setId(dto.getCompanyAdministratorId());
-	    
-	    //companyField object
-	    companyField com = new companyField();
-	    com.setFieldName(dto.getFieldName());
-	    com.setCompanyAdministrator(companyAdmin);
-//	    com.setRequiredQualifications(dto.getRequiredQualifications());
-	   if(findByFieldName(dto.getFieldName())==null)
-	   {
-		   companyField returnedcompanyField=companyFieldRepository.save(com); //insert the companyField containing fieldName and companyAdmin.   
-		// Batch insert new skills
-		    Set<String> newSkills = new HashSet<>(dto.getSkills());//Set of new skills that will be inserted 
-		    
-		    Map<String, Skill> existingSkills = new HashMap<>(); //Map that conatains existing skills the skill name and skill object
-
-		    if(!dto.getQualifications().isEmpty())
-		    {
-		    	Set<String> newQuals = new HashSet<>(dto.getQualifications());//Set of new skills that will be inserted 
-			    
-			    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
-			   
-			    List<Qualification> qualificationsToInsert = new ArrayList<>();
-			    
-			    for(String newQual:newQuals)
-			    {
-			    	Qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
-			    	if(qualiciationSearch!=null) 
-			    	{
-			    		existingQuals.put(qualiciationSearch.getQualificationName(),qualiciationSearch);
-			    	}
-			    	
-			    	if (!existingQuals.containsKey(newQual)) {
-			        	Qualification newQuall = new Qualification();
-			        	newQuall.setQualificationName(newQual);
-			            qualificationsToInsert.add(newQuall);
-			        }
-			    }
-			    
-			    
-//			    for (String qualName : newQuals) 
+//	@Override
+//	public companyField insertCompanyFieldAndSkillsAndQualifications(companyFieldDTO dto) {
+//		 // Create companyAdmin 
+//	    companyAdministrator companyAdmin = new companyAdministrator();
+//	    companyAdmin.setId(dto.getCompanyAdministratorId());
+//	    
+//	    //companyField object
+//	    companyField com = new companyField();
+//	    com.setFieldName(dto.getFieldName());
+//	    com.setCompanyAdministrator(companyAdmin);
+////	    com.setRequiredQualifications(dto.getRequiredQualifications());
+//	   if(findByFieldName(dto.getFieldName())==null)
+//	   {
+//		   companyField returnedcompanyField=companyFieldRepository.save(com); //insert the companyField containing fieldName and companyAdmin.   
+//		// Batch insert new skills
+//		    Set<String> newSkills = new HashSet<>(dto.getSkills());//Set of new skills that will be inserted 
+//		    
+//		    Map<String, Skill> existingSkills = new HashMap<>(); //Map that conatains existing skills the skill name and skill object
+//
+//		    if(!dto.getQualifications().isEmpty())
+//		    {
+//		    	Set<String> newQuals = new HashSet<>(dto.getQualifications());//Set of new skills that will be inserted 
+//			    
+//			    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
+//			   
+//			    List<Qualification> qualificationsToInsert = new ArrayList<>();
+//			    
+//			    for(String newQual:newQuals)
 //			    {
-//			        if (!existingQuals.containsKey(newQual)) {
-	//		        	qualification newQuall = new qualification();
-	//		        	newQuall.setQualificationName(newQual);
-	//		            qualificationsToInsert.add(newQuall);
-//	        		}
-//			    }
-			    
-			    qualificationServiceI.insertAll(qualificationsToInsert);
-			    
-			    // Retrieve inserted skills
-			    List<Qualification> allQualifications = new ArrayList<>(existingQuals.values());
-			    allQualifications.addAll(qualificationsToInsert);
-
-			    // Insert companyFieldSkills
-			    List<companyFieldQualification> comapanyFieldQuals = new ArrayList<companyFieldQualification>();
-			    
-			    for (Qualification qual : allQualifications) {
-			        companyFieldQualification companyFieldQual = new companyFieldQualification();
-			        companyFieldQual.setQualification(qual);
-			        companyFieldQual.setCompanyField(com);
-			        comapanyFieldQuals.add(companyFieldQual);
-			    }
-			    companyFieldQualificationI.insertAll(comapanyFieldQuals);
-
-		    } // The end of check if user insert qualification or not 
-		    List<Skill> skillsToInsert = new ArrayList<>();
-		    if(!dto.getSkills().isEmpty()) // check fro comming skills
-		    {
-		    	   
-			    for(String newSkill:newSkills) // Iterate over the newSkills.
-			    {
-			    	//find by skill name and the return value for the skillSearch
-			    	Skill skillSearch= skillServiceI.findByName(newSkill);
-			    	if(skillSearch!=null) //check if the skillSearch object !null
-			    	{
-			    		existingSkills.put(skillSearch.getSkillName(), skillSearch); //putting the skill name and skill object for the existing skills hashMap
-			    	}
-			    	
-			    	if (!existingSkills.containsKey(newSkill)) {
-			            Skill newSkillObj = new Skill();
-			            newSkillObj.setSkillName(newSkill);
-			            skillsToInsert.add(newSkillObj);
-			        }
-			    }
-			    
-//			    for (String skillName : newSkills) {
-//			        if (!existingSkills.containsKey(skillName)) {
-//			            Skill newSkill = new Skill();
-//			            newSkill.setSkillName(skillName);
-//			            skillsToInsert.add(newSkill);
+//			    	Qualification qualiciationSearch=qualificationServiceI.findByName(newQual); //Search if the qualification exists
+//			    	if(qualiciationSearch!=null) 
+//			    	{
+//			    		existingQuals.put(qualiciationSearch.getQualificationName(),qualiciationSearch);
+//			    	}
+//			    	
+//			    	if (!existingQuals.containsKey(newQual)) {
+//			        	Qualification newQuall = new Qualification();
+//			        	newQuall.setQualificationName(newQual);
+//			            qualificationsToInsert.add(newQuall);
 //			        }
 //			    }
-			    
-			    
-			    skillServiceI.insertAll(skillsToInsert); // insert all new skills into the public skills table
-
-			    // Getting The inserted skills from the existingSkills Map<skillName,skillObject>
-			    List<Skill> allSkills = new ArrayList<>(existingSkills.values());
-			    allSkills.addAll(skillsToInsert);// adding the inserted skills and the existing skills into the same list
-
-			    // Insert companyFieldSkills from the allSkills
-			    List<companyFieldSkill> companyFieldSkills = new ArrayList<>();
-			    for (Skill skill : allSkills) {
-			        companyFieldSkill companyFieldSkill = new companyFieldSkill();
-			        companyFieldSkill.setCompanyFieldSkill(skill);
-			        companyFieldSkill.setCompanyField(com);
-			        companyFieldSkills.add(companyFieldSkill);
-			    }
-			    
-			    companyFieldSkillI.insertAll(companyFieldSkills);
-			    
-
-		    }
-		 		    // Return the inserted companyField object
-		    return returnedcompanyField;
-
-	   }else 
-	   {
-		   
-		    return null;
-	   }
-
-	}
+//			    
+//			    
+////			    for (String qualName : newQuals) 
+////			    {
+////			        if (!existingQuals.containsKey(newQual)) {
+//	//		        	qualification newQuall = new qualification();
+//	//		        	newQuall.setQualificationName(newQual);
+//	//		            qualificationsToInsert.add(newQuall);
+////	        		}
+////			    }
+//			    
+//			    qualificationServiceI.insertAll(qualificationsToInsert);
+//			    
+//			    // Retrieve inserted skills
+//			    List<Qualification> allQualifications = new ArrayList<>(existingQuals.values());
+//			    allQualifications.addAll(qualificationsToInsert);
+//
+//			    // Insert companyFieldSkills
+//			    List<companyFieldQualification> comapanyFieldQuals = new ArrayList<companyFieldQualification>();
+//			    
+//			    for (Qualification qual : allQualifications) {
+//			        companyFieldQualification companyFieldQual = new companyFieldQualification();
+//			        companyFieldQual.setQualification(qual);
+//			        companyFieldQual.setCompanyField(com);
+//			        comapanyFieldQuals.add(companyFieldQual);
+//			    }
+//			    companyFieldQualificationI.insertAll(comapanyFieldQuals);
+//
+//		    } // The end of check if user insert qualification or not 
+//		    List<Skill> skillsToInsert = new ArrayList<>();
+//		    if(!dto.getSkills().isEmpty()) // check fro comming skills
+//		    {
+//		    	   
+//			    for(String newSkill:newSkills) // Iterate over the newSkills.
+//			    {
+//			    	//find by skill name and the return value for the skillSearch
+//			    	Skill skillSearch= skillServiceI.findByName(newSkill);
+//			    	if(skillSearch!=null) //check if the skillSearch object !null
+//			    	{
+//			    		existingSkills.put(skillSearch.getSkillName(), skillSearch); //putting the skill name and skill object for the existing skills hashMap
+//			    	}
+//			    	
+//			    	if (!existingSkills.containsKey(newSkill)) {
+//			            Skill newSkillObj = new Skill();
+//			            newSkillObj.setSkillName(newSkill);
+//			            skillsToInsert.add(newSkillObj);
+//			        }
+//			    }
+//			    
+////			    for (String skillName : newSkills) {
+////			        if (!existingSkills.containsKey(skillName)) {
+////			            Skill newSkill = new Skill();
+////			            newSkill.setSkillName(skillName);
+////			            skillsToInsert.add(newSkill);
+////			        }
+////			    }
+//			    
+//			    
+//			    skillServiceI.insertAll(skillsToInsert); // insert all new skills into the public skills table
+//
+//			    // Getting The inserted skills from the existingSkills Map<skillName,skillObject>
+//			    List<Skill> allSkills = new ArrayList<>(existingSkills.values());
+//			    allSkills.addAll(skillsToInsert);// adding the inserted skills and the existing skills into the same list
+//
+//			    // Insert companyFieldSkills from the allSkills
+//			    List<companyFieldSkill> companyFieldSkills = new ArrayList<>();
+//			    for (Skill skill : allSkills) {
+//			        companyFieldSkill companyFieldSkill = new companyFieldSkill();
+//			        companyFieldSkill.setCompanyFieldSkill(skill);
+//			        companyFieldSkill.setCompanyField(com);
+//			        companyFieldSkills.add(companyFieldSkill);
+//			    }
+//			    
+//			    companyFieldSkillI.insertAll(companyFieldSkills);
+//			    
+//
+//		    }
+//		 		    // Return the inserted companyField object
+//		    return returnedcompanyField;
+//
+//	   }else 
+//	   {
+//		   
+//		    return null;
+//	   }
+//
+//	}
 }

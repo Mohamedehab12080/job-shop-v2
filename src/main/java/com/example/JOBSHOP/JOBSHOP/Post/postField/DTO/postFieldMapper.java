@@ -22,7 +22,7 @@ public class postFieldMapper {
 		dto.setId(field.getId());
 		dto.setPost(field.getPost());
 		dto.setEmployerField(field.getEmployerField());
-		dto.setFieldName(field.getEmployerField().getCompanyField().getFieldName());
+		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
 		dto.setSkills(field.getSkills());
 		dto.setQualifications(field.getQualifications());
 		return dto;
@@ -56,7 +56,7 @@ public class postFieldMapper {
 		
 		dto.setId(field.getId());
 		dto.setEmployerField(field.getEmployerField());
-		dto.setFieldName(field.getEmployerField().getCompanyField().getFieldName());
+		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
 		dto.setSkills(field.getSkills());
 		dto.setQualifications(field.getQualifications());
 		dto.setPost(field.getPost());

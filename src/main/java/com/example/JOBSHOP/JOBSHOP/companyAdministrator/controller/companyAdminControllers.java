@@ -99,28 +99,28 @@ public class companyAdminControllers {
 //		return "add-fields";
 //	}
 	
-	@PostMapping("/save-field")
-	public String saveCompanyField(@ModelAttribute("companyField") companyFieldDTO companyFieldDto,@RequestParam("userName") Long userName)
-	{
-		List<String> skills=companyFieldDto.getSkills();
-		skills.remove("");
-		System.out.println("List of skills added : "+skills);
-		Long oldCompanyField=companyFieldServiceI.findIdByFieldName(companyFieldDto.getFieldName());
-		if(oldCompanyField==null)
-		{
-			companyField companyFieldResult=companyFieldServiceI.insertCompanyFieldAndSkillsAndQualifications(companyFieldDto);
-			if(companyFieldResult!=null)
-			{
-				return "redirect:/companyAdmin/add-field/"+userName+"?success_register"; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
-			}else
-			{
-				return "redirect:/companyAdmin/add-field/"+userName; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
-			}
-		}else 
-		{
-			return "redirect:/companyAdmin/add-field/"+userName+"?already_exists"; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
-		}
-	}
+//	@PostMapping("/save-field")
+//	public String saveCompanyField(@ModelAttribute("companyField") companyFieldDTO companyFieldDto,@RequestParam("userName") Long userName)
+//	{
+//		List<String> skills=companyFieldDto.getSkills();
+//		skills.remove("");
+//		System.out.println("List of skills added : "+skills);
+////		Long oldCompanyField=companyFieldServiceI.findByFieldIdAndCompanyId(companyFieldDto.getFieldName());
+//		if(oldCompanyField==null)
+//		{
+//			companyField companyFieldResult=companyFieldServiceI.insertCompanyFieldAndSkillsAndQualifications(userName,companyFieldDto);
+//			if(companyFieldResult!=null)
+//			{
+//				return "redirect:/companyAdmin/add-field/"+userName+"?success_register"; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
+//			}else
+//			{
+//				return "redirect:/companyAdmin/add-field/"+userName; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
+//			}
+//		}else 
+//		{
+//			return "redirect:/companyAdmin/add-field/"+userName+"?already_exists"; //we will send success at the parameter of this url to show the added field with its skills and it can be deleted 
+//		}
+//	}
 	
 	@GetMapping("/delete-field/{id}")
 	public String deleteField(@PathVariable("id") Long id ,@RequestParam("userName") Long userName)

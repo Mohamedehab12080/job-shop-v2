@@ -329,7 +329,7 @@ const renderIcon = () => {
           mountOnEnter
           unmountOnExit
           timeout={{ enter: 500, exit: 300 }}
-          transitionTimingFunction="ease-in-out" 
+          transitiontimingfunction="ease-in-out" 
           style={slideStyle}
       >
         <Box sx={style}>
@@ -358,14 +358,16 @@ const renderIcon = () => {
           </div>
           <form onSubmit={formik.handleSubmit}>
             <Grid container direction="column" spacing={2}>
-              <Grid item container justifyContent="center">
-                <Button type="submit" 
-                variant="contained" 
-                color="primary"
-                disabled={disabled}>
-                  Save
-                </Button>
-              </Grid>
+                <div className="sticky">
+                    <Grid item container justifyContent="center">
+                      <Button type="submit" 
+                      variant="contained" 
+                      color="primary"
+                      disabled={disabled}>
+                        Save
+                      </Button>
+                    </Grid>
+              </div>
               <Grid item xs={12}>
                 <div>
                     {renderIcon()}

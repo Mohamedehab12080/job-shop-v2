@@ -123,12 +123,9 @@ const SignupForm = () => {
             ...values,
             picture: imageUrl
           };
-          if(userType === "jobSeeker")
-            {
-                const { day, month, year } = updatedValues.birthDate;
-                const birthDate = `${year}-${month}-${day}`;
-                updatedValues.birthDate = birthDate;
-            }
+          const { day, month, year } = updatedValues.birthDate;
+          const birthDate = `${year}-${month}-${day}`;
+          updatedValues.birthDate = birthDate;
           const formData = { ...updatedValues, contacts: updatedValues.contacts.filter(contact => contact !== '') };
       
           // Dispatch action based on userType

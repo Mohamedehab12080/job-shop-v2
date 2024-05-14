@@ -2,22 +2,25 @@ package com.example.JOBSHOP.JOBSHOP.Post.Specifications;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class postSearch {
 
 	
-	private String Title;
+	private String title;
 	private String location;
 	private String employmentType;
-	private LocalDate createdDate;
+	private String createdDate;
 	private String companyName;
 	private String fieldName;
 	
 	
 	public String getTitle() {
-		return Title;
+		return title;
 	}
 	public void setTitle(String title) {
-		Title = title;
+		title = title;
 	}
 	public String getLocation() {
 		return location;
@@ -31,10 +34,10 @@ public class postSearch {
 	public void setEmploymentType(String employmentType) {
 		this.employmentType = employmentType;
 	}
-	public LocalDate getCreatedDate() {
+	public String getCreatedDate() {
 		return createdDate;
 	}
-	public void setCreatedDate(LocalDate createdDate) {
+	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
 	public String getCompanyName() {

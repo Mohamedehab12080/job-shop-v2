@@ -51,7 +51,7 @@ public class employerFieldMapper {
 		{
 			qualifications.add(qual.getQualification().getQualificationName());  // it should be map <id , skillName>
 		}
-		dto.setFieldName(empf.getCompanyField().getFieldName());
+		dto.setFieldName(empf.getCompanyField().getField().getFieldName());
 		dto.setId(empf.getId());
 		dto.setSkills(skills);
 		dto.setQualifications(qualifications);

@@ -1,5 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.Post.Specifications;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import java.util.List;
@@ -48,9 +50,25 @@ public class postSpecification implements Specification<Post>{
 		}
 		
 		//Filter by companyName
-		if(postSearch.getCreatedDate()!=null)
+		if(postSearch.getCreatedDate()!=null && !postSearch.getCreatedDate().isEmpty())
 		{
-			predicatList.add(cb.like(root.get("createdDate"),"%"+postSearch.getCreatedDate()+"%"));
+			String pattern = "yyyy-MM-dd";
+	        // Create a DateTimeFormatter using the defined pattern
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+	        
+	        LocalDateTime createdDate=LocalDateTime.parse(postSearch.getCreatedDate(),formatter);
+	        // Extract year, month, and year-month combinations
+	        Integer year = createdDate.getYear();
+	        Integer month = createdDate.getMonthValue();
+	        if (year != null) {
+	        	
+	        	predicatList.add(cb.equal(cb.function("YEAR", Integer.class, root.get("createdDate")), year));
+	        }
+	        
+	        if (month != null) {
+	        	
+	        	predicatList.add(cb.equal(cb.function("MONTH", Integer.class, root.get("createdDate")), month));
+	        }
 		}
 		
 		//Filter by companyName
@@ -62,6 +80,7 @@ public class postSpecification implements Specification<Post>{
 				System.out.println("user Exception...");
 			}
 		}
+		
 //		//Filter by postFieldName
 //		if(postSearch.getFieldName()!=null &&!postSearch.getFieldName().isEmpty())
 //		{

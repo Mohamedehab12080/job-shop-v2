@@ -36,7 +36,7 @@ public class companyAdministratorMapper {
 		dto.setPicture(companyAdmin.getPicture());
 		for(int i=0;i<companyAdmin.getCompanyFields().size();i++)
 		{
-			companyFields.add(companyAdmin.getCompanyFields().get(i).getFieldName());
+			companyFields.add(companyAdmin.getCompanyFields().get(i).getField().getFieldName());
 		}
 		dto.setCompanyFields(companyFields);
 		for(int i=0;i<companyAdmin.getEmployers().size();i++)

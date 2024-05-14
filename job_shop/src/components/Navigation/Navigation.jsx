@@ -1,4 +1,4 @@
-import  React, { useState } from "react";
+import  React, { useEffect, useState } from "react";
 import { navigation } from "./NavigationMenu";
 import logo from "../common/images/logo.png";
 import userLogo from "../common/images/default.jpg";
@@ -45,7 +45,22 @@ export const Navigation = () => {
   const handleOpenShowApplicationsModal=()=>setOpenShowApplicationsModal(true);
   const handleCloseShowApplicationsModal=()=>setOpenShowApplicationsModal(false);
 
+  const [navigationValue,setNavigationValue]=useState("");
   const dispatch=useDispatch()
+
+  useEffect(()=>
+  {
+    if(auth.user.userType === "jobSeeker")
+      {
+        setNavigationValue(`/profile/${auth.user.id}`);
+      }else if(auth.user.userType === "Employer")
+        {
+          setNavigationValue(`/employerProfile/${auth.user.id}`);
+        }else 
+        {
+          setNavigationValue(`/companyProfile/${auth.user.id}`);
+        }
+  },[])
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -239,7 +254,7 @@ const handleItemClick = (item) => {
 
         <div className="mt-3 flex items-center py-1 space-x-5">
           <Avatar 
-            onClick={() => navigate(`/profile/${auth.user.id}`)}
+            onClick={() => navigate(navigationValue)}
             alt="username" 
             src={auth.user.picture}  
           />

@@ -89,12 +89,23 @@ public class postCotroller {
 	
 	
 	@PostMapping("/postSearch")
-	public List<postDTO> findBostWithSpecifications(@RequestBody postSearch postSearch)
+	public ResponseEntity<List<postDTO>> findBostWithSpecifications(
+			@RequestBody postSearch postSearch
+			,@RequestHeader("Authorization") String jwt) throws UserException
 	{
-		List<Post> postList=postService.findPostsWithSearch(postSearch);
-		return postList.stream() 
-				.map(this::convertPost)
-				.collect(Collectors.toList());
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null)
+		{
+			List<Post> postList=postService.findPostsWithSearch(postSearch);
+			return new ResponseEntity<List<postDTO>>(postList.stream() 
+					.map(this::convertPost)
+					.collect(Collectors.toList()),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("User not found for this token");
+		}
+		
+		
 	} 
 	@GetMapping("/findById/{postId}")
 	public ResponseEntity<postDTO> findPostById(@PathVariable("postId") Long postId,

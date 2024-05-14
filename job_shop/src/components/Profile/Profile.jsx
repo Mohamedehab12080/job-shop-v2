@@ -15,6 +15,7 @@ import MessageModal from '../../responses/MessageModal'
 import ShowSkillsmodal from './ShowSkillsModal';
 import ContactsModal from '../../responses/CotactsModal';
 import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';  
+import ShowPostImageModal from '../HomeSection/posts/ShowPostImageModal';
 const Profile = () => { 
     const [tabValue,setTabValue]=useState("1")
     const [openProfileModal,setOpenProfileModal]=useState(false);
@@ -41,9 +42,18 @@ const Profile = () => {
     const  handleOpenContactsModal=()=>setOpenContactsModal(true);
     const handleCloseContactsModal=()=>setOpenContactsModal(false);
        
+    const [openShowPostImageModal,setOpenShowPostImageModal]=React.useState(false);
+
+    const handleCloseShowPostImageModal=()=>setOpenShowPostImageModal(false);
+
+
+    const [imageForShow,setImageForShow]=useState("");
     const [coverImage,setCoverImage]=useState("");
     const [profileImage,setProfileImage]=useState("");
-    
+    const handleOpenShowPostImageModal=(value)=>{
+        setOpenShowPostImageModal(true);
+        setImageForShow(value);
+    };
   useEffect(() => {
 
         dispatch(getInfo(id));
@@ -102,13 +112,13 @@ const Profile = () => {
         </section>
 
         <section>
-            <img className='w-[100%] h-[15rem] object-cover' src={coverImage} alt="Cover Image" />
+            <img onClick={()=>handleOpenShowPostImageModal(coverImage)} className='w-[100%] h-[15rem] object-cover' src={coverImage} alt="Cover Image" />
         </section>
 
         <section className='pl-6'>
             
             <div className='flex justify-between items-start mt-5 h-[5rem]'>
-                <Avatar className='transform -translate-y-24' alt='BOB' src={profileImage}
+                <Avatar onClick={()=>handleOpenShowPostImageModal(profileImage)} className='transform -translate-y-24' alt='BOB' src={profileImage}
                 sx={{width:"10rem",height:"10rem",border:"4px solid white"}}/> 
              {jobSeekerData !==null && jobSeekerData.req_user ? (<Button
              onClick={handleOpenProfileModel}
@@ -200,6 +210,10 @@ const Profile = () => {
       <section>
         <ContactsModal openContactsModal={openContactsModal} handleCloseContactsModal={handleCloseContactsModal} contactsList={contactList} isRequestUser={isRequestUser}/>
       </section>
+
+      <section>
+              <ShowPostImageModal openShowPostImageModal={openShowPostImageModal} handleCloseShowPostImageModal={handleCloseShowPostImageModal} postImage={imageForShow} />
+     </section>
     </div>
   )
 }

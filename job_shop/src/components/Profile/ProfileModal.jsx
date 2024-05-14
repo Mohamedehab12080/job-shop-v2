@@ -264,7 +264,7 @@ export default function ProfileModal({ open, handleClose, data, Type }) {
       // Dispatch action based on userType
       if (Type === "jobSeeker") {
         dispatch(updateProfile(formData));
-      } else if (Type === "company") {
+      } else if (Type === "Admin") {
         dispatch(updateCompanyProfile(formData));
       } else {
         dispatch(updateEmployerProfile(formData));
@@ -287,7 +287,7 @@ export default function ProfileModal({ open, handleClose, data, Type }) {
       // Dispatch action based on userType
       if (Type === "jobSeeker") {
         dispatch(updateProfile(formData));
-      } else if (Type === "company") {
+      } else if (Type === "Admin") {
          dispatch(updateCompanyProfile(formData));
       } else {
          dispatch(updateEmployerProfile(formData));
@@ -709,6 +709,7 @@ export default function ProfileModal({ open, handleClose, data, Type }) {
                               variant="outlined"
                               size="large"
                               name="companyName"
+                              id="companyName"
                               value={formik.values.companyName}
                               onChange={formik.handleChange}
                               onBlur={formik.handleBlur}

@@ -62,7 +62,7 @@ export const getCompanyInfo=(compId)=>async(dispatch)=>
     export const updateCompanyProfile=(formData)=>async(dispatch)=>
         {
             try {
-                const {data}=await api.get(`/api/company/update`,formData)
+                const {data}=await api.put(`/api/company/update`,formData)
                 console.log("updated Company Profile : ",data)
                 dispatch({type:UPDATE_COMPANY_INFO_SUCCCESS,payload:data})
             } catch (error) {
@@ -86,11 +86,11 @@ export const createField=(fieldData)=>async(dispatch)=>
 export const getAllFields=(compId)=>async(dispatch)=>
 {
     try {
+        console.log("company ID  : ",compId)
         const {data}=await api.get(`/api/company/findComapnyFields/${compId}`)
         console.log("Data from back : ",data)
         dispatch({type:GET_FIELDS_SUCCCESS,payload:data})
     } catch (error) {
-        console.error("Error : ",error)
         dispatch({type:GET_FIELDS_FAILURE,payload:error.message})
     }
 }

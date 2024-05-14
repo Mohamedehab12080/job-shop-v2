@@ -191,7 +191,7 @@ public class employerController {
 					.getCompanyAdministrator()
 					.getCompanyName());
 			post.setEmployerUserName(user.getUserName());
-			post.setFieldName(employerFieldService.findById(post.getField()).getCompanyField().getFieldName());
+			post.setFieldName(employerFieldService.findById(post.getField()).getCompanyField().getField().getFieldName());
 			return new ResponseEntity<>(post,HttpStatus.CREATED);
 		}else
 		{

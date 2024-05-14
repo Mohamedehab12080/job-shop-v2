@@ -7,7 +7,7 @@ import {skillReducer} from "./skills/Reducer"
 import { qualReducer } from "./qualifications/Reducer";
 import { employerReducer } from "./company/Employer/Reducer";
 import { jobSeekerReducer } from "./JobSeeker/Reducer";
-
+import {fieldsReducer} from "./fields/Reducer"
 const rootReducers=combineReducers(
     {
       auth:authReducer,
@@ -16,7 +16,8 @@ const rootReducers=combineReducers(
       skills:skillReducer,
       quals:qualReducer,
       emp:employerReducer,
-      jobSeeker:jobSeekerReducer
+      jobSeeker:jobSeekerReducer,
+      fieldReducer:fieldsReducer
     }
 );
 

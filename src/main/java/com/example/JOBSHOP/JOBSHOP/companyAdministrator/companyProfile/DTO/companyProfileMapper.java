@@ -27,7 +27,7 @@ public class companyProfileMapper {
 		dto.setId(Profile.getId());
 		for (companyField compField:Profile.getCompanyAdmin().getCompanyFields())
 		{
-			companyFields.add(compField.getFieldName());
+			companyFields.add(compField.getField().getFieldName());
 		}
 		
 		if(Profile.getFollowers()!=null)

@@ -60,11 +60,11 @@ public class employerDTOMapper {
 		dto.setGender(emp.getGender());
 		for(employerField field: emp.getEmployerFields())
 		{
-			fieldsString.add(field.getCompanyField().getFieldName());
+			fieldsString.add(field.getCompanyField().getField().getFieldName());
 		}
 		dto.setCompanyAdministratorId(emp.getCompanyAdmin().getId());
 		dto.setFieldsNames(fieldsString);
-		dto.setCoverImage(emp.getCoverImage());
+		dto.setCoverImage(emp.getCoverImage()); 
 		dto.setPicture(emp.getPicture());
 		return dto;
 	}

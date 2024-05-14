@@ -131,6 +131,7 @@ public class employerService implements employerServiceInterface{
 			{
 				oldEmployer.setGender(t.getGender());
 			}
+			
 			Employer inserted =employerRepository.save(oldEmployer);
 			employerDTO dto=employerDTOMapper.mapEmployerToDTO(oldEmployer);
 			return dto;

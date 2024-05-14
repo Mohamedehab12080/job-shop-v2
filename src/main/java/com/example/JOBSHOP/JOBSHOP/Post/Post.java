@@ -23,6 +23,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -53,6 +54,10 @@ public class Post extends baseEntity<Long>{
 	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
 	private List<postField> postFields=new ArrayList<postField>();
 	
+	
+//	@OneToOne
+//	@JoinColumn(name="postField_id")
+//	private postField postFields;
 	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
     private Long fieldCount;
    

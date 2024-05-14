@@ -21,7 +21,6 @@ export const getEmployerFields=(empId)=>async(dispatch)=>
         console.log("Fetched Employer fields : ",data)
         dispatch({type:GET_EMPLOYER_FIELDS_SUCCESS,payload:data})
     } catch (error) {
-        console.error("Error : ",error)
         dispatch({type:GET_EMPLOYER_FIELDS_FAILURE,payload:error.message})
     }
 }

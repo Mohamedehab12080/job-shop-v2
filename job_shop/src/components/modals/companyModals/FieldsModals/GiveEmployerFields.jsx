@@ -5,12 +5,21 @@ import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteEmployer, deleteField, getAllFields, getEmployers, giveEmployerFields } from '../../../../store/company/Action';
-import {  Avatar, Grid, MenuItem, TextField } from '@mui/material';
+import {  Avatar, Grid, MenuItem, Slide, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { Formik, useFormik } from 'formik';
 import { Close } from "@mui/icons-material";
 import {IconButton} from "@mui/material";
 import MessageModal from '../../../../responses/MessageModal';
+
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGiveEmployerFields}) {
   
   var [filteredEmployers,setFilteredEmployers] = React.useState([]);
@@ -155,9 +164,18 @@ React.useEffect(() => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
+<Slide
+    direction="left"
+    in={openGiveEmployerFields}
+    mountOnEnter
+    unmountOnExit
+    timeout={{ enter: 800, exit: 800 }}
+    transitionTimingFunction="ease-in-out" 
+    style={slideStyle}
+>
         <Box  sx={{
           position: "absolute",
-          top: "50%",
+          top: "10%",
           left: "50%",
           transform: "translate(-50%, -50%)",
           width: 600,
@@ -369,6 +387,7 @@ React.useEffect(() => {
           Title={"Give Employer Fields"}/>
   </section>
         </Box>
+        </Slide>
       </Modal>
     </div>
   );

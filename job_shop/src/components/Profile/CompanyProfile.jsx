@@ -68,6 +68,7 @@ const CompanyProfile = () => {
            {
                setProfileImage(companyData.picture); 
                setContactList(companyData.contacts);
+               setCoverImage(companyData.coverImage);
            }
         setIsRequestUser(comp.isRequestUser);
 },[
@@ -198,7 +199,7 @@ const CompanyProfile = () => {
         </section>
 
         <section>
-            <ProfileModal open={openProfileModal} handleClose={handleClose} data={companyData} Type={"company"}/>
+            <ProfileModal open={openProfileModal} handleClose={handleClose} data={companyData} Type={"Admin"}/>
         </section>
 
         <section>

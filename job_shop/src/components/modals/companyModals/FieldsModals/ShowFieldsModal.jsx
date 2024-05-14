@@ -52,8 +52,10 @@ export default function ShowFieldsModal({openShowFieldsModal,handleCloseShowFiel
 
   React.useEffect(() => {
     if (openShowFieldsModal && isRequestUser) {
+      console.log("auth.user .id :",auth.user.id)
       dispatch(getAllFields(auth.user.id));
     }else if(openShowFieldsModal){
+      console.log("User id   :: ",userId);
       dispatch(getAllFields(userId));
     }
   }, [openShowFieldsModal, dispatch, auth.user.id,userId]);

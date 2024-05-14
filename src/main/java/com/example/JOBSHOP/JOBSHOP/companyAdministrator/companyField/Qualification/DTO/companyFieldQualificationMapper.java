@@ -43,7 +43,7 @@ public class companyFieldQualificationMapper {
 		
 		dto.setCompanyField(com.getCompanyField());
 		dto.setCompanyFieldId(com.getCompanyField().getId());
-		dto.setCompanyFieldName(com.getCompanyField().getFieldName());
+		dto.setCompanyFieldName(com.getCompanyField().getField().getFieldName());
 		dto.setQualification(com.getQualification());
 		dto.setQualificationId(com.getQualification().getId());
 		dto.setQualificationName(com.getQualification().getQualificationName());

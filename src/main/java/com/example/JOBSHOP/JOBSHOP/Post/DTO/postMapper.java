@@ -105,7 +105,7 @@ public class postMapper {
 	    if (!postFields.isEmpty()) {
 	    	dto.setSkills(postFields.get(0).getSkills());
 	    	dto.setQualifications(postFields.get(0).getQualifications());
-	    	dto.setFieldName(postFields.get(0).getEmployerField().getCompanyField().getFieldName());
+	    	dto.setFieldName(postFields.get(0).getEmployerField().getCompanyField().getField().getFieldName());
 	    }
 
 	    // Set other properties

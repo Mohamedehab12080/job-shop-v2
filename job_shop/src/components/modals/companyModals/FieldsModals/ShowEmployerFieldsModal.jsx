@@ -48,8 +48,10 @@ export default function ShowEmployerFieldsModal({openShowEmployerFieldsModal,han
 
   React.useEffect(() => {
     if (openShowEmployerFieldsModal && isRequestUser) {
+      console.log("User Employer ID : ",auth.user.id);
       dispatch(getEmployerFields(auth.user.id));
     }else if(openShowEmployerFieldsModal){
+      console.log("User ID : ",userId)
       dispatch(getEmployerFields(userId));
     }
   }, [openShowEmployerFieldsModal, dispatch, auth.user.id,userId]);

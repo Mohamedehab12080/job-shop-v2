@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, InputAdornment, MenuItem } from "@mui/material";
+import { IconButton, InputAdornment, MenuItem, Slide } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -16,7 +16,14 @@ import { getQualifications } from "../../../../store/qualifications/Action";
 import AddIcon from '@mui/icons-material/Add';
 import ShowFieldsModal from './ShowFieldsModal'
 import * as Yup from "yup";
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function CreateFieldModal({
   openCreateFieldModal,
   handleCloseCreateFieldModal,
@@ -241,11 +248,20 @@ const validationSchema=Yup.object().shape({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
+  <Slide
+    direction="down"
+    in={openCreateFieldModal}
+    mountOnEnter
+    unmountOnExit
+    timeout={{ enter: 800, exit: 800 }}
+    transitionTimingFunction="ease-in-out" 
+    style={slideStyle}
+>
       <Box
         sx={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
+          top: "10%",
+          left: "20%",
           transform: "translate(-50%, -50%)",
           width: 900,
           bgcolor: "background.paper",
@@ -427,9 +443,10 @@ const validationSchema=Yup.object().shape({
             </Grid>
         </form>
         <section>
-          <ShowFieldsModal openShowFieldsModal={openShowFieldsModal} handleCloseShowFieldsModal={handleCloseShowFielsModal}/>
+          <ShowFieldsModal openShowFieldsModal={openShowFieldsModal} handleCloseShowFieldsModal={handleCloseShowFielsModal} isRequestUser={true}/>
         </section>
       </Box>
+  </Slide>
     </Modal>
   );
 }

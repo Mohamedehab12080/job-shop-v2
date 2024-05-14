@@ -9,6 +9,7 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
 
 public class companyFieldMapper {
 
@@ -26,7 +27,11 @@ public class companyFieldMapper {
 		dto.setStatuseCode(companyField.getStatusCode());
 		dto.setCompanyAdministratorId(companyField.getCompanyAdmin().getId());
 		dto.setCompanyName(companyField.getCompanyAdmin().getCompanyName());
-		dto.setFieldName(companyField.getFieldName());
+		if(companyField.getField()!=null)
+		{
+			dto.setField(companyField.getField());
+			dto.setFieldName(companyField.getField().getFieldName());
+		}
 //		dto.setRequiredQualifications(companyField.getRequiredQualifications());
 		for(companyFieldSkill Skill:companyField.getCompanyFieldSkills())
 		{
@@ -62,8 +67,16 @@ public class companyFieldMapper {
 			compAdm.setId(companyFieldDto.getCompanyAdministratorId());
 			compAdm.setCompanyName(companyFieldDto.getCompanyName());
 		companyField.setCompanyAdministrator(compAdm);
-		companyField.setFieldName(companyFieldDto.getFieldName());
-//		companyField.setRequiredQualifications(companyFieldDto.getRequiredQualifications());
+		if(companyField.getField()!=null)
+		{
+			companyField.setField(companyField.getField());
+		}else 
+		{
+			Field field=new Field();
+			field.setId(companyFieldDto.getFieldId()); 
+			companyField.setField(field);
+		}
+//		companyField.setFieldName(companyField.getField().getFieldName());//		companyField.setRequiredQualifications(companyFieldDto.getRequiredQualifications());
 		companyField.setCompanyFieldSkills(companyFieldDto.getCompanyFieldSkills());
 		companyField.setCompanyFieldQualifications(companyFieldDto.getCompanyFieldQualifications());
 		return companyField;

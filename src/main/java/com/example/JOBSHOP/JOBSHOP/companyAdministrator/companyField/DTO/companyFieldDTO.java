@@ -9,6 +9,7 @@ import java.util.Map;
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
 
 public class companyFieldDTO extends baseEntityDTO<Long>{
 
@@ -17,7 +18,8 @@ public class companyFieldDTO extends baseEntityDTO<Long>{
 	private Long companyAdministratorId;
 	
 	private String companyName;
-		
+	private Field field;
+	private Long fieldId;
 	private List <String> qualifications=new ArrayList<String>();
 	private List<String> skills=new ArrayList<String>();
 	
@@ -27,6 +29,18 @@ public class companyFieldDTO extends baseEntityDTO<Long>{
 	private List<companyFieldQualification> companyFieldQualifications=new ArrayList<companyFieldQualification>();
 	
 	
+	public Long getFieldId() {
+		return fieldId;
+	}
+	public void setFieldId(Long fieldId) {
+		this.fieldId = fieldId;
+	}
+	public Field getField() {
+		return field;
+	}
+	public void setField(Field field) {
+		this.field = field;
+	}
 	public List<companyFieldQualification> getCompanyFieldQualifications() {
 		return companyFieldQualifications;
 	}

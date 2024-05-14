@@ -15,9 +15,11 @@ public interface companyFieldServiceInterface {
 	 String deleteById(Long id);
 	 String updateCompanyField(Long id,companyField newCompanyField);
 	 List<companyField> findCompanyFieldsWithAdminId(Long Id);
-	companyField findByFieldName(String fieldName);
-	Long findIdByFieldName(String fieldName);
+//	companyField findByFieldName(String fieldName);
+//	Long findIdByFieldName(String fieldName);
 	companyField insertCompanyFieldAndSkillsAndQualifications(Long companyAdminId,companyFieldDTO dto);
-	companyField insertCompanyFieldAndSkillsAndQualifications(companyFieldDTO companyFieldDto);
+//	companyField insertCompanyFieldAndSkillsAndQualifications(companyFieldDTO companyFieldDto);
+	
+	companyField findByFieldIdAndCompanyId(Long fieldId,Long companyId);
 
 }
