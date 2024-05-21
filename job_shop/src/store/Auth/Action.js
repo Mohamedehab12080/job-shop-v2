@@ -18,6 +18,22 @@ export const loginUser=(loginData)=>async(dispactch)=>
     }
 }
 
+export const sendMailVerificationPassword=(Email)=>async(dispactch)=>
+    {
+        try {
+            const {data}=await axios.post(`${API_BASE_URL}/auth/sendMail`,Email)
+            if(data.jwt)
+            {
+                localStorage.setItem("jwt",data.jwt)
+            }
+            console.log("data returned : ",data)
+            dispactch({type:LOGIN_USER_SUCCESS,payload:data.jwt})
+        } catch (error) {
+            console.log("error",error)
+            dispactch({type:LOGIN_USER_FAILURE,payload:error.message})
+        }
+    }
+    
 export const registerJobSeekerUser=(registerJobSeekerData)=>async(dispactch)=>
 {
     try {

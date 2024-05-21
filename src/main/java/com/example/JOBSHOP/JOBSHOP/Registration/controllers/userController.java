@@ -113,6 +113,29 @@ public class userController {
 		}
 	}
 	
+	
+	@PutMapping("/updateContacts")
+	public ResponseEntity<?> updateContactsForUser(
+			@RequestBody updateContactsRequest updateContactsRequest
+			,@RequestHeader("Authorization")String jwt) throws UserException
+	{
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null)
+		{
+			if(userServiceI.updateUSer(user.getId(), updateContactsRequest)!=null)
+			{
+				return new ResponseEntity<>(userServiceI.updateUSer(user.getId(), updateContactsRequest),HttpStatus.OK);
+			}else 
+			{
+				return new ResponseEntity<>("Not FOund",HttpStatus.NOT_FOUND);
+			}
+			
+		}else
+		{
+			throw new UserException("user notfound for this token");
+		}
+	}
+	
 	@PutMapping("/follow/{userId}")
 	public ResponseEntity<UserDTO> followUnfollow(@PathVariable Long userId,
 			@RequestHeader("Authorization") String jwt) throws UserException

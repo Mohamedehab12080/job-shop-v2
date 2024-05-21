@@ -20,4 +20,6 @@ public interface employerFieldRepository extends /*baseRepo<employerField,Long>*
 	
 	@Query("SELECT f from employerField f where f.companyField.id=:id")
 	List<employerField> findByCompanyFieldId(@Param("id") Long id);
+	
+	employerField findByEmployerIdAndCompanyFieldFieldId(Long employerId,Long fieldId);
 }

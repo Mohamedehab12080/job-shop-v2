@@ -97,9 +97,12 @@ public class postCotroller {
 		if(user!=null)
 		{
 			List<Post> postList=postService.findPostsWithSearch(postSearch);
-			return new ResponseEntity<List<postDTO>>(postList.stream() 
+			
+			List<postDTO> postListDto= postList.stream() 
 					.map(this::convertPost)
-					.collect(Collectors.toList()),HttpStatus.OK);
+					.collect(Collectors.toList());
+			return new ResponseEntity<List<postDTO>>(
+					jobSeekerService.getPostsFromSearchAndJobSeekerSkills(user.getId(), postListDto),HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("User not found for this token");
@@ -107,6 +110,7 @@ public class postCotroller {
 		
 		
 	} 
+	
 	@GetMapping("/findById/{postId}")
 	public ResponseEntity<postDTO> findPostById(@PathVariable("postId") Long postId,
 			@RequestHeader("Authorization") String jwt) throws UserException
@@ -239,6 +243,22 @@ public class postCotroller {
 	private applicationDTO convertApplicationToDTO(Application app)
 	{
 		return applicationMapper.mapApplicationToDTO(app);
+	}
+	
+	
+	@PostMapping("/recommendation")
+	public ResponseEntity<?> getRecommendedPostsFromModel(
+			@RequestBody List<String> skills,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+		User user=userServiceI.findUserByJwt(jwt);
+		if(user!=null)
+		{
+			return new ResponseEntity<>(jobSeekerService.callFlaskAPI(String.join(",", skills)),HttpStatus.OK);
+		}else 
+		{
+			throw new UserException("user Not found for this token :");
+		}
 	}
 	
 	@GetMapping("/findPostsWithProfileSkills/{id}")

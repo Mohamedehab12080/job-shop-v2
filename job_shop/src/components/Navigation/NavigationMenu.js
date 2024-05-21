@@ -13,7 +13,7 @@ export const navigation=[
     {
         title:"Recommend me",
         icon:<ApiIcon/>,
-        path:"/explore"
+        path:"/Recommendation"
     },
     {
         title:"Notifications",

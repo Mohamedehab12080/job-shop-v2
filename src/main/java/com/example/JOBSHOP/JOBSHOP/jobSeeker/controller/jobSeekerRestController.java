@@ -169,7 +169,6 @@ public class jobSeekerRestController {
 		}
 		
 	}
-	
 	@DeleteMapping("/delete-qual/{jobSeekerQualificationId}") //(Tested)
 	public ResponseEntity<ApiResponse> deleteQualification(
 			@PathVariable("jobSeekerQualificationId") Long id

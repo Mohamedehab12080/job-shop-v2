@@ -1,7 +1,24 @@
-import axios from "axios"
-import { CREATE_EMPLOYER_FAILURE, CREATE_EMPLOYER_SUCCCESS, CREATE_FIELD_FAILURE, CREATE_FIELD_SUCCCESS, DELETE_EMPLOYER_FAILURE, DELETE_EMPLOYER_SUCCCESS, DELETE_FIELD_FAILURE, DELETE_FIELD_SUCCCESS, GET_COMPANY_INFO_FAILURE, GET_COMPANY_INFO_SUCCCESS, GET_EMPLOYERS_FAILURE, GET_EMPLOYERS_SUCCCESS, GET_FIELDS_FAILURE, GET_FIELDS_SUCCCESS, GIVE_EMPLOYER_FIELDS_FAILURE, GIVE_EMPLOYER_FIELDS_SUCCCESS, UPDATE_COMPANY_INFO_FAILURE, UPDATE_COMPANY_INFO_SUCCCESS } from "./ActionType"
+import { CREATE_EMPLOYER_FAILURE,
+     CREATE_EMPLOYER_SUCCCESS,
+      CREATE_FIELD_FAILURE,
+       CREATE_FIELD_SUCCCESS,
+        DELETE_EMPLOYER_FAILURE,
+         DELETE_EMPLOYER_SUCCCESS,
+          DELETE_FIELD_FAILURE,
+           DELETE_FIELD_SUCCCESS,
+            GET_COMPANY_INFO_FAILURE,
+             GET_COMPANY_INFO_SUCCCESS,
+              GET_EMPLOYERS_FAILURE,
+               GET_EMPLOYERS_SUCCCESS,
+                GET_FIELDS_FAILURE,
+                 GET_FIELDS_SUCCCESS,
+                  GIVE_EMPLOYER_FIELDS_FAILURE,
+                   GIVE_EMPLOYER_FIELDS_SUCCCESS,
+                    UPDATE_COMPANY_INFO_FAILURE,
+                     UPDATE_COMPANY_INFO_SUCCCESS } from "./ActionType"
 import { API_BASE_URL, api } from "../../config/api"
 import { type } from "@testing-library/user-event/dist/type"
+import { UPDATE_JOBSEEKER_CONTACTS_FAILURE, UPDATE_JOBSEEKER_CONTACTS_SUCCESS } from "../JobSeeker/ActionType"
 
 
 export const createEmployer=(employerData)=>async(dispatch)=>
@@ -106,3 +123,15 @@ export const deleteField=(fieldId)=>async(dispatch)=>
      dispatch({type:DELETE_FIELD_FAILURE,payload:error.message});   
     }
 }
+
+export const updateCompanyContacts=(contacts)=>async(dispatch)=>
+    {
+    try {
+        const {data}=await api.put(`/api/user/updateContacts`,contacts);
+        dispatch({type:UPDATE_JOBSEEKER_CONTACTS_SUCCESS,payload:data});
+    } catch (error) {
+        dispatch({type:UPDATE_JOBSEEKER_CONTACTS_FAILURE,payload:error.message});
+    }
+    }
+    
+    

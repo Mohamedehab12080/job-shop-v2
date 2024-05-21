@@ -41,12 +41,12 @@ public class employerFieldServiceImpl implements employerFieldServiceInterface{
 	}
 	
 	@Override
-	public employerField findById(Long id)
+	public employerField findById(Long employerId,Long id)
 	{
-		Optional<employerField> finded=employerFieldRepository.findById(id);
-		if(finded.isPresent())
+		employerField finded=employerFieldRepository.findByEmployerIdAndCompanyFieldFieldId(employerId, id);
+		if(finded !=null)
 		{
-			return finded.get();
+			return finded;
 		}else 
 		{
 			return null;

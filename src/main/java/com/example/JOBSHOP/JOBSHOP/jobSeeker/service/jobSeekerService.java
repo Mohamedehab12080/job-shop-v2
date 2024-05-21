@@ -1,9 +1,12 @@
 package com.example.JOBSHOP.JOBSHOP.jobSeeker.service;
 
+
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import java.util.Collections;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +38,8 @@ import com.example.JOBSHOP.JOBSHOP.Application.skill.service.applicationSkillSer
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
+import com.example.JOBSHOP.JOBSHOP.Post.controller.backEndResponse;
+import com.example.JOBSHOP.JOBSHOP.Post.controller.pythonApiResponse;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.service.postRepository;
 import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
@@ -59,9 +64,12 @@ import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillReposit
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.skill.service.jobSeekerSkillServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.skills.Skill;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
-
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
 @Service
 public class jobSeekerService implements jobSeekerServiceInterface{
 
@@ -258,6 +266,18 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	 }
 	 
 	 private boolean checkForApply(Long jobSekerId,Post post)
+	 {
+		 Application app=applicationServiceI.findByJobSeekerIdAndPostId(jobSekerId,post.getId());
+		 if(app!=null)
+		 {
+			 return false;
+		 }else 
+		 {
+			 return true;
+		 }
+	 }
+	 
+	 private boolean checkForApplyPostDto(Long jobSekerId,postDTO post)
 	 {
 		 Application app=applicationServiceI.findByJobSeekerIdAndPostId(jobSekerId,post.getId());
 		 if(app!=null)
@@ -505,7 +525,6 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	  * The sorted method the score to sort the postScore objects. 
 	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
 	  */
-	 
 	 @Override
 	 public List<postDTO> getPostsWithSkillsOnPublic(Long jobSeekerId) {
 	     // Fetch job seeker and their skills
@@ -661,8 +680,261 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	    	 return Collections.emptyList();
 	     }
 	 }
+	 /**
+	  * @author BOBO
+	  * The sorted method the score to sort the postScore objects. 
+	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
+	  */
+	 @Override
+	 public List<postDTO> getPostsFromSearchAndJobSeekerSkills(Long jobSeekerId,List<postDTO> postDtoList) {
+	     // Fetch job seeker and their skills
+	     jobSeeker jobSeeker = findById(jobSeekerId);
+	     if(jobSeeker!=null)
+	     {
+	    	  Set<String> jobSeekerSkills = 
+	 	    		 jobSeekerSkillServiceI.findByJobSeekerId(jobSeeker.getId())
+	 	             .stream().map(this::convertJobSeekerSkillToDto)
+	 	             .map(jobSeekerSkillDTO::getSkillName)
+	 	             .collect(Collectors.toSet());
+				System.out.println("Job Seeker Skills : "+jobSeekerSkills);
+				
+				Set<String> jobSeekerQualifications=
+						jobSeekerQualificationServiceI.findByJobSeekerId(jobSeeker.getId())
+						.stream().map(this::convertJobSeekerQualificationToDto)
+						.map(jobSeekerQualificationDTO::getQualificationName)
+						.collect(Collectors.toSet());
+				
+				System.out.println("Job Seeker Qualifications : "+jobSeekerQualifications);
+				
+				
+				Set<postDTO> posts =postDtoList.stream()
+						.filter(post -> checkForApplyPostDto(jobSeekerId, post))
+						.collect(Collectors.toSet());
+				
+				if (posts.isEmpty()) {
+					return Collections.emptyList();
+				}
+				
+				// Calculate and sort post scores
+				List<postDTO> sortedPosts = posts.stream()				       
+						.map(post -> {
+				            Set<String> postSkills = post.getSkills().stream()
+				                    .collect(Collectors.toSet());
+				            Set<String> postQualifications = post.getQualifications().stream()
+				                    .collect(Collectors.toSet());
+
+				            int score = calculateScore(
+				            		new ArrayList<String>(postQualifications),
+				            		new ArrayList<>(postSkills),
+				            		new ArrayList<String>(jobSeekerQualifications),
+				            		new ArrayList<>(jobSeekerSkills));
+				            
+				            List<String>remainedSkills=applicationService
+				            							.returningRemainedSkillsForListOfPosts(
+				            									new ArrayList<String>(postSkills),
+				            									new ArrayList<String>(jobSeekerSkills));
+				            
+				            List<String> remainedQualifications=applicationService
+				            									.returningRemainedQualificationsForPostList(
+				            											new ArrayList<String>(postQualifications),
+				            											new ArrayList<String>(jobSeekerQualifications));
+				            List<String> matchedSkills=new ArrayList<String>();
+				            for(String matchedSkill:postSkills)
+				            {
+				            	if(!remainedSkills.contains(matchedSkill))
+				            	{
+				            		matchedSkills.add(matchedSkill);
+				            	}
+				            }
+				            post.setMatchedSkills(matchedSkills);
+				            List<String> matchedQualifications=new ArrayList<String>();
+				            for(String matchedQualification:postQualifications)
+				            {
+				            	if(!remainedQualifications.contains(matchedQualification))
+				            	{
+				            		matchedQualifications.add(matchedQualification);
+				            	}
+				            }
+				            post.setMatchedQulifications(matchedQualifications);
+				            post.setRemainedSkills(remainedSkills);
+			                post.setRemainedQualifications(remainedQualifications);
+				            if(!matchedSkills.isEmpty())
+				            {
+				            	if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
+					            {
+				            		  post.setState(0);
+							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
+						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
+//							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
+					            }else 
+					            {
+					            	  post.setState(1);   
+							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
+						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
+//							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
+					            }
+				            	System.out.println("Matched Skills : "+matchedSkills);
+					            return new postScore(post, score);
+				            }else 
+				            {				            	
+				            	return new postScore(post, score);
+				            }
+				            
+				        })// Update the comparator to prioritize posts with more matched skills and fewer remaining skills
+					    .sorted(Comparator.comparingInt(postScore -> {
+					        postDTO post = ((postScore) postScore).getPost();
+					        int matchedSkillsCount = post.getMatchedSkills().size() + post.getMatchedQulifications().size();
+					        int remainedSkillsCount = post.getRemainedSkills().size() + post.getRemainedQualifications().size();
+					        double ratio = (double) matchedSkillsCount / (matchedSkillsCount + remainedSkillsCount);
+					        				// this multiply for retaining precision
+					        System.out.println("Ratioooooo :::: "+(-ratio * 10000));
+					        return  (int) (-ratio * 10000);  // The negative for getting the higher matched skills and qualifications and lower missedSkills Posts first
+					    }))
+					    .map(postScore -> ((postScore) postScore).getPost()) // Extract the postDTO from postScore
+					    .collect(Collectors.toList());
+				
+//						.sorted(
+//								Comparator
+//								.comparingInt((postScore) -> {
+//		                    if (((postScore) postScore)
+//		                    		.getPost()
+//		                    		.getRemainedSkills()
+//		                    		.isEmpty()
+//		                    		&& 
+//		                    		((postScore) postScore)
+//		                    		.getPost()
+//		                    		.getRemainedQualifications()
+//		                    		.isEmpty()) {
+//		                    	
+//		                        return ((postScore) postScore)
+//		                        		.getScore();
+//		                    } else 
+//		                    {
+//		                    	return ((postScore) postScore)
+//		                    			.getPost()
+//		                    			.getRemainedSkills()
+//		                    			.size()
+//		                    			+((postScore) postScore)
+//		                    			.getPost()
+//		                    			.getRemainedQualifications()
+//		                    			.size();
+//		                    }
+//		                }).reversed()) // Reverse to get highest score first
+//		                .map(postScore::getPost) // Accessing the postDTO directly from postScore
+//		                .collect(Collectors.toList());
+
+				
+				// Map to store unique post IDs
+				Map<Long, postDTO> uniquePostsMap = new LinkedHashMap<>();
+				sortedPosts.forEach(post -> uniquePostsMap.put(post.getId(), post));
+				// Convert the map back to a list
+				List<postDTO> uniquePostsList = new ArrayList<>(uniquePostsMap.values());
+				
+				return uniquePostsList;
+	     }else 
+	     {
+	    	 return Collections.emptyList();
+	     }
+	 }
 	 
-	 
+	 ////  return Type  :  : backEndResponse
+	 public backEndResponse callFlaskAPI(String userSkills) {
+		    // Define the URL of your Flask API endpoint
+		    String response = "";
+		    String apiUrl = "http://localhost:5000/match-skills";
+		    backEndResponse backEndResponse=new backEndResponse();
+		    // Create a RestTemplate instance
+		    RestTemplate restTemplate = new RestTemplate();
+
+		    // Prepare the request body
+		    HttpHeaders headers = new HttpHeaders();
+		    headers.setContentType(MediaType.APPLICATION_JSON);
+
+		    // Create the request body as a map
+		    Map<String, String> requestBodyMap = new HashMap<>();
+		    requestBodyMap.put("skills", userSkills);
+
+		    // Convert the map to a JSON string
+		    ObjectMapper objectMapper = new ObjectMapper();
+		    String requestBody = "";
+		    try {
+		        requestBody = objectMapper.writeValueAsString(requestBodyMap);
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+
+		    // Log the request body
+		    System.out.println("Request Body: " + requestBody);
+
+		    // Create the request entity with headers and body
+		    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
+
+		    // Make a POST request to the Flask API endpoint
+		    ResponseEntity<String> responseEntity = null;
+		    try {
+		        responseEntity = restTemplate.exchange(
+		            apiUrl,
+		            HttpMethod.POST,
+		            requestEntity,
+		            String.class
+		        );
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		    }
+
+		    // Handle the response
+		    if (responseEntity != null) {
+		        HttpStatus statusCode = (HttpStatus) responseEntity.getStatusCode();
+		        if (statusCode == HttpStatus.OK) {
+		            String responseBody = responseEntity.getBody();
+		            response = responseEntity.getBody();
+		            // Process the JSON response from the Flask API
+		            System.out.println("Response from Flask API: " + responseBody);
+
+		            // Parse the JSON response into a list of JobRecommendation objects
+		            try {
+		                List<pythonApiResponse> jobRecommendations = objectMapper.readValue(
+		                    responseBody, new TypeReference<List<pythonApiResponse>>() {}
+		                );
+
+		               
+		                List<pythonApiResponse> modelResponseForBackEndObject=new ArrayList<pythonApiResponse>();
+		                List<postDTO> postDtos=new ArrayList<postDTO>();
+		                // Access specific attributes
+		                for (pythonApiResponse recommendation : jobRecommendations) {
+		                    System.out.println("Job Title: " + recommendation.getJobTitle());
+		                    System.out.println("Skills: " + recommendation.getSkills());
+		                    if(recommendation.getRowType().equals("Train"))
+		                    {
+		                    	modelResponseForBackEndObject.add(recommendation);
+		                    }else
+		                    {
+		                    	
+		                    	System.out.println("The else reached with post Id : "+recommendation.getPostId());
+		                    	Optional<Post> postOption=postService.findById(Long.valueOf(recommendation.getPostId()));
+		                    	if(postOption.isPresent())
+		                    	{
+		                    		
+		                    		postDTO postRetreived=postMapper.mapPostTODTO(postOption.get());
+		                    		postDtos.add(postRetreived);
+		                    	}
+		                    	
+		                    }
+		                    // Access other attributes similarly   // here will check if the row is in site or not and handle all senarios and return an object including List <pythonApiResponse> for Train and List<postDTO> for posts
+		                }
+		                
+		                backEndResponse.setPostDtosResponse(postDtos);
+		                backEndResponse.setPythonResponses(modelResponseForBackEndObject);
+		            } catch (Exception e) {
+		                e.printStackTrace();
+		            }
+		        } else {
+		            // Handle other status codes if needed
+		            System.err.println("Failed to call Flask API. Status code: " + statusCode);
+		        }
+		    }
+		    return backEndResponse;
+		}
 //	 @Override
 //	 public List<postDTO> getPostsWithSkillsOnPublic(Long jobSeekerId) {
 //	     jobSeeker jobSeeker = findById(jobSeekerId);

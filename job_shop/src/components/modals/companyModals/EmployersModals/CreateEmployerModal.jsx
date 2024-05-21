@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, InputAdornment, MenuItem } from "@mui/material";
+import { IconButton, InputAdornment, MenuItem, Slide } from "@mui/material";
 import { Close, Visibility, VisibilityOff } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -16,10 +16,11 @@ import { useState } from "react";
 import { AddCircleOutline as AddCircleOutlineIcon, RemoveCircleOutline as RemoveCircleOutlineIcon } from '@mui/icons-material';
 import CloseIcon from '@mui/icons-material/Close';
 import ShowEmployerModal from "./ShowEmployersModal";
+import { fetchAllFields } from "../../../../store/fields/Action";
 
 const style = {
   position: "absolute",
-  top: "50%",
+  top: "10%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 600,
@@ -32,7 +33,14 @@ const style = {
   maxHeight: "80vh",
   overflowY: "auto", // Enable scrolling
 };
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::-webkit-scrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function CreateEmployerModal({ openCreateEmployerModal, handleCloseCreateEmployerModal }) {
 
 
@@ -122,7 +130,7 @@ const [showPassword, setShowPassword] = useState(false);
     address: Yup.string().required("Address is required"),
     gender:Yup.string().required("Gender is required")
   });
-
+  const fieldsToDisplay=filterInputFields === "" ? fields : filteredFields;
   const formik = useFormik({
     initialValues: {
         userName: '',
@@ -171,6 +179,15 @@ const [showPassword, setShowPassword] = useState(false);
         onClose={handleCloseCreateEmployerModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
+      >
+        <Slide 
+          direction="left"
+          in={openCreateEmployerModal}
+          mountOnEnter
+          unmountOnExit
+          timeout={{ enter: 800, exit: 800 }}
+          transitionTimingFunction="ease-in-out" 
+          style={slideStyle}
       >
         <Box sx={style}>
           <div className="modal-content-container flex items-center justify-between mb-4">
@@ -366,33 +383,32 @@ const [showPassword, setShowPassword] = useState(false);
               </Grid>
               <Grid item xs={12}>
               <div className="skills-scroll-container sapce-y-2" style={{ maxHeight: "200px", overflowY: "auto" }}>
-                {/* Filter and map through fields to display buttons */}
-                {(filterInputFields === "" ? fields : filteredFields)
+                
+              {Array.isArray(fieldsToDisplay) && fieldsToDisplay.length > 0 && (
+                fieldsToDisplay
                   .filter((field) => !selectedField.some((selected) => selected.id === field.id))
-                  .map((field) => (
-                    <Button key={field.id} variant="outlined" onClick={() => handleAddField(field)}>
-                      {/* Display field name */}
-                      <>
+                  .map((field,index) => (
+                    <Button 
+                      key={index} 
+                      variant="outlined" 
+                      onClick={() => handleAddField(field)}
+                    >
                       <div className="ml-2">{field.fieldName}</div>
-                       </>
-                      
-                    <ul>
 
-                    {field.skills && field.skills.length > 0 ? (
-                        field.skills.map((skill, index) => (
-                          <div className="flex" key={index}>
-                             <li className="">- {skill}</li>
-                            
+                      <ul className="flex flex-wrap space-x-2 mt-3">
+                        {field.skills && field.skills.length > 0 ? (
+                          field.skills.map((skill, index) => (
+                            <div className="flex" key={index}>
+                              <li key={index}>- {skill}</li>
                             </div>
-                        ))
-                      ) : (
-                        <div>No skills</div>
-                      )}
-                    </ul>
-                      {/* Display skills if available, otherwise show "No skills" */}
-                    
+                          ))
+                        ) : (
+                          <div>No skills</div>
+                        )}
+                      </ul>
                     </Button>
-                  ))}
+                  ))
+              )}
               </div>
               </Grid>
               <Grid item container justifyContent="center">
@@ -424,6 +440,7 @@ const [showPassword, setShowPassword] = useState(false);
           <ShowEmployerModal openShowEmployerModal={openShowEmployerModal} handleCloseShowEmployerModal={handleCloseShowEmployerModal}/>
         </section>
         </Box>
+        </Slide>
       </Modal>
     </div>
   );

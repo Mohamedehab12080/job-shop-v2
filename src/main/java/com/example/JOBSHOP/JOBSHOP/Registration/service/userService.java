@@ -27,6 +27,7 @@ import com.example.JOBSHOP.JOBSHOP.User.service.userRepository;
 import com.example.JOBSHOP.JOBSHOP.Registration.tokens.verificationTokenRepository;
 import jakarta.transaction.Transactional;
 import com.example.JOBSHOP.JOBSHOP.Registration.tokens.verificationToken;
+import com.example.JOBSHOP.JOBSHOP.Registration.controllers.updateContactsRequest;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.exceptions.UserAlreadyExistsException;
 import com.example.JOBSHOP.JOBSHOP.Registration.security.jwtProvider;
@@ -225,32 +226,25 @@ public class userService implements userServiceInterface{
 
 	@Transactional
 	@Override
-	public User updateUSer(Long id,User user) {
+	public User updateUSer(Long id,updateContactsRequest user) {
 		
-
-			User oldUser=findById(id).get();
-			if(user.getUserName()!=null)
+			if(findById(id).isPresent())
 			{
-				oldUser.setUserName(user.getUserName());
-			}
-			
-			if(user.getAddress() !=null)
+				User oldUser=findById(id).get();
+				if(!user.getContacts().isEmpty())
+				{
+					oldUser.setContacts(user.getContacts());
+				}
+				
+				User insertedUser= userRepository.save(oldUser);
+				return oldUser;
+			}else 
 			{
-				oldUser.setAddress(user.getAddress());
+				return null;
 			}
-			
-			if(!user.getContacts().isEmpty())
-			{
-				oldUser.setContacts(user.getContacts());
-			}
-			
-			if(user.getPicture()!=null)
-			{
-				oldUser.setPicture(user.getPicture());
-			}
+		
 			
 			
-			return userRepository.save(oldUser);
 			
 		}
 

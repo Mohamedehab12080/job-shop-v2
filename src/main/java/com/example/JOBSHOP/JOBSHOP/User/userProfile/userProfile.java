@@ -26,6 +26,7 @@ public class userProfile{
 	{
 		this.followService=followService;
 	}
+	
 	public userProfile()
 	{
 		

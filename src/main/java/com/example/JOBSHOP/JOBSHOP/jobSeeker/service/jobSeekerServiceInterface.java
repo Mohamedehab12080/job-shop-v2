@@ -38,4 +38,11 @@ public interface jobSeekerServiceInterface {
 	skillsAndQualificationsRequest getJobSeekerSkillsAndQualificaitonsByJobSeekerId(Long jobSeekerId);
 
 	jobSeekerDTO update(Long jobSeekerId, registerUserRequest user) throws ParseException;
+
+	/**
+	  * @author BOBO
+	  * The sorted method the score to sort the postScore objects. 
+	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
+	  */
+	List<postDTO> getPostsFromSearchAndJobSeekerSkills(Long jobSeekerId, List<postDTO> postDtoList);
 } 

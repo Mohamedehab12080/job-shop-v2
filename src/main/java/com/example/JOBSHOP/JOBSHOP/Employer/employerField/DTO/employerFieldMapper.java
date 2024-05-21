@@ -55,6 +55,7 @@ public class employerFieldMapper {
 		dto.setId(empf.getId());
 		dto.setSkills(skills);
 		dto.setQualifications(qualifications);
+		dto.setFieldId(empf.getCompanyField().getField().getId());
 		return dto;
 	}
 	

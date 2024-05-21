@@ -120,7 +120,6 @@ public class employerController {
 			
 			if(returnedUser!=null)
 			{
-
 				return new ResponseEntity<>(returnedUser,HttpStatus.OK);
 			}
 			
@@ -184,6 +183,7 @@ public class employerController {
 		{
 			Employer emp=employerService.findById(user.getId());
 			Post savedPost=employerService.createAPost(emp,post);
+			System.out.println("saved Post Null "+savedPost.getId());
 			Post returnedPost=postService.findById(savedPost.getId());
 			post.setId(returnedPost.getId());
 			post.setCompanyName(companyProfileService
@@ -191,7 +191,8 @@ public class employerController {
 					.getCompanyAdministrator()
 					.getCompanyName());
 			post.setEmployerUserName(user.getUserName());
-			post.setFieldName(employerFieldService.findById(post.getField()).getCompanyField().getField().getFieldName());
+			System.out.println("Field Name From inserting post DTo  : "+post.getFieldName());
+			post.setFieldName(employerFieldService.findById(user.getId(),post.getField()).getCompanyField().getField().getFieldName());
 			return new ResponseEntity<>(post,HttpStatus.CREATED);
 		}else
 		{
@@ -199,6 +200,22 @@ public class employerController {
 		}
 	}
 	
+	@PutMapping("/updatePost/{postId}")
+	public ResponseEntity<?> updatePost(
+			@PathVariable("postId") Long postId,
+			@RequestBody postDTO podtDto,
+			@RequestHeader("Authorization") String jwt) throws UserException
+	{
+			User user =userServiceI.findUserByJwt(jwt);
+			if(user!=null)
+			{
+				return new ResponseEntity< >(postService.update(postId,podtDto),HttpStatus.OK);
+			}else 
+			{
+				throw new UserException("user not found for this token");
+			}
+	}
+
 	@GetMapping("/findPost/{id}")
 	public ResponseEntity<postDTO> findPostById(@PathVariable("id") Long id,
 			@RequestHeader("Authorization") String jwt) throws UserException,postException

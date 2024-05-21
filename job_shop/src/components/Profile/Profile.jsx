@@ -118,7 +118,7 @@ const Profile = () => {
         <section className='pl-6'>
             
             <div className='flex justify-between items-start mt-5 h-[5rem]'>
-                <Avatar onClick={()=>handleOpenShowPostImageModal(profileImage)} className='transform -translate-y-24' alt='BOB' src={profileImage}
+                <Avatar  onClick={()=>handleOpenShowPostImageModal(profileImage)} className='transform -translate-y-24 cursor-pointer' alt='BOB' src={profileImage}
                 sx={{width:"10rem",height:"10rem",border:"4px solid white"}}/> 
              {jobSeekerData !==null && jobSeekerData.req_user ? (<Button
              onClick={handleOpenProfileModel}

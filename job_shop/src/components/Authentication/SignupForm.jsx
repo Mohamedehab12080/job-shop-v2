@@ -3,16 +3,17 @@ import { Button } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { blue } from '@mui/material/colors';
 import { useFormik } from 'formik';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { AddCircleOutline as AddCircleOutlineIcon, RemoveCircleOutline as RemoveCircleOutlineIcon } from '@mui/icons-material';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { registerJobSeekerUser, registrerCompanyUser } from '../../store/Auth/Action';
 import { uploadToCloudnary } from '../../Utils/UploadToCloudnary.';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { image } from '@cloudinary/url-gen/qualifiers/source';
+import { fetchLocations } from '../../store/location/Action';
 
 library.add(faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt);
 const SignupForm = () => {
@@ -47,6 +48,43 @@ const SignupForm = () => {
             }),
         })
     });
+    const [other,setOther]=useState(false);
+    const handleOther=()=>{
+        if(formik.values.address !=="Other")
+        {
+            setOther(true);
+            formik.setFieldValue("address","");
+        }else
+         {
+            setOther(false);
+         }
+       
+        
+    };
+
+    const [locations,setLocations]=useState([]);
+    const locationReducer=useSelector(state=>state.locationReducer);
+    const dispatch3=useDispatch();
+        useEffect(()=>
+        {
+          dispatch3(fetchLocations());
+        },[dispatch3])
+    
+        useEffect(()=>
+        {
+          setLocations(locationReducer.locations);
+        },[locationReducer.locations])
+
+        useEffect(()=>
+            {
+              let updatedLocations = [...locationReducer.locations];
+          
+              const specificValue = "Other";
+              updatedLocations.push(specificValue);
+              
+              setLocations(updatedLocations);
+            },[locationReducer.locations])
+        
     const [preview,setPreview]=useState("");
     const handleFileUpload=(e)=>
         {
@@ -128,6 +166,7 @@ const SignupForm = () => {
           updatedValues.birthDate = birthDate;
           const formData = { ...updatedValues, contacts: updatedValues.contacts.filter(contact => contact !== '') };
       
+          console.log("Form Data : ",formData);
           // Dispatch action based on userType
           if (updatedValues.userType === 'jobSeeker') {
                dispatch(registerJobSeekerUser(formData));
@@ -136,6 +175,7 @@ const SignupForm = () => {
           }
         }
     };
+
     const formik = useFormik({
         initialValues: {
             userName: "",
@@ -335,20 +375,43 @@ const SignupForm = () => {
                     )}
                 </Grid>
             </Grid>
-                <Grid item xs={12}>
-                    <TextField
-                        fullWidth
-                        label="Country/City"
-                        variant='outlined'
-                        size='large'
-                        name="address"
-                        value={formik.values.address}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        error={formik.touched.address && Boolean(formik.errors.address)}
-                        helperText={formik.touched.address && formik.errors.address}
-                    />
-                </Grid>
+                <Grid item xs={12} className='mt-3'   >
+                <TextField
+                  fullWidth
+                  select
+                  label="Country/City"
+                  variant='outlined'
+                  size='large'
+                  name="address"
+                  value={formik.values.address}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={formik.touched.address && Boolean(formik.errors.address)}
+                  helperText={formik.touched.address && formik.errors.address}
+                >
+                  {locations && locations.map( (location,index)=>(
+                    <MenuItem key={index} value={location} onClick={handleOther}>{location}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              {other &&(
+                 <Grid item xs={12}>
+                 <TextField
+                     fullWidth
+                     label="Country/City"
+                     variant='outlined'
+                     size='large'
+                     name="address"
+                     value={formik.values.address}
+                     onChange={formik.handleChange}
+                     onBlur={formik.handleBlur}
+                     error={formik.touched.address && Boolean(formik.errors.address)}
+                     helperText={formik.touched.address && formik.errors.address}
+                 />
+             </Grid>
+
+             )}
                {formik.values.userType==="jobSeeker" ? (
                     <>
         <Grid item xs={12}>

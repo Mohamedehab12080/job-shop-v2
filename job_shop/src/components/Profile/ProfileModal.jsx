@@ -296,11 +296,22 @@ export default function ProfileModal({ open, handleClose, data, Type }) {
   };
 
   const renderIcon = () => {
-    if (uploadStatus === "uploading") {
+    if (uploadStatus === "uploading" || uploadStatus2 === "uploading") {
       return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
-    } else if (uploadStatus === "success") {
+    } else if (uploadStatus === "success" || uploadStatus2 === "success") {
       return <FontAwesomeIcon icon="check-circle" />; // Display checkmark icon on successful upload
-    } else if (uploadStatus === "error") {
+    } else if (uploadStatus === "error" || uploadStatus2 === "error") {
+      return <FontAwesomeIcon icon="exclamation-circle" />; // Display error icon if upload fails
+    } else {
+      return <FontAwesomeIcon icon="cloud-upload-alt" />; // Default upload icon
+    }
+  };
+  const renderIcon2 = () => {
+    if (uploadStatus2 === "uploading") {
+      return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
+    } else if (uploadStatus2 === "success") {
+      return <FontAwesomeIcon icon="check-circle" />; // Display checkmark icon on successful upload
+    } else if (uploadStatus2 === "error") {
       return <FontAwesomeIcon icon="exclamation-circle" />; // Display error icon if upload fails
     } else {
       return <FontAwesomeIcon icon="cloud-upload-alt" />; // Default upload icon

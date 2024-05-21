@@ -7,6 +7,7 @@ import React from 'react'
 import * as Yup from 'yup';
 import { useDispatch } from 'react-redux';
 import { loginUser } from '../../store/Auth/Action';
+import { useNavigate } from 'react-router-dom';
 
 const SigninForm = () => {
     const dispatch=useDispatch();
@@ -16,6 +17,7 @@ const SigninForm = () => {
         password: Yup.string().required("Password is required")
     });
 
+    const navigate=useNavigate();
     const formik = useFormik({
         initialValues: {
             email: "",
@@ -76,6 +78,7 @@ const SigninForm = () => {
                     />
                 </Grid>
                
+
                 <Grid className='mt-20' item xs={12}>
                     <Button
                         sx={{ borderRadius: "29px", py: "15px", bgcolor: blue[500], width: '100%' }} // Set width to 100%
@@ -83,6 +86,9 @@ const SigninForm = () => {
                         fullWidth
                         size="large"
                         variant='contained'>Login</Button>
+                </Grid>
+                <Grid item xs={12} > 
+                        <a className='ml-3 cursor-pointer' onClick={() => navigate(`/request-reset`)}>Forgot password ?</a>
                 </Grid>
             </Grid>
         </form>

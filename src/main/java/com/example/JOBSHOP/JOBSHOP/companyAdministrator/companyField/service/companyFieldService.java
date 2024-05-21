@@ -123,19 +123,6 @@ public class companyFieldService implements companyFieldServiceInterface{
 				{
 					for(employerField empField:employerFieldList)
 					{
-						List<postField> postFieldList=postFieldServiceI.findAllPostFieldsByEmployerFieldId(empField.getId());
-						if(!postFieldList.isEmpty())
-						{
-							for(postField postF:postFieldList)
-							{
-								if(postF.getPost()!=null)
-								{
-									postServiceI.deleteById(postF.getPost().getId());
-								}
-								
-								postFieldServiceI.deleteById(postF.getId());
-							}
-						}
 						employerFieldServiceI.deleteById(empField.getId());
 					}
 				}

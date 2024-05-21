@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, InputAdornment, MenuItem, Slide } from "@mui/material";
+import { ClickAwayListener, IconButton, InputAdornment, MenuItem, Slide } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -16,11 +16,13 @@ import { getQualifications } from "../../../../store/qualifications/Action";
 import AddIcon from '@mui/icons-material/Add';
 import ShowFieldsModal from './ShowFieldsModal'
 import * as Yup from "yup";
+import SearchableDropdown from "./SearchableDropDown";
+import { fetchAllFields } from "../../../../store/fields/Action";
 const slideStyle = {
   height: '100%',
   overflowY: 'auto',
   scrollbarWidth: 'none', // Hide scrollbar for Firefox
-  '&::-webkit-scrollbar': {
+  '&::WebkitScrollbar': {
     display: 'none', // Hide scrollbar for Chrome, Safari, Edge
   },
 };
@@ -35,7 +37,10 @@ export default function CreateFieldModal({
   
   var [selectedSkills, setSelectedSkills] = React.useState([]);
   var [filteredSkills, setFilteredSkills] = React.useState([]);
+  var [filteredFields, setFilteredFields] = React.useState([]);
   const [filterInputSkills, setFilterInputSkills] = React.useState("");
+  const [filterInputFields, setFilterInputFields] = React.useState("");
+  // const [anchorEl, setAnchorEl] = useState(null);
   const comp=useSelector(state=>state.comp)
   const auth = useSelector(state => state.auth);
   const dispatch=useDispatch();
@@ -46,23 +51,44 @@ export default function CreateFieldModal({
   const [fields,setFields]=useState([])
   const [fetchedSkills,setFetchedSkills]=useState([])
   const [displayedSkills,setDisplayedSkills]=useState([])
+  const [displayedFields,setDisplayedFields]=useState([])
   const [fetchedQuals,setFetchedQuals]=useState([])
   const [displayedQuals,setDisplayedQuals]=useState([])
   var [selectedQuals, setSelectedQuals] = React.useState([]);
   var [filteredQuals, setFilteredQuals] = React.useState([]);
   const [filterInputQuals, setFilterInputQuals] = React.useState("");
   
-  const handleSetSkills = () => {
-    if (skills && skills.skills) {
-      
-    }
-  };
-  const handleSetQuals = () => {
-    if (quals && quals.quals) {
-     
-    }
-  };
+  const [fetchedFields,setFetchedFields]=React.useState([]);
+  const [selectedField,setSelectedField]=React.useState("");
+  const dispatch4=useDispatch();
+  const fieldReducer = useSelector(state=>state.fieldReducer);
 
+
+  const handleAddManualField=(value)=>
+    {
+      if(filterInputFields !== "" && !selectedField.includes(value))
+      {
+          setSelectedField(value);
+          formik.setFieldValue("fieldName", value);
+          setFilterInputFields("")
+      }
+    }
+  // useEffect(()=>
+  // {
+  //   if(openCreateFieldModal)
+  //   {
+  //     dispatch4(fetchAllFields());
+
+  //   }
+  // },[openCreateFieldModal.dispatch4])
+
+  useEffect(()=>
+  {
+    if(openCreateFieldModal)
+      {
+        setFetchedFields(fieldReducer.fields);
+      }
+  },[openCreateFieldModal,fieldReducer.fields]);
 useEffect(() => {
   
   if(openCreateFieldModal)
@@ -96,6 +122,11 @@ useEffect(()=>
     setDisplayedQuals(fetchedQuals.slice(0,10));
 },[fetchedSkills,fetchedQuals]);
 
+useEffect(()=>
+  {
+    setDisplayedFields(fetchedFields.slice(0,10));
+  },[fetchedFields]);
+  
 
 // React.useEffect(()=>
 // {
@@ -119,6 +150,14 @@ useEffect(()=>
 //   }
 // }
 
+const handleAddField=(value)=>
+  {
+    if(!selectedField.includes(value))
+    {
+      setSelectedField(value);
+      formik.setFieldValue("fieldName",value);
+    }
+  }
 const handleAddSkill = (skill) => {
   if (!selectedSkills.includes(skill)) {
     const updatedSkills = [...selectedSkills, skill];
@@ -143,6 +182,12 @@ const handleAddSkill = (skill) => {
   }
 };
 
+const handleRemoveField=()=>
+  {
+    setSelectedField("");
+    formik.setFieldValue("fieldName","");
+  }
+
 const handleRemoveSkill = (skillToRemove) => {
   const updatedSkills = selectedSkills.filter(
     (skill) => skill !== skillToRemove
@@ -157,21 +202,38 @@ const handleRemoveSkill = (skillToRemove) => {
   }
 };
 
+const handleFilterFields= (input) => {
+  const normalizedInput = input.toLowerCase();
+
+  const filtered = fetchedFields.filter((field) =>{
+    if(field.toLowerCase().includes(normalizedInput) && !selectedField.includes(normalizedInput))
+      {
+        return field;
+      }
+  }
+  );
+  setFilteredFields(filtered);
+  setFilterInputFields(input);
+};
+
 const handleFilterSkills = (input) => {
   const normalizedInput = input.toLowerCase();
 
-  const filtered = fetchedSkills.filter((skill) => {
-    // Check if the normalized skill (converted to lowercase) is not included in selectedSkills
-    // Convert each selected skill to lowercase before checking inclusion
-    return !selectedSkills.some((selectedSkill) =>
-      selectedSkill.toLowerCase().includes(normalizedInput)
-    );
-  });
+  const filtered = fetchedSkills.filter((skill) =>{
+    if(skill.toLowerCase().includes(normalizedInput) && !selectedSkills.includes(normalizedInput))
+      {
+        return skill;
+      }
+  }
+  );
 
   setFilteredSkills(filtered);
   setFilterInputSkills(input);
 };
-
+// const handleClickAway=()=>
+//   {
+//     setAnchorEl(null);
+//   };
 const handleAddQual = (qual) => {
   if (!selectedQuals.includes(qual)) {
     const updatedQuals = [...selectedQuals, qual];
@@ -214,6 +276,16 @@ const handleAddManualSkill=(value)=>
   }
 }
 
+// const handleAddManualField=(value)=>
+//   {
+//     if(filterInputFields !== "" && !selectedField.includes(value))
+//     {
+//         setSelectedField(value);
+//         formik.setFieldValue("fieldName",value);
+//         setFilterInputFields("")
+//     }
+//   }
+  
 const handleFilterQuals = (input) => {
   const filtered = fetchedQuals.filter((qual) =>
     qual.toLowerCase().includes(input.toLowerCase())
@@ -233,11 +305,15 @@ const validationSchema=Yup.object().shape({
       qualifications:[],
       skills:[],
      }, // Initialize field with an empty string or appropriate initial value    },
-    onSubmit: (values) => {
-      dispatch(createField(values));
-      formik.resetForm();
-      setSelectedQuals([])
-      setSelectedSkills([])
+    onSubmit: async (values) => {
+        if(values.fieldName !=="" && values.skills.length > 0)
+        {
+          await dispatch(createField(values));
+          formik.resetForm();
+          setSelectedQuals([]);
+          setSelectedSkills([]);
+          handleOpenShowFieldsModal();
+        }
         },
   });
 
@@ -254,7 +330,7 @@ const validationSchema=Yup.object().shape({
     mountOnEnter
     unmountOnExit
     timeout={{ enter: 800, exit: 800 }}
-    transitionTimingFunction="ease-in-out" 
+    transitiontimingfunction="ease-in-out" 
     style={slideStyle}
 >
       <Box
@@ -282,18 +358,96 @@ const validationSchema=Yup.object().shape({
         </div>
         <form onSubmit={formik.handleSubmit}>
         <Grid container spacing={2}>
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
               <TextField
                 fullWidth
-                id="fieldName"
-                name="fieldName"
-                label="Field Name"
-                value={formik.values.fieldName}
+                id="filterFields"
+                name="filterFields"
+                label="Filter Fields"
                 onChange={formik.handleChange}
                 variant="outlined"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={()=>handleAddManualSkill(filterInputSkills)}>
+                        <AddIcon />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
               >
               </TextField>
-            </Grid> 
+        </Grid>  */}
+
+            {/* <SearchableDropdown options={fetchedFields}/> */}
+   <Grid item xs={12}>
+      <TextField
+        fullWidth
+        id="filterFields"
+        name="filterFields"
+        label="Filter Fields"
+        value={filterInputFields}
+        onChange={(e) => handleFilterFields(e.target.value)}
+        error={
+          formik.touched.filterFields &&
+          Boolean(formik.errors.filterFields)
+        }
+        helperText={
+          formik.touched.filterFields && formik.errors.filterFields
+        }
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton onClick={()=>handleAddManualField(filterInputFields)}>
+                <AddIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+        
+      />
+    </Grid>
+    <Grid item xs={12}>
+            <div className="selected-skills-container">
+              {selectedField !=="" ?(
+                  <div  className="selected-skill">
+                    <span>{selectedField}</span>
+                    <IconButton
+                      onClick={() => handleRemoveField()}
+                      aria-label="delete"
+                      size="small"
+                    >
+                      <Close />
+                    </IconButton>
+                  </div>
+                )
+              : (
+                <div className="error-message">
+                  Field Required
+                </div>
+              )}
+            </div>
+          </Grid>
+
+    <Grid item xs={12}>
+      <div
+        className="skills-scroll-container"
+        style={{ maxHeight: "200px", overflowY: "auto" }}
+      >
+        {(filterInputFields === "" ? displayedFields : filteredFields)
+          .filter((field) => !selectedField.includes(field))
+          .map((field, index) => (
+            <Button
+              key={index}
+              variant="outlined"
+              onClick={() => handleAddField(field)}
+            >
+              {field}
+            </Button>
+          ))}
+      </div>
+    </Grid>
+
     <Grid item xs={12}>
       <TextField
         fullWidth

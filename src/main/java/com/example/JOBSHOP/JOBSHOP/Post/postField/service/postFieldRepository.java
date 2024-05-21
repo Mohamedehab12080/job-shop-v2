@@ -12,6 +12,6 @@ import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 @Repository
 public interface postFieldRepository extends JpaRepository<postField,Long>{
 
-	@Query("SELECT f from postField f where f.employerField.id=:empFieldId")
-	List<postField> findByEmployerFieldId(@Param("empFieldId") Long id);
+//	@Query("SELECT f from postField f where f.employerField.id=:empFieldId")
+//	List<postField> findByEmployerFieldId(@Param("empFieldId") Long id);
 }

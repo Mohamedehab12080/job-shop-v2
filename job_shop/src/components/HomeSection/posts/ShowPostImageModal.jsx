@@ -1,9 +1,17 @@
 import { Close } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { IconButton, Slide } from "@mui/material";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import React from "react";
 
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::WebkitScrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 export default function ShowPostImageModal({
   openShowPostImageModal,
   handleCloseShowPostImageModal,
@@ -27,11 +35,20 @@ export default function ShowPostImageModal({
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
     >
+       <Slide
+          direction="up"
+          in={openShowPostImageModal}
+          mountOnEnter
+          unmountOnExit
+          timeout={{ enter: 800, exit: 500 }}
+          transitiontimingfunction="ease-in-out" 
+          style={slideStyle}
+      >
       <Box
         sx={{
           position: "absolute",
-          top: "50%",
-          left: "50%",
+          top: "10%",
+          left: "30%",
           transform: "translate(-50%, -50%)",
           width: "90vw", // Use viewport width for modal width
           maxWidth: "800px", // Set maximum width for larger screens
@@ -73,6 +90,8 @@ export default function ShowPostImageModal({
           </div>
         )}
       </Box>
+
+      </Slide>
     </Modal>
   );
 }

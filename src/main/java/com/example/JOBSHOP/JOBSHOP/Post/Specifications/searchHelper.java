@@ -1,31 +1,38 @@
 package com.example.JOBSHOP.JOBSHOP.Post.Specifications;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
-import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postRepository;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.service.companyFieldService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
-import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdminService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdministratorServiceInterface;
 
 @Component
 public class searchHelper {
-
-	@Autowired
-	private companyAdminService companyAdminService;
-	
-	@Autowired
-	private companyFieldService companyFieldService;
-	
-	public companyProfile findCompanyProfile(String companyName) throws UserException
-	{
-		return companyAdminService.findcompanyProfileIdByCompanyName(companyName);
-	}
-//	public postField findPostFieldWithFieldName(String fieldName)
-//	{
-////		return companyFieldService.findPostFieldWithFieldName(fieldName);
-//	}
+//
+//	private final companyAdministratorServiceInterface companyAdminService;
+//
+//	private final postRepository postServiceI;
 //	
+//    public searchHelper(companyAdministratorServiceInterface companyAdminService2,postRepository postServiceI) {
+//        this.companyAdminService = companyAdminService2;
+//        this.postServiceI=postServiceI;
+//    }
+////	@Autowired
+////	private postService postService;
+////	
+//	public companyProfile findCompanyProfile(String companyName) throws UserException
+//	{
+//		return companyAdminService.findcompanyProfileIdByCompanyName(companyName);
+//	}
+//	public List<Post> findAllPostsForTheFieldName(String fieldName)
+//	{
+////		return null;
+//		return postServiceI.findByPostFieldsFieldFieldName(fieldName);
+//	}
 }

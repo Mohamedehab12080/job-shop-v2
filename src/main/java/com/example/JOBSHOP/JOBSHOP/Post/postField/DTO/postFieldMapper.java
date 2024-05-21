@@ -5,9 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
 
 public class postFieldMapper {
 
@@ -20,9 +22,11 @@ public class postFieldMapper {
 		dto.setLastModifiedDate(field.getLastModifiedDate());
 		dto.setStatuseCode(field.getStatusCode());
 		dto.setId(field.getId());
-		dto.setPost(field.getPost());
-		dto.setEmployerField(field.getEmployerField());
-		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
+//		dto.setPost(field.getPost());
+//		dto.setPostId(field.getPost().getId());
+//		dto.setEmployerField(field.getEmployerField());
+//		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
+		dto.setFieldName(field.getField().getFieldName());
 		dto.setSkills(field.getSkills());
 		dto.setQualifications(field.getQualifications());
 		return dto;
@@ -55,11 +59,12 @@ public class postFieldMapper {
 //		List <String> postQualList=new ArrayList<String>(postQualSet);
 		
 		dto.setId(field.getId());
-		dto.setEmployerField(field.getEmployerField());
-		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
+//		dto.setEmployerField(field.getEmployerField());
+//		dto.setFieldName(field.getEmployerField().getCompanyField().getField().getFieldName());
+		dto.setFieldName(field.getField().getFieldName());
 		dto.setSkills(field.getSkills());
 		dto.setQualifications(field.getQualifications());
-		dto.setPost(field.getPost());
+//		dto.setPost(field.getPost());
 		return dto;
 	}
 	public static postField mapDTOToPostField(postFieldDTO dto)
@@ -72,8 +77,26 @@ public class postFieldMapper {
 			postF.setLastModifiedDate(dto.getLastModifiedDate());
 			postF.setStatusCode(dto.getStatuseCode());
 			postF.setId(dto.getId());
-			postF.setPost(dto.getPost());
-			postF.setEmployerField(dto.getEmployerField());
+//			postF.setPost(dto.getPost());
+//			postF.setEmployerField(dto.getEmployerField());
+			if(dto.getField() !=null)
+			{
+				postF.setField(dto.getField());
+			}else 
+			{
+				Field field=new Field();
+				field.setId(dto.getFieldId());
+				postF.setField(field);
+			}
+//			if(dto.getPost()!=null)
+//			{
+//				postF.setPost(dto.getPost());
+//			}else 
+//			{
+//				Post post=new Post();
+//				post.setId(dto.getPostId());
+//				postF.setPost(post);
+//			}
 			postF.setSkills(dto.getSkills());
 			postF.setQualifications(dto.getQualifications());
 			return postF;

@@ -83,16 +83,7 @@ public class registrationCompleteEventListener
 							"<p>Thank you <br> Users verification Service";
 		emailMessage("",subject,senderName,mailContent,mailSender,theUser);
 	}
-	public void sendVerificationEmailPasswordReset(User resetuser,String url) throws UnsupportedEncodingException, MessagingException
-	{
-		String subject="Password reset request verification";
-		String senderName="Users verification service";
-		String mailContent="<p> Hi, "+resetuser.getUserName()+", </p>"+
-							"<p> please follow the link below to reset password verification.</p>"+
-							"<a href=\""+url+"\">Reset password</a>"+
-							"<p>Thank you <br> Users verification Service";
-		emailMessage("",subject,senderName,mailContent,mailSender,theUser);
-	}
+
 	public void sendMailAfterAcceptedApplyToTheCompany(User resetuser,String url,String applicationId,String postTitle) throws UnsupportedEncodingException, MessagingException
 	{
 		String subject="Apply for jobs";
@@ -104,6 +95,7 @@ public class registrationCompleteEventListener
 		System.out.println("User for sending mail : "+resetuser.getEmail());
 		emailMessage("",subject,senderName,mailContent,mailSender,resetuser);
 	}
+	
 	public void sendMailAcceptedApplicationToThejobSeeker(String fromMail,User resetuser,String url,String applicationId,String postTitle) throws UnsupportedEncodingException, MessagingException
 	{
 		String subject="Apply for jobs";
@@ -126,10 +118,19 @@ public class registrationCompleteEventListener
 							"<p> please follow the link below to show the application with Application Id :"+applicationId+" on post : "+postTitle+".</p>"+
 							"<a href=\""+url+"\">Show Application</a>"+
 							"<p>Thank you <br> Apply for jobs service...";
-		System.out.println("User for sending mail : "+resetuser.getEmail());
 		emailMessage(fromMail,subject,senderName,mailContent,mailSender,resetuser);
 	}
 	
+	public void sendVerificationEmailPasswordReset(User resetuser,String url) throws UnsupportedEncodingException, MessagingException
+	{
+		String subject="Password reset request verification";
+		String senderName="Users verification service";
+		String mailContent="<p> Hi, "+resetuser.getUserName()+", </p>"+
+							"<p> please follow the link below to reset password verification.</p>"+
+							"<a href=\""+url+"\">Reset password</a>"+
+							"<p>Thank you <br> Users verification Service";
+		emailMessage("",subject,senderName,mailContent,mailSender,resetuser);
+	}
 	private static void emailMessage(String fromMail,String subject,String senderName,String mailContent,JavaMailSender mailSender,User user) throws UnsupportedEncodingException, MessagingException
 	{
 		MimeMessage message=mailSender.createMimeMessage();

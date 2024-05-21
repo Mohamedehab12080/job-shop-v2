@@ -65,31 +65,7 @@ export default function ShowEmployerModal({openShowEmployerModal,handleCloseShow
     dispatch2(deleteEmployer(employerId));
     setFetchedEmployers(prevEmps => prevEmps.filter(emp => emp.id !== employerId));
   };
-  // const [employerpicture,setEmployerPicture]=React.useState(null);
-  // const uint8Array = new Uint8Array(employerpicture);
 
-  // // Convert the Uint8Array to a Blob
-  // const blob = new Blob([uint8Array]);
-  // const imageUrl = URL.createObjectURL(blob);
-  const getDynamicImageUrl = (picture) => {
-    if (picture && picture.length > 0) {
-      // Determine image type based on magic number (file signature)
-      const signature = picture.slice(0, 4); // Read the first 4 bytes
-
-      // Check for known image file signatures (magic numbers)
-      if (signature[0] === 0x89 && signature[1] === 0x50 && signature[2] === 0x4E && signature[3] === 0x47) {
-        // PNG file
-        return `data:image/png;base64,${btoa(String.fromCharCode(...picture))}`;
-      } else if (signature[0] === 0xFF && signature[1] === 0xD8) {
-        // JPEG file
-        return `data:image/jpeg;base64,${btoa(String.fromCharCode(...picture))}`;
-      } else {
-        // Default to treating as a generic binary file (may not render as an image)
-        return `data:application/octet-stream;base64,${btoa(String.fromCharCode(...picture))}`;
-      }
-    }
-    return ''; // Return empty string if no picture or invalid data
-  };
   return (
     <div>
       <Modal
@@ -128,12 +104,12 @@ export default function ShowEmployerModal({openShowEmployerModal,handleCloseShow
            {(filterInputEmployer === "" ? fetchedEmployers : filteredEmployers).map((emp, index) => (
            <>
            <div><hr></hr></div>
-           <div key={emp.id} className='flex space-x-5'>
+           <div key={index} className='flex space-x-5'>
            <Avatar
-                onClick={() => navigate(`/profile/${emp.id}`)}
+                onClick={() => navigate(`/employerProfile/${emp.id}`)}
                 className='cursor-pointer'
                 alt="userName"
-                src={getDynamicImageUrl(emp.picture)}
+                src={emp.picture}
            />
             <div className='w-full'>
 
@@ -173,19 +149,28 @@ export default function ShowEmployerModal({openShowEmployerModal,handleCloseShow
                 </div>
                 <div className='flex'>
                 <p className='font-semibold text-gray-500'> Fields :</p>
+              
+                <ul className='flex flex-wrap'>
+
                 {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
                   emp.fieldsNames.map((empField, index) => (
+
                     <>
-                    <div className='flex'> 
+                      <li> <p className='ml-2 text-gray-600'>- {empField}</p></li>
+                    </>
+                    // <>
+                   /* <div className='flex'> 
                     <p className='ml-2'>{index > 0 && " , "}</p>
                     <p className='ml-2 text-gray-600'>{empField}</p>
-                    </div>
-                    </>
+                    </div> */
+                    // </>
                     
                   ))
                 ) : (
                   <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
                 )}  
+                </ul>
+                
                 </div>
                 
             </div>

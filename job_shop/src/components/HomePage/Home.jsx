@@ -10,6 +10,11 @@ import PostDetails from '../PostDetails/PostDetails';
 import Authentication from '../Authentication/Authentication';
 import CompanyProfile from '../Profile/CompanyProfile';
 import EmployerProfile from '../Profile/EmployerProfile';
+import ForgotPassword from '../Authentication/RequestReset';
+import RequestReset from '../Authentication/RequestReset';
+import ResetPassword from '../Authentication/ResetPassword';
+import RecommendationModal from '../modals/companyModals/postModals/RecommedationModal';
+import RecommendationPath from '../HomeSection/RecommendationPath';
 
 export const Home = () => {
   return (
@@ -28,11 +33,15 @@ export const Home = () => {
           <Route path="/companyProfile/:id" element={<CompanyProfile />} />
           <Route path="/employerProfile/:id" element={<EmployerProfile />} />
           <Route path="/postDetails/:id" element={<PostDetails />} />
-        </Routes>
+          <Route path="/Recommendation" element={<RecommendationPath />} />
+          
+          {/* <Route path="/request-reset" component={<RequestReset />} /> 
+           <Route path="/reset-password/:token" component={ResetPassword} /> {/* Updated route */}
+          </Routes>
       </Grid>
 
       {/* Right Section */}
-      <Grid item xs={12} lg={3} className='hidden lg:block w-full relative'>
+      <Grid item xs={12} lg={3} className='hidden lg:block w-full relative sticky'>
         <RightSection />
       </Grid>
     </Grid>

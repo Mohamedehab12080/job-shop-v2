@@ -6,26 +6,37 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
 
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postRepository;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postService;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdminService;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdministratorServiceInterface;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+
 public class postSpecification implements Specification<Post>{
 
 	
-	postSearch postSearch;	
-	searchHelper searchHelper;
-	public postSpecification(postSearch postSearch)
-	{
-		this.postSearch=postSearch;
-		this.searchHelper=new searchHelper();
-	}
+		private  postSearch postSearch;
+//	    private  postService postService;
+
+		private List<Long>postIds;
+	    public postSpecification(postSearch postSearch,List<Long> postIds) {
+	        this.postSearch = postSearch;
+//	        this.postService = postService;
+	        this.postIds=postIds;
+	    }
+
 	List<Predicate> predicatList=new ArrayList<Predicate>();
 	
 	@Override
@@ -71,21 +82,20 @@ public class postSpecification implements Specification<Post>{
 	        }
 		}
 		
-		//Filter by companyName
-		if(postSearch.getCompanyName()!=null &&!postSearch.getCompanyName().isEmpty())
-		{
-			try {
-				predicatList.add(cb.equal(root.get("companyProfile"),searchHelper.findCompanyProfile(postSearch.getCompanyName())));
-			} catch (UserException e) {
-				System.out.println("user Exception...");
-			}
-		}
-		
-//		//Filter by postFieldName
-//		if(postSearch.getFieldName()!=null &&!postSearch.getFieldName().isEmpty())
+//		//Filter by companyName
+//		if(postSearch.getCompanyName()!=null &&!postSearch.getCompanyName().isEmpty())
 //		{
-//			predicatList.add(cb.equal(root.get("postField"),searchHelper.findPostFieldWithFieldName(postSearch.getFieldName())));
+//			try {
+//				predicatList.add(cb.equal(root.get("companyProfile"),companyAdminService.findcompanyProfileIdByCompanyName(postSearch.getCompanyName())));
+//			} catch (UserException e) {
+//				System.out.println("user Exception...");
+//			}
 //		}
+		
+		if (postIds!=null && !postIds.isEmpty()) {
+
+                predicatList.add(root.get("id").in(postIds));
+        }
 		
 		return cb.and(predicatList.toArray(new Predicate[0]));
 	}

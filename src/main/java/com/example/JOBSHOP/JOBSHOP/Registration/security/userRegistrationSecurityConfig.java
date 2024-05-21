@@ -122,7 +122,7 @@ public class userRegistrationSecurityConfig {
 	{
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
-		.authorizeHttpRequests(Authorize->Authorize.requestMatchers("/images/**","/api/**")
+		.authorizeHttpRequests(Authorize->Authorize.requestMatchers("/images/**","/api/**","/location/**")
 				.authenticated().anyRequest().permitAll()
 				).addFilterBefore(new JwtTokenValidator(),BasicAuthenticationFilter.class)
 		.csrf().disable()

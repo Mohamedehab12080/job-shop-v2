@@ -113,76 +113,46 @@ public class registrationController {
 		
 	}
 	
-//	// show the forgot password form after click on forgot password at the login page
-//	@GetMapping("/forgot-password-request")
-//	public String forgotPasswordForm()
-//	{
-//		return "forgot-password-form"; //display the forgot password form
-//	}
+	// show the forgot password form after click on forgot password at the login page
+	@GetMapping("/forgot-password-request")
+	public String forgotPasswordForm()
+	{
+		return "forgot-password-form"; //display the forgot password form
+	}
 	
-//	// verifing the email by sending gmail for the user including verification link
-//	@PostMapping("/forgot-password")
-//	public String resetPasswordRequest(HttpServletRequest request,Model model)
-//	{
-//		passwordResetToken alreadyToken;
-//		//getting the input email from the forgot password page
-//		String email=request.getParameter("email");
-//		User user=userServiceI.findByEmail(email); // find the user by the email entered
-//		if(user==null) //check if the user not found
-//		{
-//			return "redirect:/register/forgot-password-request?not_found"; //display not found at the forgot password form
-//		}else 
-//		{
-//			if(iPasswordResetTokenService.findPasswordTokenByUser(user).isPresent())
-//			{
-//				alreadyToken=iPasswordResetTokenService.findPasswordTokenByUser(user).get();
-//				return "redirect:/register/password-reset-form?token="+alreadyToken.getToken();
-//			}else 
-//			{
-//				String ResetToken=UUID.randomUUID().toString();//generate random token
-//				iPasswordResetTokenService.saveResetPasswordVerificationToken(ResetToken, user); //save the token generated for the user found
-//				String url =applicationUrl(request)+"/register/password-reset-form?token="+ResetToken; //making the url including the created token at the parameter token
-//				try {
-//					registrationCompleteEventListener.sendVerificationEmailPasswordReset(user,url); //sending the email from the listener including the created url
-//				} catch (UnsupportedEncodingException | MessagingException e) {
-//					model.addAttribute("error",e.getMessage());//display the error if occured
-//				}
-//			}
-//		}
-//		return "redirect:/register/forgot-password-request?success"; //display message in the page of sending the verification to the user on Gmail.
-//	}
-//	 
-//	@GetMapping("/password-reset-form") //invoked when the user click on the link sent on Gmail
-//	public String resetPasswordForm(@RequestParam("token") String token,Model model)
-//	{
-//		model.addAttribute("token",token); // sending the token from the parameter to the hidden input in password-reset-form
-//		return "password-reset-form";
-//	}
+//	// verifing the email by sending gmail for the user including verification lin
+	 
+	@GetMapping("/password-reset-form") //invoked when the user click on the link sent on Gmail
+	public String resetPasswordForm(@RequestParam("token") String token,Model model)
+	{
+		model.addAttribute("token",token); // sending the token from the parameter to the hidden input in password-reset-form
+		return "password-reset-form";
+	}
 	
-//	/**
-//	 * 
-//	 * @author BOBO
-//	 * @Function reset the password replace the old with the new
-//	 */
-//	@PostMapping("/reset-password")
-//	public String resetPassword(HttpServletRequest request)
-//	{
-//		String theToken=request.getParameter("token"); //getting the hidden input token from the password reset form
-//		String newPassword=request.getParameter("password");
-//		String verificationPasswordTokenValidateResult=iPasswordResetTokenService.validateToken(theToken);
-//		if(!verificationPasswordTokenValidateResult.equalsIgnoreCase("valid")) //validate the token if it is expired or invalid not found
-//		{
-//			return "redirect:/error?invalid_token"; 
-//		}
-//		User theUser=iPasswordResetTokenService.findUserByVerificationPasswordToken(theToken);//Find the user by the token if present
-//		if(theUser!=null)
-//		{
-//			// set the new password of the user and then update the user. 
-//			iPasswordResetTokenService.resetPassword(theUser, newPassword);
-//			return"redirect:/login?reset_success";
-//		}
-//		return "redirect:/error?not_found";
-//	}
+	/**
+	 * 
+	 * @author BOBO
+	 * @Function reset the password replace the old with the new
+	 */
+	@PostMapping("/reset-password")
+	public String resetPassword(HttpServletRequest request)
+	{
+		String theToken=request.getParameter("token"); //getting the hidden input token from the password reset form
+		String newPassword=request.getParameter("password");
+		String verificationPasswordTokenValidateResult=iPasswordResetTokenService.validateToken(theToken);
+		if(!verificationPasswordTokenValidateResult.equalsIgnoreCase("valid")) //validate the token if it is expired or invalid not found
+		{
+			return "redirect:/error?invalid_token"; 
+		}
+		User theUser=iPasswordResetTokenService.findUserByVerificationPasswordToken(theToken);//Find the user by the token if present
+		if(theUser!=null)
+		{
+			// set the new password of the user and then update the user. 
+			iPasswordResetTokenService.resetPassword(theUser, newPassword);
+			return"redirect:/login?reset_success";
+		}
+		return "redirect:/error?not_found";
+	}
 //	
 	
 	

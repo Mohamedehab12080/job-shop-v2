@@ -67,13 +67,27 @@ public class postFieldService implements postFieldServiceInterface{
 	@Transactional
 	public postField update(postField t)
 	{
-		if(getReferenceById(t.getId())!=null)
+		postField postfield=getReferenceById(t.getId());
+		if(postfield!=null)
 		{
-//			logInfo("Employer Updated Successfully");
-			return postFieldRepository.save(t);
+			if(t.getField()!=null)
+			{
+				postfield.setField(t.getField());
+			}
+			
+			if(t.getQualifications()!=null && !t.getSkills().isEmpty())
+			{
+				postfield.setQualifications(t.getQualifications());
+			}
+			
+			if(t.getSkills()!=null && !t.getSkills().isEmpty())
+			{
+				postfield.setSkills(t.getSkills());
+			}
+			postFieldRepository.save(postfield);
+			return postfield;
 		}else 
 		{
-//			logError("EmployerNotFound");
 			return null;
 			
 		}
@@ -97,8 +111,8 @@ public class postFieldService implements postFieldServiceInterface{
 		}
 	}
 
-	@Override
-	public List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId) {
-		return postFieldRepository.findByEmployerFieldId(empFieldId);
-	}
+//	@Override
+//	public List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId) {
+//		return postFieldRepository.findByEmployerFieldId(empFieldId);
+//	}
 }

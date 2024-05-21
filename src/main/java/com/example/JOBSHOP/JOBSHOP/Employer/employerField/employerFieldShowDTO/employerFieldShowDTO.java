@@ -9,7 +9,15 @@ public class employerFieldShowDTO {
 	private String fieldName;
 	private List<String>Skills;
 	private List<String>qualifications;
+	private Long fieldId;
 	
+	
+	public Long getFieldId() {
+		return fieldId;
+	}
+	public void setFieldId(Long fieldId) {
+		this.fieldId = fieldId;
+	}
 	public List<String> getQualifications() {
 		return qualifications;
 	}

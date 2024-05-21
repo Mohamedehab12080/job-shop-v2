@@ -15,7 +15,7 @@ public interface employerFieldServiceInterface {
 
 	employerField insert(employerField t);
 
-	employerField findById(Long id);
+	employerField findById(Long employerId,Long fieldId);
 
 //	employerField update(Long id,employerField t);
 

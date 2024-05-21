@@ -4,18 +4,20 @@ import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
 import { IconButton, MenuItem, Slide } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Close} from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
 import axios from "axios";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import {getEmployerFields } from "../../../../store/company/Employer/Action";
-import { createPost } from "../../../../store/Post/Action";
+import { createPost, editPost } from "../../../../store/Post/Action";
 import { uploadToCloudnary } from "../../../../Utils/UploadToCloudnary.";
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSpinner, faCheckCircle, faExclamationCircle, faCloudUploadAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { fetchLocations } from "../../../../store/location/Action";
+import MessageModal from "../../../../responses/MessageModal";
 
 const style = {
   position: "absolute",
@@ -32,14 +34,36 @@ const style = {
   maxHeight: "80vh",
   overflowY: "auto", // Enable scrolling
 };
-
+const slideStyle = {
+  height: '100%',
+  overflowY: 'auto',
+  scrollbarWidth: 'none', // Hide scrollbar for Firefox
+  '&::WebkitScrollbar': {
+    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  },
+};
 // Array of skills options
 var skillsOptions = [];
 
 // Array of qualification options
 var qualificationOptions = [];
 
-export default function PostModal({ openPostModal, handleClose }) {
+export default function PostModal(
+  { openPostModal,
+     handleClose,
+      operationType,
+      fieldName,
+      id,
+      Title,
+      description,
+      Experience,
+      jobRequirments,
+      location,
+      employmentType,
+      skills,
+      qualifications,
+      field,
+      postImage,}) {
   
   var [selectedSkills, setSelectedSkills] = React.useState([]);
   var [selectedQualifications, setSelectedQualifications] = React.useState(
@@ -61,18 +85,38 @@ export default function PostModal({ openPostModal, handleClose }) {
   const auth=useSelector(state=>state.auth)
   const dispatch2=useDispatch();
 
-  const emp=useSelector(state=>state.emp)
-  const [uploadingImage, setUploadingImage] = React.useState(true);
+    const emp=useSelector(state=>state.emp)
+    const [uploadingImage, setUploadingImage] = React.useState(true);
     const [selectedImage, setSelectedImage] = React.useState("");
     const [uploadProgress, setUploadProgress] = React.useState(0);
     const [uploadStatus, setUploadStatus] = React.useState(null); // 'uploading', 'success', 'error'
-  const [postImageUrl,setPostImageUrl]=React.useState("");
+    const [postImageUrl,setPostImageUrl]=React.useState("");
+ 
+  const [locations,setLocations]=React.useState([]);
+  const locationReducer=useSelector(state=>state.locationReducer);
+  const dispatch3=useDispatch();
+
+  const [other,setOther]=React.useState(false);
+
+  const [openMessageModal,setOpenMessageModal]=React.useState(false);
+  const handleOpenMessageModal=()=>setOpenMessageModal(true);
+  const handleCloseMessageModal=()=>setOpenMessageModal(false);
+   
+  const [messageAfterSave,setMessageAfterSave]=React.useState("");
+  const [postState,setPostState]=React.useState(false);
   React.useEffect(()=>
 {
-    if(openPostModal)
-    {
-      dispatch2(getEmployerFields(auth.user.id))
+  const fetchData = async () => {
+    try {
+      if(openPostModal)
+        {
+          await dispatch2(getEmployerFields(auth.user.id))
+        }
+    } catch (error) {
+      console.error("Error fetching locations:", error);
     }
+  };
+  fetchData();
 },[openPostModal,dispatch2,auth.user.id]);
 
 React.useEffect(()=>
@@ -82,6 +126,37 @@ React.useEffect(()=>
       setFields(emp.fields);
     }
 },[openPostModal,emp]);
+
+React.useEffect(() => {
+  const fetchData = async () => {
+    try {
+      await dispatch3(fetchLocations());
+    } catch (error) {
+      console.error("Error fetching locations:", error);
+    }
+  };
+  fetchData();
+}, [dispatch3]);
+
+
+
+
+React.useEffect(()=>
+  {
+    setLocations(locationReducer.locations);
+    // locations.push("Other");
+  },[locationReducer.locations])
+
+
+  React.useEffect(()=>
+    {
+      let updatedLocations = [...locationReducer.locations];
+  
+      const specificValue = "Other";
+      updatedLocations.push(specificValue);
+      
+      setLocations(updatedLocations);
+    },[locationReducer.locations])
 
 const renderIcon = () => {
   if (uploadStatus === 'uploading') {
@@ -126,6 +201,22 @@ const renderIcon = () => {
   };
   
     
+  
+  const handleOther=(location)=>{
+    if(location === "Other")
+      {
+        console.log("LOCATION VALUE : ",location)
+          setOther(true);
+          formik.setFieldValue("location","");
+      }else
+       {
+          setOther(false);
+          
+          console.log("LOCATION VALUE False : ",location)
+
+       }
+  };
+
   const [preview,setPreview]=React.useState("");
 
   const handleFileUpload=(e)=>
@@ -167,55 +258,99 @@ const renderIcon = () => {
       };
   
   const handleSubmit = async (values,actions) => {
-    const imageUrl = await handleSelectImage();
-      if( imageUrl !=="")
+    if(operationType !== "edit")
       {
-        const updatedValues = {
-          ...values,
-          postImage: imageUrl
-        };
-        console.log("values : ",updatedValues);
-        dispatch(createPost(updatedValues));
-        setDisabled(true);
-        if(post.response.id !== 0)
-        {
-          actions.resetForm();
-          setSelectedSkills([]);
-          setSelectedField("");
-          setSelectedQualifications([]);
-          setFilteredSkills([]);
-          setFilterInputQualifications([]);
-          setPreview("");
-          setDisabled(false);
-        }
-        console.log("post Response : ",post.response)
+          try{
+            const imageUrl = await handleSelectImage();
+          if( imageUrl !=="")
+          {
+            const updatedValues = {
+              ...values,
+              postImage: imageUrl
+            };
+            console.log("values : ",updatedValues);
+            dispatch(createPost(updatedValues));
+            setDisabled(true);
+            if(post.response.id !== 0)
+            {
+              actions.resetForm();
+              setSelectedSkills([]);
+              setSelectedField("");
+              setSelectedQualifications([]);
+              setFilteredSkills([]);
+              setFilterInputQualifications([]);
+              setPreview("");
+              setDisabled(false);
+            }
+            console.log("post Response : ",post.response)
+          }else 
+          {
+            dispatch(createPost(values));
+            setDisabled(true);
+            if(post.response.id !== 0)
+            {
+              actions.resetForm();
+              setDisabled(false);
+            }
+            console.log("post Response : ",post.response)
+          }
+            setPostState(true);
+            setMessageAfterSave(`Post ${values.title} was successffully Saved`);
+          } catch (error) {
+            setPostState(false);
+            setMessageAfterSave(`Post ${values.title} can't be Saved : `,error.message);
+          }
+          finally{
+            handleOpenMessageModal();
+          }          
       }else 
       {
-        dispatch(createPost(values));
-        setDisabled(true);
-        if(post.response.id !== 0)
-        {
-          actions.resetForm();
-          setDisabled(false);
-        }
-        console.log("post Response : ",post.response)
+          try {
+            const imageUrl = await handleSelectImage();
+            if( imageUrl !=="")
+            {
+              const updatedValues = {
+                ...values,
+                postImage: imageUrl
+              };
+              console.log("values : ",updatedValues);
+              dispatch(editPost(id,updatedValues));
+              setDisabled(true);
+              if(post.response.id !== 0)
+              {
+                actions.resetForm();
+                setSelectedSkills([]);
+                setSelectedField("");
+                setSelectedQualifications([]);
+                setFilteredSkills([]);
+                setFilterInputQualifications([]);
+                setPreview("");
+                setDisabled(false);
+              }
+              console.log("post Response : ",post.response)
+            }else 
+            {
+              dispatch(editPost(id,values));
+              setDisabled(true);
+              if(post.response.id !== 0)
+              {
+                actions.resetForm();
+                setDisabled(false);
+              }
+              console.log("post Response : ",post.response)
+            }
+            setPostState(true);
+            setMessageAfterSave(`Post ${values.title} was successffully updated`);
+          } catch (error) {
+            setPostState(false);
+            setMessageAfterSave(`Post ${values.title} can't be updated : `,error.message);
+           }
+           finally{
+            handleOpenMessageModal();
+           }
+           
       }
-  // else 
-  //   {
-  //     if(uploadingImage === true)
-  //       {
-  //           console.log("values : ",values);
-  //         dispatch(createPost(values));
-  //         setDisabled(true);
-  //         if(post.response.id !== 0)
-  //         {
-  //           // actions.resetForm();
-  //           // setPreview("");
-  //           setDisabled(false);
-  //         }
-  //         console.log("post Response : ",post.response)
-  //       } 
-  //   }
+      
   };
 
   const validationSchema = Yup.object().shape({
@@ -245,6 +380,59 @@ const renderIcon = () => {
   });
 
     
+  React.useEffect(()=>
+  {
+    if(operationType ==="edit" && openPostModal && fields.length > 0)
+      {
+        
+        if(Title.includes("{"))
+          {
+            formik.setFieldValue("title",Title.substring(0, Title.indexOf("{")));
+          }else 
+          {
+            formik.setFieldValue("title",Title);
+          }
+        
+        formik.setFieldValue("description",description);
+        formik.setFieldValue("location",location);
+        console.log("field ID : ",field)
+        const fieldObj = fields.find((fieldObj) => fieldObj.fieldName === fieldName);
+        if(fieldObj)
+          {
+            setSelectedField(fieldObj);
+            // console.log("Selected Field ID : ",fieldObj.id);
+            skillsOptions = fieldObj.skills;
+            setFilteredSkills(fieldObj.skills);
+            qualificationOptions = fieldObj.qualifications;
+            setFilteredQualifications(fieldObj.qualifications);
+            formik.setFieldValue("field",fieldObj.fieldId);
+
+          }  
+        formik.setFieldValue("skills",skills);
+        setSelectedSkills(skills);
+        formik.setFieldValue("qualifications",qualifications);
+        setSelectedQualifications(qualifications);
+        console.log("JOB REQUIREMENTS : ",jobRequirments);
+        formik.setFieldValue("jobRequirments",jobRequirments);
+        formik.setFieldValue("employmentType",employmentType);
+        formik.setFieldValue("experience",Experience);
+        formik.setFieldValue("postImage",postImage);
+        setPreview(postImage);
+      }
+  },[
+    openPostModal,
+    operationType,
+    id,
+    Title,
+    description,
+    Experience,
+    jobRequirments,
+    location,
+    employmentType,
+    skills,
+    qualifications,
+    field,
+    postImage,])
   const handleAddSkill = (skill) => {
     if (!selectedSkills.includes(skill)) {
       const updatedSkills = [...selectedSkills, skill];
@@ -307,14 +495,7 @@ const renderIcon = () => {
     setFilterInputSkills("");
     setFilterInputQualifications("");
   };
-  const slideStyle = {
-    height: '100%',
-    overflowY: 'auto',
-    scrollbarWidth: 'none', // Hide scrollbar for Firefox
-    '&::-webkit-scrollbar': {
-      display: 'none', // Hide scrollbar for Chrome, Safari, Edge
-    },
-  };
+
   return (
     <div>
       <Modal
@@ -328,7 +509,7 @@ const renderIcon = () => {
           in={openPostModal}
           mountOnEnter
           unmountOnExit
-          timeout={{ enter: 500, exit: 300 }}
+          timeout={{ enter: 500, exit: 500 }}
           transitiontimingfunction="ease-in-out" 
           style={slideStyle}
       >
@@ -358,7 +539,19 @@ const renderIcon = () => {
           </div>
           <form onSubmit={formik.handleSubmit}>
             <Grid container direction="column" spacing={2}>
-                <div className="sticky">
+                {operationType==="edit" ? (
+                  <div className="sticky">
+                  <Grid item container justifyContent="center">
+                    <Button type="submit" 
+                    variant="contained" 
+                    color="primary"
+                    disabled={disabled}>
+                      Edit
+                    </Button>
+                  </Grid>
+            </div>
+                ):(
+                  <div className="sticky">
                     <Grid item container justifyContent="center">
                       <Button type="submit" 
                       variant="contained" 
@@ -368,6 +561,7 @@ const renderIcon = () => {
                       </Button>
                     </Grid>
               </div>
+                )}
               <Grid item xs={12}>
                 <div>
                     {renderIcon()}
@@ -405,20 +599,38 @@ const renderIcon = () => {
                   }
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} className='mt-3'   >
                 <TextField
                   fullWidth
+                  select
                   id="location"
                   name="location"
-                  label="Location"
+                  label="Select a location"
                   value={formik.values.location}
                   onChange={formik.handleChange}
-                  error={
-                    formik.touched.location && Boolean(formik.errors.location)
-                  }
-                  helperText={formik.touched.location && formik.errors.location}
-                />
+                  variant="outlined"
+                >
+                  {Array.isArray(locations) && locations.length >0 && locations.map( (location,index)=>(
+                    <MenuItem key={index} value={location} onClick={()=>handleOther(location)}>{location}</MenuItem>
+                  ))}
+                </TextField>
               </Grid>
+              
+              {other &&(
+                 <Grid item xs={12}>
+                 <TextField
+                     fullWidth
+                     id="location"
+                     name="location"
+                     label="Select a location"
+                     value={formik.values.location}
+                     onChange={formik.handleChange}
+                     variant="outlined"
+                 />
+             </Grid>
+
+             )}
+
               <Grid item xs={12}>
                 <TextField
                   fullWidth
@@ -426,14 +638,14 @@ const renderIcon = () => {
                   id="field"
                   name="field"
                   label="Select a Field"
-                  value={selectedField ? selectedField.id : ""}
+                  value={selectedField ? selectedField.fieldId : ""}
                   onChange={(event) => handleFieldSelect(event.target.value)}
                   error={formik.touched.field && Boolean(formik.errors.field)}
                   helperText={formik.touched.field && formik.errors.field}
                   variant="outlined"
                 >
-                  {fields.map((field) => (
-                    <MenuItem key={field.id} value={field.id}>
+                  {fields.map((field,index) => (
+                    <MenuItem key={index} value={field.id}>
                       {field.fieldName}
                     </MenuItem>
                   ))}
@@ -533,14 +745,6 @@ const renderIcon = () => {
                   label="Filter Qualifications"
                   value={filterInputQualifications}
                   onChange={(e) => handleFilterQualifications(e.target.value)}
-                  error={
-                    formik.touched.filterQualifications &&
-                    Boolean(formik.errors.filterQualifications)
-                  }
-                  helperText={
-                    formik.touched.filterQualifications &&
-                    formik.errors.filterQualifications
-                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -672,6 +876,14 @@ const renderIcon = () => {
         </Box>
         </Slide>
       </Modal>
+        <section>
+          <MessageModal 
+          openMessageModal ={openMessageModal} 
+          handleCloseMessageModal={handleCloseMessageModal} 
+          response={messageAfterSave} 
+          Title={"Message..."}
+          state={postState}/>
+        </section>
     </div>
   );
 }

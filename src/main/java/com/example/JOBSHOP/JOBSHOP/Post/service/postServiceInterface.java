@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
 import com.example.JOBSHOP.JOBSHOP.Post.Specifications.postSearch;
 
 public interface postServiceInterface {
@@ -18,7 +19,7 @@ public interface postServiceInterface {
 
 	Post findById(Long id);
 
-	Post update(Post t);
+	postDTO update(Long postId,postDTO t);
 
 	Post updateWithId(Long id, Post t);
 
@@ -37,4 +38,7 @@ public interface postServiceInterface {
 	Post findPostsWithTitleOne(String title);
 	
 
+	List<Post> findPostsWithFieldName(String fieldName);
+
+	void updatePostForCreate(Post post);
 }

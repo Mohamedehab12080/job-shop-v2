@@ -20,7 +20,11 @@ const slideStyle = {
     display: 'none', // Hide scrollbar for Chrome, Safari, Edge
   },
 };
-export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGiveEmployerFields}) {
+export default function GiveEmployerFields(
+  {
+    openGiveEmployerFields,
+    handleCloseGiveEmployerFields
+  }) {
   
   var [filteredEmployers,setFilteredEmployers] = React.useState([]);
   const [filterInputEmployer, setFilterInputEmployer] = React.useState("");
@@ -41,23 +45,10 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
   const handleOpenMessageModal=()=>setOpenMessageModal(true);
   const handleCloseMessageModal=()=>setOpenMessageModal(false);
   const [responseMessage,setResponseMessage]=React.useState("");
-  const handleFilterFields=(input)=>
-    {
-      const filtered=fetchedCompanyFields.filter((field)=>
-      {
-        return field.fieldName.toLowerCase().includes(input.toLowerCase());
-      });
-        setFilteredFields(filtered);
-        setFilterInputField(input);
-    }
-  const handleSelecteEmployer=(value)=>{
-    setSelectedEmployer(value);
-    // setFilteredEmployers(value);
-  }
-  
-  const handleCancelSelecteEmployer=()=>{
-    setSelectedEmployer(null);
-  }
+  const [fieldNames,setFieldNames]=React.useState([]);
+
+
+
   const handleFilterEmployers=(input)=>
   {
     const filtered=fetchedEmployers.filter((employer)=>
@@ -71,15 +62,7 @@ export default function GiveEmployerFields({openGiveEmployerFields,handleCloseGi
       setFilterInputEmployer(input);
   }
 
-  const handleSubmit = async (values) => {
-    console.log("values : ",values);
-    dispatch4(giveEmployerFields(values));
-    setResponseMessage(comp.response);
-    handleOpenMessageModal();
-    setSelectedEmployer(null);
-    setSelectedField([]);
-    formik.resetForm();
-  };
+  
 
   const handleRemoveField = (fieldToRemove) => {
     const updatedFields = selectedField.filter(
@@ -125,7 +108,8 @@ React.useEffect(() => {
   }, [comp, openGiveEmployerFields]);
 
   const handleAddField = (fieldToAdd) => {
-    if (!selectedField.some((field) => field.id === fieldToAdd.id)) {
+    if (!selectedField.some((field) => field.id === fieldToAdd.id)
+         && !fieldNames.includes(fieldToAdd.fieldName) && selectedEmployer!==null) {
       const updatedFields = [...selectedField, fieldToAdd];
       setSelectedField(updatedFields);
       const objectofSetFields = updatedFields.map((field) => ({
@@ -137,6 +121,18 @@ React.useEffect(() => {
         formik.setFieldValue("employerFields", objectofSetFields);
       }
     }
+  };
+
+  const handleSubmit = async (values) => {
+    console.log("values : ",values);
+    dispatch4(giveEmployerFields(values));
+    console.log("Returned Response: ",comp.response);
+    setResponseMessage(comp.response);
+    // setResponseMessage();
+    setSelectedEmployer(null);
+    handleOpenMessageModal();
+    setSelectedField([]);
+    formik.resetForm();
   };
  const formik=useFormik({
     initialValues:{
@@ -155,7 +151,64 @@ React.useEffect(() => {
     dispatch2(deleteEmployer(employerId));
     setFetchedEmployers(prevEmps => prevEmps.filter(emp => emp.id !== employerId));
   };
+  const employersToDisplay = filterInputEmployer === "" ? fetchedEmployers : filteredEmployers;
+  const fieldsToDisplay1= filterInputFields === "" ? fetchedCompanyFields : filteredFields;
+  const [fieldsToDisplay,setFieldsToDisplay]=React.useState([]);
+  React.useEffect(()=>
+  {
+    setFieldsToDisplay(fieldsToDisplay1);
+  },[fieldsToDisplay1])
 
+
+  const handleSelecteEmployer=(value)=>{
+    console.log("Field Names : ",value.fieldsNames);
+  if (value !== null && value.fieldsNames && Array.isArray(value.fieldsNames)) {
+      setSelectedEmployer(value);
+      setFieldNames(value.fieldsNames);
+      const newFieldsToDisplay = fieldsToDisplay.filter((field) => !value.fieldsNames.includes(field.fieldName));
+      setFieldsToDisplay(newFieldsToDisplay);
+      console.log("NEW FIELDS TO DISPLAY : ",fieldsToDisplay);
+  } else {
+      // Handle cases where value or value.fieldNames might be undefined or not an array
+      console.error("Invalid value or fieldNames:", value);
+  }
+    // setFilteredEmployers(value);
+  }
+
+  
+  const handleFilterFields=(input)=>
+    {
+        if(fieldNames.length > 0 )
+          {
+            const lowerCaseFieldNames = fieldNames.map(name => name.toLowerCase());
+            const filtered=fetchedCompanyFields.filter((field)=>
+            {
+              const lowerCaseFieldName = field.fieldName.toLowerCase();
+              const lowerCaseInput = input.toLowerCase();
+              // Check if input is included in fieldName and if fieldName is not in fieldNames array
+              return lowerCaseFieldName.includes(lowerCaseInput) && !lowerCaseFieldNames.includes(lowerCaseFieldName);
+            });
+            setFilteredFields(filtered);
+             setFilterInputField(input);
+          }else 
+          {
+            const filtered=fetchedCompanyFields.filter((field)=>
+              {
+                const lowerCaseFieldName = field.fieldName.toLowerCase();
+                const lowerCaseInput = input.toLowerCase();
+                // Check if input is included in fieldName and if fieldName is not in fieldNames array
+                return lowerCaseFieldName.includes(lowerCaseInput);
+              });
+              setFilteredFields(filtered);
+              setFilterInputField(input);
+          }
+        
+    }
+    const handleCancelSelecteEmployer=()=>{
+      setSelectedEmployer(null);
+      setFieldNames([])
+    }
+  
   return (
     <div>
       <Modal
@@ -164,7 +217,8 @@ React.useEffect(() => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-<Slide
+
+    <Slide
     direction="left"
     in={openGiveEmployerFields}
     mountOnEnter
@@ -214,7 +268,7 @@ React.useEffect(() => {
                <div><hr></hr></div>
                <div key={selectedEmployer.id} className='flex space-x-5'>
                <Avatar
-                    onClick={() => navigate(`/profile/${selectedEmployer.id}`)}
+                    onClick={() => navigate(`/employerProfile/${selectedEmployer.id}`)}
                     className='cursor-pointer'
                     alt="userName"
                     src={selectedEmployer.picture}
@@ -240,10 +294,10 @@ React.useEffect(() => {
                     <div className='flex'>
                     <p className='font-semibold text-gray-500'> Fields :</p>
                     <ul>
-                    {selectedEmployer.fieldsNames && selectedEmployer.fieldsNames.length > 0 ? (
+                    {Array.isArray(selectedEmployer.fieldsNames )&&selectedEmployer.fieldsNames && selectedEmployer.fieldsNames.length > 0 ? (
                       selectedEmployer.fieldsNames.map((empField, index) => (
                         <>
-                        <li className='ml-2 text-gray-600'>- {empField}</li>
+                        <li key={index} className='ml-2 text-gray-600'>- {empField}</li>
                         </>
                       ))
                     ) : (
@@ -257,57 +311,61 @@ React.useEffect(() => {
                </div>
                </>
           ):(
-            <>
-        {(filterInputEmployer==="" ? fetchedEmployers : filteredEmployers).map((emp, index) => (
-           <>
-           <div><hr></hr></div>
-           <div key={emp.id} className='flex space-x-5'>
-           <Avatar
-                onClick={() => navigate(`/profile/${emp.id}`)}
-                className='cursor-pointer'
-                alt="userName"
-                src={emp.picture}
-           />
-            <div className='w-full'>
-
-            <div className='flex justify-between items-center'>
-                    <div className='flex cursor-pointer items-center space-x-2'>
-                        <span className='font-semibold'>{emp.userName}</span>
-                        <span className='text-gray-600'>@{emp.email}</span>
-                    </div>
-                    
-                    <div>
-                            <Button
-                            id="basic-button"
-                            onClick={() => handleSelecteEmployer(emp)}
-                        >
-                            Select
-                        </Button>
-                        
-                    </div>
+      <>
+        {Array.isArray(employersToDisplay) && employersToDisplay.length > 0 ? (
+                employersToDisplay.map((emp, index) => (
+                  <>
+                  <div><hr></hr></div>
+                  <div key={index} className='flex space-x-5'>
+                  <Avatar
+                       onClick={() => navigate(`/profile/${emp.id}`)}
+                       className='cursor-pointer'
+                       alt="userName"
+                       src={emp.picture}
+                  />
+                   <div className='w-full'>
+       
+                   <div className='flex justify-between items-center'>
+                           <div className='flex cursor-pointer items-center space-x-2'>
+                               <span className='font-semibold'>{emp.userName}</span>
+                               <span className='text-gray-600'>@{emp.email}</span>
+                           </div>
+                           
+                           <div>
+                                   <Button
+                                   id="basic-button"
+                                   onClick={() => handleSelecteEmployer(emp)}
+                               >
+                                   Select
+                               </Button>
+                               
+                           </div>
+                          
+                       </div>
+                       <div className='flex'>
+                       <p className='font-semibold text-gray-500'> Fields :</p>
+                         <ul>
+                         {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
+                         emp.fieldsNames.map((empField, index) => (
+                           <>
+                           <li key={index} className='text-gray-600'>- {empField}</li>
+                           </>
+                               
+                             ))
+                           ) : (
+                             <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
+                           )}  
+                         </ul>
+                       </div>
+                       
+                   </div>
                    
-                </div>
-                <div className='flex'>
-                <p className='font-semibold text-gray-500'> Fields :</p>
-                  <ul>
-                  {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
-                  emp.fieldsNames.map((empField, index) => (
-                    <>
-                    <li className='text-gray-600'>- {empField}</li>
-                    </>
-                        
-                      ))
-                    ) : (
-                      <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
-                    )}  
-                  </ul>
-                </div>
-                
-            </div>
-            
-           </div>
-           </>
-          ))}
+                  </div>
+                  </>
+                ))
+            ) : (
+                <div>No employers available.</div>
+            )}
             </>
           )}
 
@@ -324,18 +382,20 @@ React.useEffect(() => {
                 />
          </Grid>
         <Grid item xs={12}>
-                <div className="selected-skills-container">
+                <div className="selected-skills-container space-x-2 mt-2">
+                  <ul className='flex flex-wrap'>
                   {selectedField.length > 0 ? (
-                    selectedField.map((field) => (
-                      <div key={field.id} className="selected-skill">
-                        <span>{field.fieldName}</span>
-                        <IconButton
-                          onClick={() => handleRemoveField(field)}
-                          aria-label="delete"
-                          size="small"
-                        >
-                          <Close />
-                        </IconButton>
+                    selectedField.map((field,index) => (
+                      <div key={index} className="selected-skill">
+                          <li key={index}>
+                            <span>{field.fieldName}</span>
+                          <IconButton
+                            onClick={() => handleRemoveField(field)}
+                            aria-label="delete"
+                            size="small"
+                          >
+                            <Close />
+                          </IconButton></li>
                       </div>
                     ))
                   ) : (
@@ -343,38 +403,36 @@ React.useEffect(() => {
                       At least one field is required
                     </div>
                   )}
+                  </ul>
                 </div>
               </Grid>
-              <Grid item xs={12}>
-              <div className="skills-scroll-container sapce-y-2" style={{ maxHeight: "200px", overflowY: "auto" }}>
-                {/* Filter and map through fields to display buttons */}
-                {(filterInputFields === "" ? fetchedCompanyFields : filteredFields)
+              <Grid item xs={12} container>
+              <div className="skills-scroll-container mt-4" style={{ maxHeight: "200px", overflowY: "auto" }}>
+              {Array.isArray(fieldsToDisplay) && fieldsToDisplay.length > 0 && (
+                fieldsToDisplay
                   .filter((field) => !selectedField.some((selected) => selected.id === field.id))
                   .map((field) => (
-                    <Button key={field.id} variant="outlined"
-                     onClick={() => handleAddField(field)}>
-                      {/* Display field name */}
-                      <>
+                    <Button 
+                      key={field.id} 
+                      variant="outlined" 
+                      onClick={() => handleAddField(field)}
+                    >
                       <div className="ml-2">{field.fieldName}</div>
-                       </>
-                      
-                    <ul>
 
-                    {field.skills && field.skills.length > 0 ? (
-                        field.skills.map((skill, index) => (
-                          <div className="flex" key={index}>
-                             <li className="">- {skill}</li>
-                            
+                      <ul className='flex flex-wrap space-x-3 mt-3'>
+                        {field.skills && field.skills.length > 0 ? (
+                          field.skills.map((skill, index) => (
+                            <div className="flex" key={index}>
+                              <li>- {skill}</li>
                             </div>
-                        ))
-                      ) : (
-                        <div>No skills</div>
-                      )}
-                    </ul>
-                      {/* Display skills if available, otherwise show "No skills" */}
-                    
+                          ))
+                        ) : (
+                          <div>No skills</div>
+                        )}
+                      </ul>
                     </Button>
-                  ))}
+                  ))
+              )}
               </div>
               </Grid>
         </section>
@@ -383,7 +441,7 @@ React.useEffect(() => {
     <MessageModal 
           openMessageModal={openMessageModal} 
           handleCloseMessageModal={handleCloseMessageModal} 
-          response={responseMessage} 
+          response={responseMessage}
           Title={"Give Employer Fields"}/>
   </section>
         </Box>

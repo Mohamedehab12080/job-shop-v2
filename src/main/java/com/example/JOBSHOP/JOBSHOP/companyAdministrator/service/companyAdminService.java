@@ -12,6 +12,8 @@ import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldS
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.employerProfile;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerProfile.service.employerProfileServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Post.Post;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
@@ -41,7 +43,11 @@ public class companyAdminService implements companyAdministratorServiceInterface
 	 @Autowired
 	 private employerProfileServiceInterface employerProfileService;
 	 
+	 @Autowired
+	 private postServiceInterface postServiceInterface;
 	 
+	 
+
 	 public companyAdministrator findByUserName(String userName)
 	 {
 		return companyAdminRepository.findByUserName(userName); 
@@ -53,6 +59,7 @@ public class companyAdminService implements companyAdministratorServiceInterface
 		return companyAdminRepository.findByEmail(email); 
 	 }
 	 
+	 @Override
 	 public companyProfile findcompanyProfileIdByCompanyName(String companyName) throws UserException
 	 {
 		 return companyProfileService.findByCompanyAdmin(companyAdminRepository.findByCompanyName(companyName));

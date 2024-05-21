@@ -37,6 +37,8 @@ import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
+import com.example.JOBSHOP.JOBSHOP.location.location;
+import com.example.JOBSHOP.JOBSHOP.location.service.locationServiceInterface;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
@@ -61,6 +63,9 @@ public class employerService implements employerServiceInterface{
 	
 	@Autowired
 	private companyProfileService companyProfileService;
+	
+	@Autowired
+	private locationServiceInterface locationServiceI;
 	
 	@Override
 	public Employer insert(Employer employer)
@@ -134,6 +139,7 @@ public class employerService implements employerServiceInterface{
 			
 			Employer inserted =employerRepository.save(oldEmployer);
 			employerDTO dto=employerDTOMapper.mapEmployerToDTO(oldEmployer);
+			dto.setReq_user(true);
 			return dto;
 		}else 
 		{
@@ -205,14 +211,20 @@ public Post createAPost(Post post) {
 	    			.findByCompanyAdmin
 	    			(user.getCompanyAdmin().getId())
 	    			.getId());
+	    	System.out.println("The Id Of Profile  : "+postDTO.getProfileId());
 	    	postDTO.setEmployerId(user.getId());
+	    	System.out.println("The ID of Employer : "+user.getId());
 	        Post post = convertDTOTOPOST(postDTO);
-	        Post insertedPost = postServiceI.insert(post);
+	        
+	        System.out.println("The Employer id from post Dto : "+postDTO.getEmployerId());
 	        
 	        postField postField=postDTO.getPostField2();
+	        	
 	        Set<String> skills = new HashSet<>();
 	        Set<String> qualifications = new HashSet<>();
-	          employerField employerField = employerFieldServiceI.findById(postDTO.getField());
+	          employerField employerField = employerFieldServiceI.findById(user.getId(), postDTO.getField());
+		        System.out.println("The user id and Field id  : "+user.getId()+" : : : "+postDTO.getField());
+
 	            if (postField.getSkills().isEmpty()) {
 	                employerField.getCompanyField().getCompanyFieldSkills().forEach(skill -> skills.add(skill.getCompanyFieldSkill().getSkillName()));
 	                postField.setSkills(new ArrayList<>(skills));
@@ -232,45 +244,59 @@ public Post createAPost(Post post) {
 	                postField.setQualifications(new ArrayList<>(qualifications));
 	            }
 	            
-	            postField.setPost(insertedPost);
+//	            postField.setPost(insertedPost);
 	            
 //	            CsvHandler csvHandler=new CsvHandler();
 //		        csvHandler.insertData(""+post.getId(), ""+post.getTitle(), postDTO.getSkills() ,"in site");
 		     // Read existing CSV file
 	            //D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\
-	            String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output.csv";
-		        String[] newRowData = {""+post.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
-	        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
-		        try {
-		        FileReader fileReader = new FileReader(csvFilePath);
-	            List<String[]> csvData=new ArrayList<String[]>();
-	            try (CSVReader cvReader = new CSVReaderBuilder(fileReader).build()) {
-	                csvData = cvReader.readAll();
-	            }
-	            
-	            System.out.println("Csv Data : " + csvData);
-	            // Append new data to the CSV data
-	            csvData.add(newRowData);
-	            System.out.println("Csv Data After add : " + csvData);
-	            // Write updated data back to the CSV file
-	            FileWriter fileWriter = new FileWriter(csvFilePath);
-	            try (CSVWriter csvWriter = new CSVWriter(fileWriter)) {
-	                csvWriter.writeAll(csvData);
-	            }
-
-	            System.out.println("New row added successfully.");
-
-	        } catch (IOException | CsvValidationException e) {
-	            System.out.println("ERror : "+e.getMessage());
-	        }
-
-	        if (!skills.isEmpty()) {
-	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
-                postServiceI.update(post);
-	        }
+	          
+	     
 	        
 	     	        postFieldServiceI.insert(postField);
-	       
+	     	        post.setPostFields(postField);
+	     	       if(post.getLocation() !=null && !post.getLocation().isEmpty())
+	     			{
+	     				location loc=locationServiceI.findByValue(post.getLocation());
+	     				if(loc ==null)
+	     				{
+	     					location locToInsert=new location();
+	     					locToInsert.setLocationValue(post.getLocation());
+	     					locationServiceI.insert(loc);
+	     				}
+	     			}
+	     	       Post insertedPost = postServiceI.insert(post);
+	     	       
+	     	      if (!skills.isEmpty()) {
+	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
+	                  postServiceI.updatePostForCreate(post);
+	  	        }
+	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output.csv";
+			        String[] newRowData = {""+insertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
+		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
+			        try {
+			        FileReader fileReader = new FileReader(csvFilePath);
+		            List<String[]> csvData=new ArrayList<String[]>();
+		            try (CSVReader cvReader = new CSVReaderBuilder(fileReader).build()) {
+		                csvData = cvReader.readAll();
+		            }
+		            
+		            System.out.println("Csv Data : " + csvData);
+		            // Append new data to the CSV data
+		            csvData.add(newRowData);
+		            System.out.println("Csv Data After add : " + csvData);
+		            // Write updated data back to the CSV file
+		            FileWriter fileWriter = new FileWriter(csvFilePath);
+		            try (CSVWriter csvWriter = new CSVWriter(fileWriter)) {
+		                csvWriter.writeAll(csvData);
+		            }
+
+		            System.out.println("New row added successfully.");
+
+		        } catch (IOException | CsvValidationException e) {
+		            System.out.println("ERror : "+e.getMessage());
+		        }
+
 	        return post;
 	    } catch (Exception e) {
 	        System.out.println("Exception from createAPost method: " + e);

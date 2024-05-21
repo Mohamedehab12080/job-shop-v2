@@ -8,6 +8,8 @@ import { qualReducer } from "./qualifications/Reducer";
 import { employerReducer } from "./company/Employer/Reducer";
 import { jobSeekerReducer } from "./JobSeeker/Reducer";
 import {fieldsReducer} from "./fields/Reducer"
+import {locationsReducer} from "./location/Reducer"
+import { recommedReducer } from "./Post/recommededPost/Reducer";
 const rootReducers=combineReducers(
     {
       auth:authReducer,
@@ -17,7 +19,9 @@ const rootReducers=combineReducers(
       quals:qualReducer,
       emp:employerReducer,
       jobSeeker:jobSeekerReducer,
-      fieldReducer:fieldsReducer
+      fieldReducer:fieldsReducer,
+      locationReducer:locationsReducer,
+      recommedRed:recommedReducer
     }
 );
 

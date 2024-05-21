@@ -96,6 +96,10 @@ export const companyReducer=(state=initialState,action)=>
                 ...state,
                 loading:false,
                 error:null,
+                companyData:state.companyData,
+                response:state.response,
+                fields:state.fields,
+                isRequestUser:state.isRequestUser,
                 employers:action.payload
             };
 

@@ -34,6 +34,8 @@ public interface postRepository extends /*baseRepo<Post,Long>*/ JpaRepository<Po
 	@Query(value="select distinct p from Post p where p.Title like %:Title%")
 	Set<Post> findByTitle(@Param("Title") String title);
 
+    List<Post> findByPostFieldsFieldFieldName(String fieldName);
+
 //	@Query("SELECT p from Post p where p.postField.id=:postFieldId")
 //	List<Post> findByPostFieldId(@Param("postFieldId") Long postFieldId);
 }

@@ -50,17 +50,17 @@ public class Post extends baseEntity<Long>{
 	
 	private String image;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
-	private List<postField> postFields=new ArrayList<postField>();
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+//	private List<postField> postFields=new ArrayList<postField>();
 	
+	@OneToOne
+	@JoinColumn(name="postField_id")
+	private postField postFields;
 	
-//	@OneToOne
-//	@JoinColumn(name="postField_id")
-//	private postField postFields;
-	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
-    private Long fieldCount;
-   
+//	@Formula("(select count(*) from post_field post_field where post_field.post_id = id)")//Query between()
+//    private Long fieldCount;
+
 //	private List<String> skills;
 	
 	@JsonIgnore
@@ -126,19 +126,27 @@ public class Post extends baseEntity<Long>{
 	public void setEmployer(Employer employer) {
 		this.employer = employer;
 	}
-	public List<postField> getPostFields() {
+	
+	
+	public postField getPostFields() {
 		return postFields;
 	}
-	public void setPostFields(List<postField> postFields) {
+	public void setPostFields(postField postFields) {
 		this.postFields = postFields;
-		
 	}
-	public Long getFieldCount() {
-		return fieldCount;
-	}
-	public void setFieldCount(Long fieldCount) {
-		this.fieldCount = fieldCount;
-	}
+	//	public List<postField> getPostFields() {
+//		return postFields;
+//	}
+//	public void setPostFields(List<postField> postFields) {
+//		this.postFields = postFields;
+//		
+//	}
+//	public Long getFieldCount() {
+//		return fieldCount;
+//	}
+//	public void setFieldCount(Long fieldCount) {
+//		this.fieldCount = fieldCount;
+//	}
 //	public List<String> getSkills() {
 //		return skills;
 //	}

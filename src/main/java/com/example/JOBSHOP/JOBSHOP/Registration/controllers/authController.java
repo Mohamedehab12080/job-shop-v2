@@ -1,10 +1,14 @@
 package com.example.JOBSHOP.JOBSHOP.Registration.controllers;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.lang.StackWalker.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,7 +32,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.JOBSHOP.JOBSHOP.Registration.event.listener.registrationCompleteEventListener;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
+import com.example.JOBSHOP.JOBSHOP.Registration.password.iPasswordResetTokenService;
 import com.example.JOBSHOP.JOBSHOP.Registration.security.jwtProvider;
 import com.example.JOBSHOP.JOBSHOP.Registration.security.userRegistrationDetails;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
@@ -39,8 +46,13 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyAdministrator;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdministratorServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.jobSeeker;
 import com.example.JOBSHOP.JOBSHOP.jobSeeker.service.jobSeekerServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.location.location;
+import com.example.JOBSHOP.JOBSHOP.location.service.locationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.response.AuthResponse;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
+
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/auth")
@@ -67,6 +79,24 @@ public class authController {
 	@Autowired
 	private userServiceInterface userServiceI;
 	
+	@Autowired
+	private registrationCompleteEventListener registrationCompleteEventListener;
+	
+	@Autowired
+	private locationServiceInterface locationServiceI;
+		
+	@GetMapping("/findAll")
+	public ResponseEntity<List<location>> findAllLocations()
+	{
+
+			return new ResponseEntity<List<location>>(locationServiceI.findAll(),HttpStatus.OK);
+	}
+	
+	@GetMapping("/findAllValues")
+	public ResponseEntity<List<String>> findAllValues()throws UserException
+	{
+			return new ResponseEntity<List<String>>(locationServiceI.findAllValues(),HttpStatus.OK);
+	}
 	
 @PostMapping("/jobSeeker/signup")
 public ResponseEntity<AuthResponse> createJobSeekerHandler(
@@ -80,7 +110,18 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		
 		jobSeeker realJobSeeker=new jobSeeker();
 		realJobSeeker.setPassword(passwordEncoder.encode(jobSeeker.getPassword()));
-		realJobSeeker.setAddress(jobSeeker.getAddress());
+		if(jobSeeker.getAddress() !=null && !jobSeeker.getAddress().isEmpty())
+		{
+			location loc=locationServiceI.findByValue(jobSeeker.getAddress());
+			if(loc ==null)
+			{
+				location locToInsert=new location();
+				locToInsert.setLocationValue(jobSeeker.getAddress());
+				locationServiceI.insert(locToInsert);
+			}
+			realJobSeeker.setAddress(jobSeeker.getAddress());
+		}
+		
 		realJobSeeker.setEmail(jobSeeker.getEmail());
 		realJobSeeker.setUserName(jobSeeker.getUserName());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -127,7 +168,17 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		
 		companyAdministrator realCompanyAdmin=new companyAdministrator();
 		realCompanyAdmin.setPassword(passwordEncoder.encode(companyAdmin.getPassword()));
-		realCompanyAdmin.setAddress(companyAdmin.getAddress());
+		if(companyAdmin.getAddress() !=null && !companyAdmin.getAddress().isEmpty())
+		{
+			location loc=locationServiceI.findByValue(companyAdmin.getAddress());
+			if(loc ==null)
+			{
+				location locToInsert=new location();
+				locToInsert.setLocationValue(companyAdmin.getAddress());
+				locationServiceI.insert(locToInsert);
+			}
+			companyAdmin.setAddress(companyAdmin.getAddress());
+		}
 		realCompanyAdmin.setEmail(companyAdmin.getEmail());
 		realCompanyAdmin.setUserName(companyAdmin.getUserName());
 		realCompanyAdmin.setUserType(Role.Admin);
@@ -168,7 +219,77 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		
 	}
 
+	
+//	/**
+//	 * 
+//	 * @author BOBO
+//	 * @Function reset the password replace the old with the new
+//	 */
+//	@PostMapping("/reset-password")
+//	public String resetPassword(HttpServletRequest request)
+//	{
+//		String theToken=request.getParameter("token"); //getting the hidden input token from the password reset form
+//		String newPassword=request.getParameter("password");
+//		String verificationPasswordTokenValidateResult=iPasswordResetTokenService.validateToken(theToken);
+//		if(!verificationPasswordTokenValidateResult.equalsIgnoreCase("valid")) //validate the token if it is expired or invalid not found
+//		{
+//			return "redirect:/error?invalid_token"; 
+//		}
+//		User theUser=iPasswordResetTokenService.findUserByVerificationPasswordToken(theToken);//Find the user by the token if present
+//		if(theUser!=null)
+//		{
+//			// set the new password of the user and then update the user. 
+//			iPasswordResetTokenService.resetPassword(theUser, newPassword);
+//			return"redirect:/login?reset_success";
+//		}
+//		return "redirect:/error?not_found";
+//	}
 
+	  @PostMapping("/request/{email}")
+	    public ResponseEntity<?> requestReset(@PathVariable("email") String email) throws UnsupportedEncodingException, MessagingException {
+	   
+		  	System.out.println("The email :"+email);
+	        Optional<User> user = userRepository.findByEmail(email);
+
+	        if (!user.isPresent()) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+	        }
+
+	        String token = jwtProvider.generateTokenResetPassword(email);
+	        registrationCompleteEventListener.
+	        sendVerificationEmailPasswordReset(
+	        		user.get(),
+	        		"http://localhost:3000/reset-password/Bearer "+token);
+	        return ResponseEntity.ok(Collections.singletonMap("token", token));
+	    }
+	  
+	  
+	  @PostMapping("/reset")
+	    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+	        String token = request.get("token");
+	        String newPassword = request.get("newPassword");
+
+	        try {
+	        	
+	            String email = jwtProvider.getEmailFromToken(token);
+
+	            System.out.println("Email : "+email);
+	            Optional<User> user = userRepository.findByEmail(email);
+
+	            if (! user.isPresent()) {
+	                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Invalid token");
+	            }
+	            
+	            User user2=user.get();
+	            user2.setPassword(passwordEncoder.encode(newPassword)); // Ensure you hash the password in a real application
+	            userRepository.save(user2);
+
+	            return ResponseEntity.ok("Password reset successful");
+	        } catch (RuntimeException e) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid token");
+	        }
+	    }
+	
 	private Authentication authenticate(String userName, String password) {
 		UserDetails userDetails=userRegistrationDetails.loadUserByUsername(userName);
 		

@@ -15,6 +15,7 @@ import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact
 import ShowFieldsModal from "../modals/companyModals/FieldsModals/ShowFieldsModal";
 import { getEmployerProfile } from "../../store/company/Employer/Action";
 import ShowEmployerFieldsModal from "../modals/companyModals/FieldsModals/ShowEmployerFieldsModal";
+import ShowPostImageModal from "../HomeSection/posts/ShowPostImageModal";
 
 const EmployerProfile = () => {
   const [tabValue, setTabValue] = useState("1");
@@ -27,6 +28,15 @@ const EmployerProfile = () => {
   const auth=useSelector(state=>state.auth);
   const dispatch = useDispatch();
   const emp = useSelector((state) => state.emp);
+  const [openShowPostImageModal,setOpenShowPostImageModal]=React.useState(false);
+
+  const handleCloseShowPostImageModal=()=>setOpenShowPostImageModal(false);
+  
+  const [imageForShow,setImageForShow]=useState("");
+  const handleOpenShowPostImageModal=(value)=>{
+    setOpenShowPostImageModal(true);
+    setImageForShow(value);
+};
   const [employerData, setEmployerData] = useState(null);
   const [contactList, setContactList] = useState([]);
   const [isRequestUser, setIsRequestUser] = useState(false);
@@ -60,10 +70,11 @@ const EmployerProfile = () => {
       setContactList(employerData.contacts);
       setCoverImage(employerData.coverImage);
       setCompanyAdminId(employerData.companyAdministratorId);
+      setIsRequestUser(employerData.req_user);
     }
     
-    setIsRequestUser(emp.isRequestUser);
-  }, [emp.fields, emp.isRequestUser, employerData]);
+    // setIsRequestUser(emp.isRequestUser);
+  }, [emp.fields, employerData]);
 
   const handleFollowUser = () => {
     console.log("Follow");
@@ -90,7 +101,8 @@ const EmployerProfile = () => {
 
       <section>
         <img
-          className="w-[100%] h-[15rem] object-cover"
+          onClick={()=>handleOpenShowPostImageModal(coverImage)}
+          className="w-[100%] h-[15rem] object-cover cursor-pointer"
           src={coverImage}
           alt="Cover Image"
         />
@@ -99,7 +111,7 @@ const EmployerProfile = () => {
       <section className="pl-6">
         <div className="flex justify-between items-start mt-5 h-[5rem]">
           <Avatar
-            className="transform -translate-y-24"
+           onClick={()=>handleOpenShowPostImageModal(profileImage)} className='transform -translate-y-24 cursor-pointer'
             alt="BOB"
             src={profileImage}
             sx={{ width: "10rem", height: "10rem", border: "4px solid white" }}
@@ -136,7 +148,7 @@ const EmployerProfile = () => {
             <div className="flex items-center space-x-20">
               <div className="ml-10 flex items-center space-x-1 font-semibold">
                 <span>
-                  {employerData !== null && employerData.followers.length > 0
+                  {employerData !== null && employerData.followers && employerData.followers.length > 0
                     ? employerData.followers.length
                     : 0}
                 </span>
@@ -144,7 +156,7 @@ const EmployerProfile = () => {
               </div>
               <div className="flex items-center space-x-1 font-semibold">
                 <span>
-                  {employerData !== null && employerData.followings.length > 0
+                  {employerData !== null && employerData.followings &&employerData.followings.length > 0
                     ? employerData.followings.length
                     : 0}
                 </span>
@@ -257,6 +269,12 @@ const EmployerProfile = () => {
           contactsList={contactList}
           isRequestUser={isRequestUser}
         />
+      </section>
+
+      <section>
+
+      <ShowPostImageModal openShowPostImageModal={openShowPostImageModal} handleCloseShowPostImageModal={handleCloseShowPostImageModal} postImage={imageForShow} />
+
       </section>
     </div>
   );

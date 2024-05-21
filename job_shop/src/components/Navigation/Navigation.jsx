@@ -15,6 +15,8 @@ import CreateEmployerModal from "../modals/companyModals/EmployersModals/CreateE
 import AddSkillsModal from "../modals/JobSeekerModal/skillsModals/AddSkillsModal";
 import ShowApplicationsModal from "../modals/companyModals/postModals/ShowApplicationsModal";
 import GiveEmployerFields from "../modals/companyModals/FieldsModals/GiveEmployerFields";
+import ConfirmMessage from "../../responses/ConfirmMessage";
+import RecommendationModal from "../modals/companyModals/postModals/RecommedationModal";
 // import GiveEmployerFields from "../modals/companyModals/FieldsModals/GiveEmployerFields";
 export const Navigation = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -65,16 +67,19 @@ export const Navigation = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
   const navigate = useNavigate();
-  const handleLogout=()=>
-  {
-    console.log("logout");
-    handleClose()
-    dispatch(Logout())
-  }
+  // const handleLogout=()=>
+  // {
+  //   dispatch(Logout());
+  // }
+
+  const [openConfirmMessage,setOpenConfirmMessage]=useState(false);
+  const handleOpenConfirmMessage=()=>setOpenConfirmMessage(true);
+  const handleCloseConfirmMessage=()=>setOpenConfirmMessage(false);
+
+  const [openRecommendationModal,setOpenRecommendationModal]=useState(false);
+  const handleOpenRecommendationModal=()=>setOpenRecommendationModal(true);
+  const handleCloseRecommendationModal=()=>setOpenRecommendationModal(false);
 
   // Define a separate function to handle item click navigation
 const handleItemClick = (item) => {
@@ -84,6 +89,9 @@ const handleItemClick = (item) => {
     } else {
       navigate(item.path);
     }
+    // else if (item.title ==="Recommend me"){
+    //   handleOpenRecommendationModal();
+    // }
   } else  if(auth.user.userType==="Admin"){
     if (item.title === "companyProfile") {
       navigate(`/companyProfile/${auth.user.id}`);
@@ -95,7 +103,7 @@ const handleItemClick = (item) => {
       if (item.title === "employerProfile") {
         navigate(`/employerProfile/${auth.user.id}`);
       } else {
-        navigate(item.path);
+        navigate(item.path);  
       }
     }
 };
@@ -140,7 +148,7 @@ const handleItemClick = (item) => {
                 </>
               ):(
                 <>
-                   {item.title !=="Profile" && auth.user.userType === "Employer" ? (
+                   {item.title !=="Profile" && item.title !=="Recommend me" && auth.user.userType === "Employer" ? (
                     <>
                       {item.icon}
                      <p className="text-xl">{item.title}</p>
@@ -252,7 +260,7 @@ const handleItemClick = (item) => {
           </>
        )}
 
-        <div className="mt-3 flex items-center py-1 space-x-5">
+        <div className="mt-3 flex items-center py-1 space-x-5 ">
           <Avatar 
             onClick={() => navigate(navigationValue)}
             alt="username" 
@@ -266,19 +274,8 @@ const handleItemClick = (item) => {
               </div>
           </div>
       <div>
-                
-      <Button
-        id="basic-button"
-        aria-controls={open ? 'basic-menu' : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
-      >
-        <MoreHorizIcon />
-
-      </Button>
-      
-      <Menu
+              
+      {/* <Menu
         id="basic-menu"
         anchorEl={anchorEl}
         open={open}
@@ -288,14 +285,25 @@ const handleItemClick = (item) => {
         }}
       >
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
-      </Menu>
+      </Menu> */}
 
                 </div>        
+          </div>
+
+          <div>
+          <Button
+            id="basic-button"
+            onClick={handleOpenConfirmMessage}
+          >
+            LOGOUT
+
+          </Button>
+          
           </div>
       </div>
 
       <section>
-            <PostModal openPostModal={openPostModal} handleClose={handleClosePostModal}/>
+            <PostModal openPostModal={openPostModal} handleClose={handleClosePostModal} operationType={"ADD"}/>
       </section>
 
        <section>
@@ -313,7 +321,14 @@ const handleItemClick = (item) => {
 <section>
   <ShowApplicationsModal openShowApplicationsModal={openShowApplicationsModal} handleCloseShowApplicationsModal={handleCloseShowApplicationsModal}/>
 </section>
-
+<section>
+  <RecommendationModal 
+  openRecommendationModal={openRecommendationModal} 
+  handleCloseRecommendationModal={handleCloseRecommendationModal}/>
+</section>
+<section>
+  <ConfirmMessage openConfirmMessage={openConfirmMessage} handleCloseConfirmMessage={handleCloseConfirmMessage} response={"Do you want to signout ? "} Title={"LOGOUT"} operationType={"Logout"}/>
+</section>
  <section>
   <GiveEmployerFields openGiveEmployerFields = {openGiveEmployerFields} handleCloseGiveEmployerFields={handleCloseGiveEmployerFields} />
 </section> 

@@ -17,6 +17,7 @@ import PostCardSocial from "./posts/PostCardSocial"
 import PostCardCompany from "./posts/PostCardCompany";
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
+import { recommendedPosts } from "../../store/Post/recommededPost/Action";
 // import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
 // import { responseUploadUrl } from "../../Utils/Server";
 import SearchIcon from '@mui/icons-material/Search'
@@ -40,6 +41,8 @@ const HomeSection = () => {
   const [filteredJobSeekerPosts,setFilteredJobSeekerPosts]=useState([]);
   const [filteredCompanyPosts,setFilteredCompanyPosts]=useState([]);
   const [filterInputPost, setFilterInputPost] = React.useState("");
+
+  const dispatch4=useDispatch();
 
   const handleChange = (event,newValue)=>
     {
@@ -86,6 +89,11 @@ const HomeSection = () => {
   const handleFetchPosts = () => {
     setStatusOfPosts(true); // Set statusOfPosts to true on button click
   };
+
+  React.useEffect(()=>
+  {
+    dispatch4(recommendedPosts("Event planning Vendor coordination Budget management "));
+  },[]);
 React.useEffect(()=>
 {
   if(auth.user.userType==="jobSeeker"){
@@ -102,6 +110,7 @@ React.useEffect(()=>
   if(auth.user.userType==="jobSeeker")
   {
     setJobSeekerPosts(post.posts);
+    console.log("POSTS : ",post.posts);
   }else {
     setCompanyPosts(post.posts);
   }
@@ -169,7 +178,7 @@ React.useEffect(()=>
       </section>
       <section className={`pb-10`}>
         <div className="flex space-x-5">
-          <Avatar alt="userName" src={logo} />
+          <Avatar alt="userName" src={auth.user.picture} />
           <div className="w-full">
             <form onSubmit={formik.handleSubmit}>
               <div>
@@ -263,7 +272,7 @@ React.useEffect(()=>
                 employerUserName={p.employerUserName}
                 Title={p.title}
                 description={p.description}
-                jobRequirements={p.jobRequirements}
+                jobRequirements={p.jobRequirments}
                 location={p.location}
                 employmentType={p.employmentType}
                 companyName={p.companyName}
@@ -288,15 +297,15 @@ React.useEffect(()=>
     ))
 ) : (
     ((filterInputPost === "" ? companyPosts : filteredCompanyPosts).length > 0) ? (
-        (filterInputPost === "" ? companyPosts : filteredCompanyPosts).map((p) => (
+        (filterInputPost === "" ? companyPosts : filteredCompanyPosts).map((p,index) => (
             <PostCardCompany
-                key={p.id}
+                key={index}
                 id={p.id}
                 employerId={p.employerId}
                 employerUserName={p.employerUserName}
                 Title={p.title}
                 description={p.description}
-                jobRequirements={p.jobRequirements}
+                jobRequirements={p.jobRequirments}
                 location={p.location}
                 employmentType={p.employmentType}
                 companyName={p.companyName}
@@ -332,7 +341,7 @@ React.useEffect(()=>
                   employerUserName={p.employerUserName}
                   Tit le={p.title}
                   description={p.description}
-                  jobRequirements={p.jobRequirements} 
+                  jobRequirements={p.jobRequirments} 
                   location={p.location}
                   employmentType={p.employmentType}
                   companyName={p.companyName}
@@ -369,7 +378,7 @@ React.useEffect(()=>
                  employerUserName={p.employerUserName}
                  Title={p.title}
                  description={p.description}
-                 jobRequirements={p.jobRequirements}
+                 jobRequirements={p.jobRequirments}
                  location={p.location}
                  employmentType={p.employmentType}
                  companyName={p.companyName}
@@ -394,15 +403,15 @@ React.useEffect(()=>
      ))
  ) : (
      ((filterInputPost === "" ? companyPostsUserPosts : filteredCompanyPosts).length > 0) ? (
-         (filterInputPost === "" ? companyPostsUserPosts : filteredCompanyPosts).map((p) => (
+         (filterInputPost === "" ? companyPostsUserPosts : filteredCompanyPosts).map((p,index) => (
              <PostCardCompany
-                 key={p.id}
+                 key={index}
                  id={p.id}
                  employerId={p.employerId}
                  employerUserName={p.employerUserName}
                  Title={p.title}
                  description={p.description}
-                 jobRequirements={p.jobRequirements}
+                 jobRequirements={p.jobRequirments}
                  location={p.location}
                  employmentType={p.employmentType}
                  companyName={p.companyName}
@@ -438,7 +447,7 @@ React.useEffect(()=>
                    employerUserName={p.employerUserName}
                    Tit le={p.title}
                    description={p.description}
-                   jobRequirements={p.jobRequirements} 
+                   jobRequirements={p.jobRequirments} 
                    location={p.location}
                    employmentType={p.employmentType}
                    companyName={p.companyName}

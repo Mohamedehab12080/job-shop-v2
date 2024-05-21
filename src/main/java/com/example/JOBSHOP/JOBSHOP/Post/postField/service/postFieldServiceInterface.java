@@ -20,7 +20,7 @@ public interface postFieldServiceInterface {
 
 	List<postField> insertAll(List<postField> entity);
 
-	List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId);
+//	List<postField> findAllPostFieldsByEmployerFieldId(Long empFieldId);
 	
 	void deleteById(Long id);
 

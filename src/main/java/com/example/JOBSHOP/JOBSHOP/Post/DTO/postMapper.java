@@ -18,7 +18,16 @@ public class postMapper {
 	{
 		Post post=new Post();
 		post.setApplications(dto.getApplications());
-//		post.setPostFields(dto.getPostFields());
+		
+		post.setPostFields(dto.getPostField());
+
+//		if(dto.getPostField()!=null)
+//		{
+//	}else 
+//		{
+//			postField postField=new postField();
+//			postField.setId(dto.getPost);
+//		}
 		post.setCreatedBy(dto.getCreatedBy());
 		post.setCreatedDate(dto.getCreatedDate());
 		post.setLastModifiedBy(dto.getLastModifiedBy());
@@ -35,7 +44,7 @@ public class postMapper {
 		emp.setId(dto.getEmployerId());
 		post.setEmployer(emp);
 		post.setApplications(dto.getApplications());
-		post.setFieldCount(dto.getFieldCount());
+//		post.setFieldCount(dto.getFieldCount());
 		post.setApplicationCount(dto.getApplicationCount());
 		post.setImage(dto.getPostImage());
 		post.setExperience(dto.getExperience());
@@ -101,19 +110,18 @@ public class postMapper {
 	    dto.setApplicationCount(post.getApplicationCount());
 	    dto.setApplications(post.getApplications());
 
-	    List<postField> postFields = post.getPostFields();
-	    if (!postFields.isEmpty()) {
-	    	dto.setSkills(postFields.get(0).getSkills());
-	    	dto.setQualifications(postFields.get(0).getQualifications());
-	    	dto.setFieldName(postFields.get(0).getEmployerField().getCompanyField().getField().getFieldName());
-	    }
+	    postField postField = post.getPostFields();
+	    	dto.setSkills(postField.getSkills());
+	    	dto.setQualifications(postField.getQualifications());
+	    	dto.setFieldName(postField.getField().getFieldName());
+	    
 
 	    // Set other properties
 	    dto.setCreatedBy(post.getCreatedBy());
 	    dto.setCreatedDate(post.getCreatedDate());
 	    dto.setLastModifiedBy(post.getLastModifiedBy());
 	    dto.setLastModifiedDate(post.getLastModifiedDate());
-	    dto.setFieldCount(post.getFieldCount());
+//	    dto.setFieldCount(post.getFieldCount());
 	    dto.setEmployerpicture(post.getEmployer().getPicture());
 	    dto.setExperience(post.getExperience());
 	    dto.setPostImage(post.getImage());
@@ -125,7 +133,7 @@ public class postMapper {
 		postDTO dto=new postDTO();
 		dto.setApplicationCount(post.getApplicationCount());
 		dto.setApplications(post.getApplications());
-		dto.setFieldCount(post.getFieldCount());
+//		dto.setFieldCount(post.getFieldCount());
 //		dto.setPostFields(post.getPostFields());
 		dto.setCreatedBy(post.getCreatedBy());
 		dto.setCreatedDate(post.getCreatedDate());
@@ -141,10 +149,10 @@ public class postMapper {
 		Employer emp=post.getEmployer();
 		dto.setEmployerId(emp.getId());
 		dto.setApplications(post.getApplications());
-		dto.setFieldCount(post.getFieldCount());
+//		dto.setFieldCount(post.getFieldCount());
 		dto.setApplicationCount(post.getApplicationCount());
-		dto.setPostField(post.getPostFields().get(0));
-		dto.setField(post.getPostFields().get(0).getId());
+		dto.setPostField(post.getPostFields());
+		dto.setField(post.getPostFields().getField().getId());
 		dto.setPostImage(post.getImage());
 		dto.setExperience(post.getExperience());
 		

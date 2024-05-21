@@ -9,6 +9,7 @@ import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.postField;
 import com.example.JOBSHOP.JOBSHOP.Post.postField.DTO.postFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.fields.Field;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -172,9 +173,12 @@ public class postDTO extends baseEntityDTO<Long>{
 		postField postField=new postField();
 		postField.setSkills(skills);
 		postField.setQualifications(qualifications);
-		employerField empF=new employerField();
-		empF.setId(field);
-		postField.setEmployerField(empF);
+		Field fieldObj=new Field();
+		fieldObj.setId(field);
+		postField.setField(fieldObj);
+//		employerField empF=new employerField();
+//		empF.setId(field);
+//		postField.setEmployerField(empF);
 		return postField;
 	}
 	
