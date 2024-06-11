@@ -116,6 +116,7 @@ const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = async (values,actions) => {
     console.log("values : ",values);
     await dispatch(createEmployer(values));
+    
     actions.resetFormik();
   };
 

@@ -3,25 +3,34 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { recommendedPosts } from "../../store/Post/recommededPost/Action";
-import SearchIcon from '@mui/icons-material/Search';
-import { Grid, TextField, Button, Typography, Box, IconButton, InputAdornment, Tab } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import AddIcon from '@mui/icons-material/Add';
-import Close from '@mui/icons-material/Close';
 import { findAllSkills } from "../../store/skills/Action";
+import {
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Box,
+  IconButton,
+  InputAdornment,
+  Tab,
+  CircularProgress,
+  Card,
+  CardContent,
+  CardActions,
+} from "@mui/material";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
+import AddIcon from "@mui/icons-material/Add";
+import Close from "@mui/icons-material/Close";
 import PostCardJobSeeker from "./posts/PostCardJobSeeker";
 
 const validationSchema = Yup.object().shape({
-  skills: Yup.array().min(1, "At least one skill is required").required("Skills are required"),
+  skills: Yup.array()
+    .min(1, "At least one skill is required")
+    .required("Skills are required"),
 });
 
 const RecommendationPath = () => {
   const [tabValue, setTabValue] = useState("1");
-  const auth = useSelector(state => state.auth);  
-  const recommedRed = useSelector(state => state.recommedRed);
-  const skills = useSelector(state => state.skills);
-  const dispatch = useDispatch();
-
   const [modelResponse, setModelResponse] = useState([]);
   const [posts, setPosts] = useState([]);
   const [filterInputSkills, setFilterInputSkills] = useState("");
@@ -32,23 +41,36 @@ const RecommendationPath = () => {
   const [statusOfPosts, setStatusOfPosts] = useState(false);
   const [filteredPosts, setFilteredPosts] = useState([]);
   const [filterInputPost, setFilterInputPost] = useState("");
+  const dispatch = useDispatch();
+
+  const auth = useSelector((state) => state.auth);
+  const recommedRed = useSelector((state) => state.recommedRed);
+  const skills = useSelector((state) => state.skills);
 
   useEffect(() => {
-    
-      dispatch(findAllSkills());
-    
-  }, [ dispatch]);
+    dispatch(findAllSkills());
+  }, [dispatch]);
 
   useEffect(() => {
-  
-      setFetchedSkills(skills.skills);
-    
+    setFetchedSkills(skills.skills || []);
   }, [skills.skills]);
+
+  useEffect(() => {
+    setModelResponse(recommedRed.response || []);
+    console.log("REomm : ", recommedRed.response);
+    setPosts(recommedRed.posts || []);
+  }, [recommedRed.response, recommedRed.posts]);
+
+  useEffect(() => {
+    setDisplayedSkills(fetchedSkills.slice(0, 10));
+  }, [fetchedSkills]);
 
   const handleFilterSkills = (input) => {
     const normalizedInput = input.toLowerCase();
-    const filtered = fetchedSkills.filter((skill) =>
-      skill.toLowerCase().includes(normalizedInput) && !selectedSkills.includes(skill)
+    const filtered = fetchedSkills.filter(
+      (skill) =>
+        skill.toLowerCase().includes(normalizedInput) &&
+        !selectedSkills.includes(skill)
     );
     setFilteredSkills(filtered);
     setFilterInputSkills(input);
@@ -58,25 +80,18 @@ const RecommendationPath = () => {
     dispatch(recommendedPosts(values.skills));
   };
 
-  useEffect(() => {
-      setModelResponse(recommedRed.response);
-      setPosts(recommedRed.posts);
-  }, [ recommedRed.response, recommedRed.posts]);
-
-  useEffect(() => {
-    setDisplayedSkills(fetchedSkills.slice(0, 10));
-  }, [fetchedSkills]);
-
   const formik = useFormik({
     initialValues: {
-      skills: []
+      skills: [],
     },
     validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
 
   const handleRemoveSkill = (skillToRemove) => {
-    const updatedSkills = selectedSkills.filter((skill) => skill !== skillToRemove);
+    const updatedSkills = selectedSkills.filter(
+      (skill) => skill !== skillToRemove
+    );
     setSelectedSkills(updatedSkills);
     formik.setFieldValue("skills", updatedSkills);
   };
@@ -99,30 +114,81 @@ const RecommendationPath = () => {
   };
 
   const handleFetchPosts = () => {
-    setStatusOfPosts(true); // Set statusOfPosts to true on button click
+    setStatusOfPosts(true);
   };
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
-    if (newValue === '2') {
+    if (newValue === "2") {
       handleFetchPosts();
     }
   };
 
   const handleFilterPosts = (input) => {
-    const filtered = auth.user.userType === "jobSeeker" ? posts : posts; // Adjust this according to your state
-    const filteredResult = filtered.filter((post) => post.title.toLowerCase().includes(input.toLowerCase()));
+    const filteredResult = posts.filter((post) =>
+      post.title.toLowerCase().includes(input.toLowerCase())
+    );
     setFilteredPosts(filteredResult);
     setFilterInputPost(input);
   };
 
   return (
-    <div className="space-y-5">
+    <div className="recommendation-path-container space-y-5">
+      <style>{`
+        .recommendation-path-container {
+          padding: 20px;
+          background-color: #f9f9f9;
+        }
+        .skills-form-container {
+          display: flex;
+          align-items: center;
+        }
+        .selected-skills-container {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .selected-skill {
+          display: flex;
+          align-items: center;
+          background-color: #e0e0e0;
+          border-radius: 5px;
+          padding: 5px 10px;
+        }
+        .skills-scroll-container {
+          max-height: 200px;
+          overflow-y: auto;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .skill-button {
+          margin: 5px;
+        }
+        .error-message {
+          color: red;
+        }
+        .py-7 {
+          padding-top: 7px;
+          padding-bottom: 7px;
+        }
+        .font-bold {
+          font-weight: bold;
+        }
+        .opacity-90 {
+          opacity: 0.9;
+        }
+        .model-response-card {
+          margin-bottom: 20px;
+        }
+      `}</style>
       <section>
-        <h1 className="py-7 text-xl font-bold opacity-90">Home</h1>
+        <Typography variant="h4" className="py-7 font-bold opacity-90">
+          Home
+        </Typography>
       </section>
       <form onSubmit={formik.handleSubmit}>
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: 16 }}>
+        <div className="skills-form-container" style={{ marginBottom: 16 }}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
@@ -135,14 +201,11 @@ const RecommendationPath = () => {
                 error={formik.touched.skills && Boolean(formik.errors.skills)}
                 helperText={formik.touched.skills && formik.errors.skills}
                 InputProps={{
-                  style: {
-                    color: '#000', // Text color
-                    backgroundColor: '#fff', // Background color
-                    borderRadius: '5px', // Border radius
-                },
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={() => handleAddManualSkill(filterInputSkills)}>
+                      <IconButton
+                        onClick={() => handleAddManualSkill(filterInputSkills)}
+                      >
                         <AddIcon />
                       </IconButton>
                     </InputAdornment>
@@ -173,25 +236,35 @@ const RecommendationPath = () => {
               </div>
             </Grid>
             <Grid item xs={12}>
-              <div className="skills-scroll-container" style={{ maxHeight: "200px", overflowY: "auto" }}>
+              <div className="skills-scroll-container">
                 {(filterInputSkills === "" ? displayedSkills : filteredSkills)
                   .filter((skill) => !selectedSkills.includes(skill))
                   .map((skill, index) => (
-                    <Button key={index} variant="outlined" onClick={() => handleAddSkill(skill)}>
+                    <Button
+                      key={index}
+                      variant="outlined"
+                      onClick={() => handleAddSkill(skill)}
+                      className="skill-button"
+                    >
                       {skill}
                     </Button>
                   ))}
               </div>
             </Grid>
             <Grid item xs={12}>
-              <Button type="submit" variant="contained" color="primary" fullWidth>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                fullWidth
+              >
                 Submit
               </Button>
             </Grid>
           </Grid>
         </div>
       </form>
-      <div className='relative flex items-center'>
+      <div className="relative flex items-center">
         <Grid item xs={12}>
           <TextField
             fullWidth
@@ -200,80 +273,87 @@ const RecommendationPath = () => {
             label="Filter Posts"
             value={filterInputPost}
             onChange={(e) => handleFilterPosts(e.target.value)}
-            InputProps={{
-              style: {
-                color: '#000', // Text color
-                backgroundColor: '#fff', // Background color
-                borderRadius: '5px', // Border radius
-            }}}
           />
         </Grid>
       </div>
-      <section className='py-5'>
-        <Box sx={{ width: '100%', typography: 'body1' }}>
+      <section className="py-5">
+        <Box sx={{ width: "100%", typography: "body1" }}>
           <TabContext value={tabValue}>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleChange} aria-label="lab API tabs example">
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <TabList
+                onChange={handleChange}
+                aria-label="lab API tabs example"
+              >
                 <Tab label="Recommended posts" value="1" />
                 <Tab label="Recommended jobs" value="2" />
               </TabList>
             </Box>
-            <TabPanel key="1" value='1'>
+            <TabPanel key="1" value="1">
               <section>
-                {(filterInputPost === "" ? posts : filteredPosts).map((p, index) => (
-                  <PostCardJobSeeker  
-                    key={index}
-                    id={p.id}
-                    employerId={p.employerId}
-                    employerUserName={p.employerUserName}
-                    Title={p.title}
-                    description={p.description}
-                    jobRequirements={p.jobRequirements}
-                    location={p.location}
-                    employmentType={p.employmentType}
-                    companyName={p.companyName}
-                    profileId={p.profileId}
-                    skills={p.skills}
-                    qualifications={p.qualifications}
-                    field={p.field}
-                    employerpicture={p.employerpicture}
-                    fieldName={p.fieldName}
-                    createdDate={p.createdDate}
-                    remainedSkills={p.remainedSkills}
-                    remainedQualifications={p.remainedQualifications}
-                    state={p.state}
-                    matchedQualifications={p.matchedQualifications}
-                    matchedSkills={p.matchedSkills}
-                    applicationCount={p.applicationCount}
-                    jobSeekerId={auth.user.id}
-                    experience={p.experience}
-                    postImage={p.postImage}
-                  />
-                ))}
+                {(filterInputPost === "" ? posts : filteredPosts).map(
+                  (p, index) => (
+                    <PostCardJobSeeker
+                      key={index}
+                      id={p.id}
+                      employerId={p.employerId}
+                      employerUserName={p.employerUserName}
+                      Title={p.title}
+                      description={p.description}
+                      jobRequirements={p.jobRequirements}
+                      location={p.location}
+                      employmentType={p.employmentType}
+                      companyName={p.companyName}
+                      profileId={p.profileId}
+                      skills={p.skills}
+                      qualifications={p.qualifications}
+                      field={p.field}
+                      employerpicture={p.employerpicture}
+                      fieldName={p.fieldName}
+                      createdDate={p.createdDate}
+                      remainedSkills={p.remainedSkills}
+                      remainedQualifications={p.remainedQualifications}
+                      state={p.state}
+                      matchedQualifications={p.matchedQualifications}
+                      matchedSkills={p.matchedSkills}
+                      applicationCount={p.applicationCount}
+                      jobSeekerId={auth.user.id}
+                      experience={p.experience}
+                      postImage={p.postImage}
+                    />
+                  )
+                )}
               </section>
             </TabPanel>
-            <TabPanel key="2" value='2'>
-              {statusOfPosts && (
+            <TabPanel key="2" value="2">
+              {statusOfPosts ? (
                 <section key={2}>
                   <div style={{ marginTop: 20 }}>
-                    <Typography variant="h6">Response</Typography>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={10}
-                      value={modelResponse ? JSON.stringify(modelResponse, null, 2) : ""}
-                      variant="outlined"
-                      InputProps={{
-                        style: {
-                          color: '#000', // Text color
-                          backgroundColor: '#fff', // Background color
-                          borderRadius: '5px', // Border radius
-                      },
-                        readOnly: true }}
-                      
-                    />
+                    <Typography variant="h6">You can work</Typography>
+                    {modelResponse.length > 0 ? (
+                      modelResponse.map((response, index) => (
+                        <Card key={index} className="model-response-card">
+                          <CardContent>
+                            <Typography variant="body1">
+                              <b>Job Title:</b> {response["Job Title"]}
+                            </Typography>
+                            <Typography variant="body1">
+                              <b>Skills:</b>
+                            </Typography>
+                            <Typography variant="body2">
+                              {response.skills}
+                            </Typography>
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (
+                      <Typography variant="body2">
+                        No recommendations available
+                      </Typography>
+                    )}
                   </div>
                 </section>
+              ) : (
+                <CircularProgress />
               )}
             </TabPanel>
           </TabContext>

@@ -733,12 +733,16 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				            	if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
 					            {
 				            		  post.setState(0);
+				            		  post.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+
 							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
 						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
 //							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
 					            }else 
 					            {
 					            	  post.setState(1);   
+				            			post.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+
 							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
 						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
 //							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);

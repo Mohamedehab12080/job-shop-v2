@@ -18,6 +18,20 @@ public interface postRepository extends /*baseRepo<Post,Long>*/ JpaRepository<Po
 //	@EntityGraph(attributePaths = {"employer"})
 	List<Post> findByEmployerId(Long id); 
 	
+	 @Query("SELECT p FROM Post p " +
+	           "WHERE (:title IS NULL OR p.Title LIKE %:title%) " +
+	           "AND (:location IS NULL OR :location = '' OR p.location LIKE %:location%) " +
+	           "AND (:employmentType IS NULL OR :employmentType = '' OR p.employmentType LIKE %:employmentType%) " +
+	           "AND (:year IS NULL OR FUNCTION('YEAR', p.createdDate) = :year) " +
+	           "AND (:month IS NULL OR FUNCTION('MONTH', p.createdDate) = :month) " +
+	           "AND (:postIds IS NULL OR p.id IN :postIds)")
+	    List<Post> findPosts(@Param("title") String title,
+	                         @Param("location") String location,
+	                         @Param("employmentType") String employmentType,
+	                         @Param("year") Integer year,
+	                         @Param("month") Integer month,
+	                         @Param("postIds") List<Long> postIds);
+	 
 //	@Query("SELECT p FROM Post p JOIN FETCH p.companyProfile WHERE p.id = :id")
 	@Query("select p from Post p where p.companyProfile.id=:id Order by createdDate Desc")
 	List<Post> findByCompanyProfileId(Long id);

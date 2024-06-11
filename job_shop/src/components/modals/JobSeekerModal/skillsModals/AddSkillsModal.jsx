@@ -21,7 +21,7 @@ import {
 const style = {
   position: "absolute",
   top: "10%",
-  left: "50%",
+  left: "10%",
   transform: "translate(-50%, -50%)",
   width: 600,
   bgcolor: "background.paper",
@@ -135,11 +135,11 @@ export default function AddSkillsModal({
       (skill) =>
         skill && // Check if skill is not null
         !selectedSkills.includes(input) &&
-        !skill.toLowerCase().includes(input.toLowerCase())
+        skill.toLowerCase().includes(input.toLowerCase())
     );
     setFilteredSkills(filtered);
     setFilterInputSkills(input);
-  };  
+  };
 
   const handleFilterQuals = (input) => {
     const filtered = fetchedQuals.filter((qual) =>
@@ -217,7 +217,7 @@ export default function AddSkillsModal({
         aria-describedby="modal-modal-description"
       >
         <Slide
-          direction="left"
+          direction="right"
           in={openAddSkillsModal}
           mountOnEnter
           unmountOnExit

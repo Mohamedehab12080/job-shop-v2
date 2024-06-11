@@ -49,6 +49,7 @@ export const fetchMatchedPosts=(userId)=>async(dispatch)=>
         dispatch({type:FETCH_MATCHED_POSTS_FAILURE,payload:error.message})
     }
 }
+
 export const findFilteredPosts=(searchData)=>async(dispatch)=>
 {
     try {
@@ -59,6 +60,7 @@ export const findFilteredPosts=(searchData)=>async(dispatch)=>
         dispatch({type:FETCH_MATCHED_SEARCH_POSTS_FAILURE,payload:error.message})
     }
 }
+
 export const fetchCompanyPosts=(userId)=>async(dispatch)=>
 {
     try {

@@ -88,17 +88,23 @@ const PostCardJobSeeker = ({
   const postRef = useRef(null);
 
   const truncatedJobRequirements =
-    jobRequirements.length > 300
+    jobRequirements && jobRequirements.length > 300
       ? `${jobRequirements.substring(0, 300)}...`
       : jobRequirements;
   const truncatedDescription =
-    description.length > 300
+    description && description.length > 300
       ? `${description.substring(0, 300)}...`
       : description;
 
   return (
-    <div>
-      <Card sx={{ mb: 4, border: "1px solid #e0e0e0", borderRadius: 8 }}>
+    <div sx={{ width: "100%" }}>
+      <Card
+        sx={{
+          mb: 4,
+          border: "1px solid #e0e0e0",
+          borderRadius: 8,
+        }}
+      >
         <CardHeader
           avatar={
             <Avatar
@@ -201,7 +207,7 @@ const PostCardJobSeeker = ({
               <Box display="flex" alignItems="center" className="mb-3 mt-4">
                 <Box flexGrow={1}>
                   {matchedSkills && matchedSkills.length > 0 && (
-                    <div className="flex items-center text-gray-600 mr-3">
+                    <div className="flex items-center text-gray-600 mr-0">
                       <CheckCircle style={{ color: "green" }} />
                       <Typography
                         className="mt-2"
@@ -213,7 +219,7 @@ const PostCardJobSeeker = ({
                       </Typography>
                       <ul>
                         {matchedSkills.map((skill, index) => (
-                          <li key={index} className="mr-1">
+                          <li key={index} className="mr-0">
                             - {skill}
                           </li>
                         ))}

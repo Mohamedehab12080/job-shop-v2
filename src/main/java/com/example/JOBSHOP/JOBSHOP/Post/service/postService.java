@@ -1,5 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.Post.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,27 +31,85 @@ public class postService implements postServiceInterface{
 	@Autowired
 	private postFieldServiceInterface postFieldServiceI;
 	
-
-	
-	@Override
-	public List<Post> findPostsWithSearch(postSearch postSearch)
-	{
-		List<Long> postIds=new ArrayList<Long>();
-		List<Post> posts=findPostsWithFieldName(postSearch.getFieldName());
-		if(posts!=null && !posts.isEmpty())
-		{
-			
-			for(Post post :posts)
+	 public List<Post> findPostsWithSearch(postSearch postSearch) {
+	        String title = postSearch.getTitle();
+	        String location = postSearch.getLocation();
+	        String employmentType = postSearch.getEmploymentType();
+	        Integer year = null;
+	        Integer month = null;
+	        
+	        List<Long> postIds=new ArrayList<Long>();
+			List<Post> posts=findPostsWithFieldName(postSearch.getFieldName());
+			if(posts!=null && !posts.isEmpty())
 			{
-				postIds.add(post.getId());
-				System.out.println("POST FROM SEARCH WITH FIELDNAME : "+post.getPostFields().getField().getFieldName());
+				
+				for(Post post :posts)
+				{
+					postIds.add(post.getId());
+					System.out.println("POST FROM SEARCH WITH FIELDNAME : "+post.getPostFields().getField().getFieldName());
+				}
 			}
-		}
-		
-		postSpecification postSpec=new postSpecification(postSearch,postIds);
-		
-		return postRepository.findAll(postSpec);
-	}
+			
+	        if (postSearch.getCreatedDate() != null && !postSearch.getCreatedDate().isEmpty()) {
+	            String pattern = "yyyy-MM-dd";
+	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+	            LocalDateTime createdDate = LocalDateTime.parse(postSearch.getCreatedDate(), formatter);
+	            year = createdDate.getYear();
+	            month = createdDate.getMonthValue();
+	        }
+
+	        return postRepository.findPosts(
+	            title != null && !title.isEmpty() ? title : null,
+	            location != null && !location.isEmpty() ? location : null,
+	            employmentType != null && !employmentType.isEmpty() ? employmentType : null,
+	            year,
+	            month,
+	            postIds != null && !postIds.isEmpty() ? postIds : null
+	        );
+	    }
+	 
+
+//	}
+//	
+//	public List<Post> findPostsWithSearch(postSearch postSearch) {
+//        String title = postSearch.getTitle();
+//        String location = postSearch.getLocation();
+//        String employmentType = postSearch.getEmploymentType();
+//        Integer year = null;
+//        Integer month = null;
+//
+//        if (postSearch.getCreatedDate() != null && !postSearch.getCreatedDate().isEmpty()) {
+//            String pattern = "yyyy-MM-dd";
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+//            LocalDateTime createdDate = LocalDateTime.parse(postSearch.getCreatedDate(), formatter);
+//            year = createdDate.getYear();
+//            month = createdDate.getMonthValue();
+//        }
+//
+//        return postRepository.findPosts(title, location, employmentType, year, month);
+//    }
+
+//	@Override
+//	public List<Post> findPostsWithSearch(postSearch postSearch)
+//	{
+//		List<Long> postIds=new ArrayList<Long>();
+//		List<Post> posts=findPostsWithFieldName(postSearch.getFieldName());
+//		if(posts!=null && !posts.isEmpty())
+//		{
+//			
+//			for(Post post :posts)
+//			{
+//				postIds.add(post.getId());
+//				System.out.println("POST FROM SEARCH WITH FIELDNAME : "+post.getPostFields().getField().getFieldName());
+//			}
+//		}
+//		
+//		postSpecification postSpec=new postSpecification(postSearch,postIds);
+//		
+//		return postRepository.findAll(postSpec);
+//	}
+	
+	
 //	//Filter by companyName
 //	if(postSearch.getCompanyName()!=null &&!postSearch.getCompanyName().isEmpty())
 //	{

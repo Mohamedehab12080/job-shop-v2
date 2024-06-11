@@ -264,7 +264,7 @@ public Post createAPost(Post post) {
 	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
 	                  postServiceI.updatePostForCreate(post);
 	  	        }
-	     	      String csvFilePath = "D:\\Partition E\\4th Year\\Graduation project\\AI\\jobs.csv";
+	     	      String csvFilePath = "D:\\Partition E\\4th Year\\Graduation project\\AI\\output.csv";
 			        String[] newRowData = {""+insertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
 		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
 			        try {
