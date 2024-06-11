@@ -1,155 +1,138 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
-import { useDispatch, useSelector } from 'react-redux';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Modal from "@mui/material/Modal";
+import { useDispatch, useSelector } from "react-redux";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
-import {  Avatar, Grid, MenuItem, Slide, TextField, Typography } from '@mui/material';
+import {
+  Avatar,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Grid,
+  MenuItem,
+  Slide,
+  TextField,
+  Typography,
+  Chip,
+} from "@mui/material";
 import Menu from "@mui/material/Menu";
-import { useNavigate } from 'react-router-dom';
-import { acceptApplication, deleteApplication, fetchBestPostApplications, fetchPostApplications, rejectApplication } from '../../../../store/Post/Action';
-import { deleteJobSeekerApplication, findJobSeekerApplications } from '../../../../store/JobSeeker/Action';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import CheckIcon from '@mui/icons-material/Check';
-import ClearIcon from '@mui/icons-material/Clear';
-import EditIcon from '@mui/icons-material/Edit';
+import { useNavigate } from "react-router-dom";
+import {
+  acceptApplication,
+  deleteApplication,
+  fetchBestPostApplications,
+  fetchPostApplications,
+  rejectApplication,
+} from "../../../../store/Post/Action";
+import {
+  deleteJobSeekerApplication,
+  findJobSeekerApplications,
+} from "../../../../store/JobSeeker/Action";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CheckIcon from "@mui/icons-material/Check";
+import ClearIcon from "@mui/icons-material/Clear";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+
 const slideStyle = {
-  height: '100%',
-  overflowY: 'auto',
-  scrollbarWidth: 'none', // Hide scrollbar for Firefox
-  '&::-webkit-scrollbar': {
-    display: 'none', // Hide scrollbar for Chrome, Safari, Edge
+  height: "100%",
+  overflowY: "auto",
+  scrollbarWidth: "none",
+  "&::WebkitScrollbar": {
+    display: "none",
   },
 };
-export default function ShowApplicationsModal(
-    {openShowApplicationsModal,handleCloseShowApplicationsModal,postId}
-) {
-  
-  var [filteredApplicants,setFilteredApplicants] = React.useState([]);
-  const [filterInputApplicants, setFilterInputApplicants] = React.useState("");
-  const auth=useSelector(state=>state.auth);
-  const dispatch=useDispatch();
-  const dispatch2=useDispatch();
-  const dispatch3=useDispatch();
-  const dispatch4=useDispatch();
 
-  const comp=useSelector(state=>state.comp);
-  const post=useSelector(state=>state.post);
-  const jobSeeker=useSelector(state=>state.jobSeeker);
+export default function ShowApplicationsModal({
+  openShowApplicationsModal,
+  handleCloseShowApplicationsModal,
+  postId,
+}) {
+  const [filteredApplicants, setFilteredApplicants] = React.useState([]);
+  const [filterInputApplicants, setFilterInputApplicants] = React.useState("");
+  const auth = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const openMenu = Boolean(anchorEl);
-  const [fetchedApplications,setFetchedApplications]=React.useState([]);
-  const navigate=useNavigate();
+  const [fetchedApplications, setFetchedApplications] = React.useState([]);
 
-  const handleFilterApplications=(input)=>
-  {
-      if(auth.user.userType!=="jobSeeker")
-      {
-        const filtered=fetchedApplications.filter((application)=>
-          {
-            return application.jobSeekerUserName.toLowerCase().includes(input.toLowerCase());
-          });
-            setFilteredApplicants(filtered);
-            setFilterInputApplicants(input);
-      }else {
-        const filtered=fetchedApplications.filter((application)=>
-          {
-            if(application.companyName.toLowerCase().includes(input.toLowerCase()) || application.postTitle.toLowerCase().includes(input.toLowerCase()))
-              {
-                return application;
-              }
-          });
-            setFilteredApplicants(filtered);
-            setFilterInputApplicants(input);
+  const post = useSelector((state) => state.post);
+  const jobSeeker = useSelector((state) => state.jobSeeker);
+
+  const handleFilterApplications = (input) => {
+    const filtered = fetchedApplications.filter((application) => {
+      if (auth.user.userType !== "jobSeeker") {
+        return application.jobSeekerUserName
+          .toLowerCase()
+          .includes(input.toLowerCase());
+      } else {
+        return (
+          application.companyName.toLowerCase().includes(input.toLowerCase()) ||
+          application.postTitle.toLowerCase().includes(input.toLowerCase())
+        );
       }
+    });
+    setFilteredApplicants(filtered);
+    setFilterInputApplicants(input);
   };
 
-  const handleEditApplications=(fieldId)=>
-  {
-    /// Handle Edit open the createFieldModal and make it for edit 
+  const handleEditApplications = (fieldId) => {
+    // Handle Edit open the createFieldModal and make it for edit
   };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   React.useEffect(() => {
     if (openShowApplicationsModal) {
-      if(auth.user.userType!=="jobSeeker")
-        {
-          dispatch(fetchBestPostApplications(postId));
-        }else 
-        {
-          dispatch(findJobSeekerApplications(auth.user.id));
-        }
+      if (auth.user.userType !== "jobSeeker") {
+        dispatch(fetchBestPostApplications(postId));
+      } else {
+        dispatch(findJobSeekerApplications(auth.user.id));
+      }
     }
-  }, [openShowApplicationsModal, dispatch,postId,auth.user.id]);
-  
-  // Add comp as a dependency to useEffect to ensure that the log executes 
-  // with the updated value. 
+  }, [openShowApplicationsModal, dispatch, postId, auth.user.id]);
+
   React.useEffect(() => {
     if (openShowApplicationsModal) {
-     if(auth.user.userType !=="jobSeeker")// Set your fields with the updated value here
-      {
+      if (auth.user.userType !== "jobSeeker") {
         setFetchedApplications(post.applications);
-      } 
-    }
-  }, [post, openShowApplicationsModal]);
-
-  React.useEffect(() => {
-    if (openShowApplicationsModal) {
-     if(auth.user.userType === "jobSeeker")// Set your fields with the updated value here
-      {
+      } else {
         setFetchedApplications(jobSeeker.applications);
-      } 
+      }
     }
-  }, [jobSeeker, openShowApplicationsModal]);
+  }, [post, jobSeeker, openShowApplicationsModal]);
 
-  const handleDeleteApplication=(applicationId)=>
-  {
-        dispatch2(deleteJobSeekerApplication(applicationId));
-        handleClose();
+  const handleDeleteApplication = (applicationId) => {
+    dispatch(deleteJobSeekerApplication(applicationId));
+    handleClose();
   };
-  const handleRejectApplication=(applicationId)=>
-    {
-        dispatch4(rejectApplication(applicationId));
-        handleClose();
-    };
-  const handleAcceptApplication=(applicationId)=>
-  {
-    // console.log("Field For Delete : ",fieldId)
-   if(auth.user.userType!=="jobSeeker")
-    {
-      dispatch3(acceptApplication(applicationId));
+
+  const handleRejectApplication = (applicationId) => {
+    dispatch(rejectApplication(applicationId));
+    handleClose();
+  };
+
+  const handleAcceptApplication = (applicationId) => {
+    if (auth.user.userType !== "jobSeeker") {
+      dispatch(acceptApplication(applicationId));
       handleClose();
     }
     setFetchedApplications(post.applications);
   };
 
-  // const getDynamicImageUrl = (picture) => {
-  //   if (picture && picture.length > 0) {
-  //     // Determine image type based on magic number (file signature)
-  //     const signature = picture.slice(0, 4); // Read the first 4 bytes
-
-  //     // Check for known image file signatures (magic numbers)
-  //     if (signature[0] === 0x89 && signature[1] === 0x50 && signature[2] === 0x4E && signature[3] === 0x47) {
-  //       // PNG file
-  //       return `data:image/png;base64,${btoa(String.fromCharCode(...picture))}`;
-  //     } else if (signature[0] === 0xFF && signature[1] === 0xD8) {
-  //       // JPEG file
-  //       return `data:image/jpeg;base64,${btoa(String.fromCharCode(...picture))}`;
-  //     } else {
-  //       // Default to treating as a generic binary file (may not render as an image)
-  //       return `data:application/octet-stream;base64,${btoa(String.fromCharCode(...picture))}`;
-  //     }
-  //   }
-  //   return ''; // Return empty string if no picture or invalid data
-  // };
-
-
+  const isSkillMatched = (skill, postSkills) => {
+    return postSkills.includes(skill);
+  };
 
   return (
     <div>
@@ -159,279 +142,324 @@ export default function ShowApplicationsModal(
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-         <Slide
+        <Slide
           direction="left"
           in={openShowApplicationsModal}
           mountOnEnter
           unmountOnExit
           timeout={{ enter: 500, exit: 300 }}
-          transitionTimingFunction="ease-in-out" 
+          transitionTimingFunction="ease-in-out"
           style={slideStyle}
-      >
-        <Box  sx={{
-          position: "absolute",
-          top: "1%",
-          left: "40%",
-          transform: "translate(-50%, -50%)",
-          width: 800,
-          bgcolor: "background.paper",
-          border: "none",
-          boxShadow: 24,
-          p: 4,
-          outline: "none",
-          borderRadius: 4,
-          maxHeight: "95vh",
-          overflowY: "auto",
-          scrollbarWidth: 'none', // Hide scrollbar for Firefox
-          '&::-webkit-scrollbar': {
-            display: 'none', // Hide scrollbar for Chrome, Safari, Edge
-          },
-        }}
         >
-  <Grid item key={1} xs={12}>
-      <TextField
-        fullWidth
-        id="filterApplications"
-        name="filterApplications"
-        label="Filter Applications"
-        value={filterInputApplicants}
-        onChange={(e) => handleFilterApplications(e.target.value)}
-      />
-    </Grid>
-    
-    <section>
-           {(filterInputApplicants === "" ?   fetchedApplications : filteredApplicants).map((app, index) => (
-           <>
-            <div><hr></hr></div>
-           <div key={app.id} className='flex'>
-            <Avatar
-                  onClick={() => navigate(`/profile/${app.jobSeekerId}`)}
-                  className='cursor-pointer'
-                  alt="userName"
-                  src={app.jobSeekerPicture}
-            />
-            <div className='w-full'>
-            <div className='flex justify-between items-center'>
-                <ul>
-                        <li className='flex cursor-pointer items-center space-x-2'>
-                                <span className='font-semibold'>{app.jobSeekerUserName}</span>
-                                <span className='text-gray-600'>@{app.jobSeekerEmail}</span>
-                        </li>
-                        <li className=''>
-                            <span className='text-gray-600'><AccessTimeIcon /> {app.createdDate}</span>
-                        </li>
-                </ul>
-                    {auth.user.userType !=="jobSeeker" ?(
-                      <div>
-                       {app.statuseCode !== null &&(
-                        <>
-                           {app.statuseCode.includes("Matched") ? (
-                              <p className="font-semibold" style={{ color: 'green' }}>{app.statuseCode}</p>
-                            ) : app.statuseCode.includes("Not match") ? (
-                              <p className="font-semibold" style={{ color: 'red' }}>{app.statuseCode}</p>
-                            ) : app.statuseCode.includes ("Accepted") ? (
-                              <p className="font-semibold" style={{ color: 'green' }}>{app.statuseCode}</p>
-                            ):null}
-                        </>
-                       )}
-                      </div>
-                    ):(
-                      <div>
-                          {app.statuseCode !== null &&(
+          <Box
+            sx={{
+              position: "absolute",
+              top: "0%",
+              left: "10%",
+              transform: "translate(-50%, -50%)",
+              width: "90%",
+              bgcolor: "background.paper",
+              border: "none",
+              boxShadow: 24,
+              p: 4,
+              outline: "none",
+              borderRadius: 4,
+              maxHeight: "90%",
+              overflowY: "auto",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": {
+                display: "none",
+              },
+            }}
+          >
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                id="filterApplications"
+                name="filterApplications"
+                label="Filter Applications"
+                value={filterInputApplicants}
+                onChange={(e) => handleFilterApplications(e.target.value)}
+              />
+            </Grid>
+
+            <Grid container spacing={2}>
+              {(filterInputApplicants === ""
+                ? fetchedApplications
+                : filteredApplicants
+              ).map((app) => (
+                <Grid item xs={12} key={app.id}>
+                  <Card>
+                    {app.statuseCode === "accepted" && (
+                      <Chip
+                        label="Accepted"
+                        color="success"
+                        style={{ position: "absolute", top: 10, right: 10 }}
+                      />
+                    )}
+                    <CardHeader
+                      avatar={
+                        <Avatar
+                          onClick={() =>
+                            navigate(`/profile/${app.jobSeekerId}`)
+                          }
+                          className="cursor-pointer"
+                          alt="userName"
+                          src={app.jobSeekerPicture}
+                        />
+                      }
+                      action={
+                        <div>
+                          <Button
+                            id="basic-button"
+                            aria-controls={openMenu ? "basic-menu" : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={openMenu ? "true" : undefined}
+                            onClick={handleClick}
+                          >
+                            <MoreHorizIcon />
+                          </Button>
+                          <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={openMenu}
+                            onClose={handleClose}
+                            MenuListProps={{
+                              "aria-labelledby": "basic-button",
+                            }}
+                          >
+                            {auth.user.userType !== "jobSeeker"
+                              ? [
+                                  <MenuItem
+                                    key="accept"
+                                    onClick={() =>
+                                      handleAcceptApplication(app.id)
+                                    }
+                                  >
+                                    <CheckIcon style={{ color: "green" }} />{" "}
+                                    Accept
+                                  </MenuItem>,
+                                  <MenuItem
+                                    key="reject"
+                                    onClick={() =>
+                                      handleRejectApplication(app.id)
+                                    }
+                                  >
+                                    <ClearIcon style={{ color: "red" }} />{" "}
+                                    Reject
+                                  </MenuItem>,
+                                ]
+                              : [
+                                  <MenuItem
+                                    key="delete"
+                                    onClick={() =>
+                                      handleDeleteApplication(app.id)
+                                    }
+                                  >
+                                    <ClearIcon style={{ color: "red" }} />{" "}
+                                    Delete
+                                  </MenuItem>,
+                                  <MenuItem
+                                    key="edit"
+                                    onClick={() =>
+                                      handleEditApplications(app.id)
+                                    }
+                                  >
+                                    <EditIcon style={{ color: "gray" }} /> Edit
+                                  </MenuItem>,
+                                ]}
+                          </Menu>
+                        </div>
+                      }
+                      title={
+                        <Typography variant="h6">
+                          {app.jobSeekerUserName}{" "}
+                          <span className="text-gray-600">
+                            @{app.jobSeekerEmail}
+                          </span>
+                        </Typography>
+                      }
+                      subheader={
+                        <Typography
+                          variant="body2"
+                          color="textSecondary"
+                          display="flex"
+                          alignItems="center"
+                        >
+                          <AccessTimeIcon /> {app.createdDate}
+                        </Typography>
+                      }
+                    />
+                    <Divider
+                      style={{
+                        backgroundColor: "blue",
+                        height: 3,
+                        marginBottom: 10,
+                      }}
+                    />
+                    <CardContent>
+                      {auth.user.userType !== "jobSeeker" ? (
+                        <div>
+                          {app.statuseCode !== null && (
                             <>
-                              {app.statuseCode.includes ("Accepted") ? (
-                                <p className="font-semibold" style={{ color: 'green' }}>{app.statuseCode}</p>
-                              ) : app.statuseCode.includes("Rejected") ? (
-                                <p className="font-semibold" style={{ color: 'red' }}>{app.statuseCode}</p>
+                              {app.statuseCode.includes("Matched") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "green" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
+                              ) : app.statuseCode.includes("Not match") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "red" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
+                              ) : app.statuseCode.includes("Accepted") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "green" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
                               ) : null}
                             </>
                           )}
-                      </div>
-                    )}
-                    <div>
+                        </div>
+                      ) : (
+                        <div>
+                          {app.statuseCode !== null && (
+                            <>
+                              {app.statuseCode.includes("Accepted") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "green" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
+                              ) : app.statuseCode.includes("Rejected") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "red" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
+                              ) : null}
+                            </>
+                          )}
+                        </div>
+                      )}
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} md={5}>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            Application Details
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Application ID:</strong> {app.id}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Experience:</strong> {app.experience}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Company Name:</strong> {app.companyName}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Skills:</strong>
+                            <ul>
+                              {app.skills && app.skills.length > 0 ? (
+                                app.skills.map((appSkill, index) => (
+                                  <li key={index}>
+                                    {isSkillMatched(
+                                      appSkill,
+                                      app.postSkills
+                                    ) ? (
+                                      <span style={{ color: "green" }}>
+                                        <CheckCircleIcon /> {appSkill}
+                                      </span>
+                                    ) : (
+                                      <span style={{ color: "red" }}>
+                                        <CancelIcon /> {appSkill}
+                                      </span>
+                                    )}
+                                  </li>
+                                ))
+                              ) : (
+                                <li>No Skills</li>
+                              )}
+                            </ul>
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Qualifications:</strong>
+                            <ul>
+                              {app.qualifications &&
+                              app.qualifications.length > 0 ? (
+                                app.qualifications.map((qual, index) => (
+                                  <li key={index}>{qual}</li>
+                                ))
+                              ) : (
+                                <li>No Qualifications</li>
+                              )}
+                            </ul>
+                          </Typography>
+                        </Grid>
+                        <Divider
+                          orientation="vertical"
+                          flexItem
+                          style={{
+                            margin: "0 20px",
+                            backgroundColor: "blue",
+                            width: 3,
+                          }}
+                        />
 
-                    <Button
-                        id="basic-button"
-                        aria-controls={openMenu ? 'basic-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={openMenu ? 'true' : undefined}
-                        onClick={handleClick}
-                    >
-            
-                        <MoreHorizIcon />
-
-                    </Button>
-                     <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={openMenu}
-                        onClose={handleClose}
-                        MenuListProps={{
-                        'aria-labelledby': 'basic-button',
-                        }}
-                    >
-
-                           {auth.user.userType !=="jobSeeker" ?(
-                             
-                              [
-                                <MenuItem key="accept" 
-                              onClick={()=>handleAcceptApplication(app.id)}>
-                                <CheckIcon style={{ color: 'green' }}/> Accept</MenuItem>,
-                              <MenuItem key="reject" onClick={()=>handleRejectApplication(app.id)}><ClearIcon style={{ color: 'red' }}/> Reject</MenuItem>
-                                
-                              ]
-                             
-                             
-                            ):(
-                            
-                              [
-                              <MenuItem  key="delete" onClick={()=>handleDeleteApplication(app.id)}><ClearIcon style={{ color: 'red' }}/> Delete</MenuItem>,
-                              <MenuItem  key="edit" onClick={()=>handleEditApplications(app.id)}><EditIcon style={{ color: 'gray' }}/> Edit</MenuItem>
-                              
-                                ]
-
-                              
-                           )}
-                            
-                    </Menu>
-                    </div>
-                   
-                </div>
-                
-<div className='flex space-x-5'>
-  {/* Left Column */}
-  <div className='flex flex-col'>
-  <div className='flex'>
-      <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-     # Application ID:
-      </Typography>
-        <p className='text-xl'>{app.id}</p>
-  </div>
-    <div className='ml-10'>
-      <div className='flex'>
-      <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-      - Application Experience:
-      </Typography>
-        <p className='text-xl'>{app.experience}</p>
-      </div>
-     {app.companyName !== "" &&(
-      
-        <div className='ml-3 flex items-center'>
-        <Typography variant="subtitle2" fontWeight="bold" mb={1}>
-            {`>`} Company Name :
-        </Typography>
-        <p className='text-xl ml-2'>{app.companyName}</p>
-        </div>
-     )}
-      <div className='flex flex-wrap py-4 mt-1 items-center'>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-         - Application Skills:
-        </Typography>
-        {app.skills && app.skills.length > 0 ? (
-          <ul>
-            {app.skills.map((appSkill, index) => (
-              <li key={index} className='text-xl'>{`->`} {appSkill}</li>
-            ))}
-          </ul>
-        ) : (
-          <>No Skills</>
-        )}
-      </div>
-      
-      <hr className='my-4'></hr>
-      
-      <div className='flex flex-wrap py-4 mt-1 items-center'>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-          - Application Qualifications:
-        </Typography>
-        {app.qualifications && app.qualifications.length > 0 ? (
-          <ul>
-            {app.qualifications.map((appQual, index) => (
-              <li key={index} className='text-gray-600'>{`->`}{appQual}</li>
-            ))}
-          </ul>
-        ) : (
-          <>No Qualifications</>
-        )}
-      </div>
-    </div>
-  </div>
-
-  {/* Vertical Line */}
-  <div className="border-4 border-gray-700 h-auto"></div>
-
-  {/* Right Column */}
-  <div className='flex flex-col'>
-    <div className=''>
-      {post.postTitle !=="" &&(
-        <div>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-            {`>`} Post Title: {app.postTitle}
-        </Typography>
-        </div>
-      )}
-      <div className='flex'>
-        {app.postExperienc === app.experience ? 
-        (
-          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-              <CheckIcon style={{ color: 'green' }}/> Post Experience: {app.postExperienc}
-          </Typography>
-        ):(
-          
-          <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-          {`>`} Post Experience: {app.postExperienc}
-          </Typography>
-        )}
-      </div>
-      
-      <div className='flex flex-wrap py-4 mt-1 items-center'>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-          - Post Skills:
-        </Typography>
-        {app.postSkills && app.postSkills.length > 0 ? (
-          <ul>
-            {app.postSkills.map((appSkill, index) => (
-              <li key={index} className='text-xl'>{app.skills.includes(appSkill) ? (<CheckIcon style={{ color: 'green' }}/>):(<>{`->`}</>)} {appSkill}</li>
-            ))}
-          </ul>
-        ) : (
-          <>No Skills</>
-        )}
-      </div>
-      
-      <hr className='my-2'></hr>
-      
-      <div className='flex py-4 items-center'>
-        <Typography variant="subtitle1" fontWeight="bold" mb={1}>
-         - Post Qualifications:
-        </Typography>
-        {app.postQualifications && app.postQualifications.length > 0 ? (
-          <ul>
-            {app.postQualifications.map((appQual, index) => (
-              <li key={index} className='text-gray-600 text-xl'>
-                {app.qualifications.length > 0 && app.qualifications.includes(appQual) ? (
-                <CheckIcon style={{ color: 'green' }}/>
-              ):(
-              <>{`->`}</>
-            )} {appQual}</li>
-            ))}
-          </ul>
-        ) : (
-          <>No Qualifications</>
-        )}
-      </div>
-    </div>
-  </div>
-</div>
-
-            </div>
-            
-           </div>
-           </>
-          ))}
-           </section>
-        </Box>
-      </Slide>
+                        <Grid item xs={12} md={5}>
+                          <Typography variant="subtitle1" fontWeight="bold">
+                            Related Post
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Post Title:</strong> {app.postTitle}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Post Experience:</strong>{" "}
+                            {app.postExperience}
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Skills:</strong>
+                            <ul>
+                              {app.postSkills && app.postSkills.length > 0 ? (
+                                app.postSkills.map((postSkill, index) => (
+                                  <li key={index}>{postSkill}</li>
+                                ))
+                              ) : (
+                                <li>No Skills</li>
+                              )}
+                            </ul>
+                          </Typography>
+                          <Typography variant="body1">
+                            <strong>Qualifications:</strong>
+                            <ul>
+                              {app.postQualifications &&
+                              app.postQualifications.length > 0 ? (
+                                app.postQualifications.map(
+                                  (postQual, index) => (
+                                    <li key={index}>{postQual}</li>
+                                  )
+                                )
+                              ) : (
+                                <li>No Qualifications</li>
+                              )}
+                            </ul>
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Slide>
       </Modal>
     </div>
   );

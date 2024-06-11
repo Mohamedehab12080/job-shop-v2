@@ -604,12 +604,14 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 				            	if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
 					            {
 				            		  post.setState(0);
+				            			post.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
 							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
 						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
 //							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
 					            }else 
 					            {
 					            	  post.setState(1);   
+						            	post.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
 							            System.out.println("Post Skills : "+postSkills+" ::: jobSeeker Skills : "+jobSeekerSkills);
 						                System.out.println("REMAINED SKILLS FOR POST LIST : "+remainedSkills);
 //							            System.out.println("Remained Skills From last Method : "+applicationService.remainedSkills);
@@ -637,38 +639,6 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 					    .map(postScore -> ((postScore) postScore).getPost()) // Extract the postDTO from postScore
 					    .collect(Collectors.toList());
 				
-//						.sorted(
-//								Comparator
-//								.comparingInt((postScore) -> {
-//		                    if (((postScore) postScore)
-//		                    		.getPost()
-//		                    		.getRemainedSkills()
-//		                    		.isEmpty()
-//		                    		&& 
-//		                    		((postScore) postScore)
-//		                    		.getPost()
-//		                    		.getRemainedQualifications()
-//		                    		.isEmpty()) {
-//		                    	
-//		                        return ((postScore) postScore)
-//		                        		.getScore();
-//		                    } else 
-//		                    {
-//		                    	return ((postScore) postScore)
-//		                    			.getPost()
-//		                    			.getRemainedSkills()
-//		                    			.size()
-//		                    			+((postScore) postScore)
-//		                    			.getPost()
-//		                    			.getRemainedQualifications()
-//		                    			.size();
-//		                    }
-//		                }).reversed()) // Reverse to get highest score first
-//		                .map(postScore::getPost) // Accessing the postDTO directly from postScore
-//		                .collect(Collectors.toList());
-
-				
-				// Map to store unique post IDs
 				Map<Long, postDTO> uniquePostsMap = new LinkedHashMap<>();
 				sortedPosts.forEach(post -> uniquePostsMap.put(post.getId(), post));
 				// Convert the map back to a list
@@ -792,39 +762,6 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 					    }))
 					    .map(postScore -> ((postScore) postScore).getPost()) // Extract the postDTO from postScore
 					    .collect(Collectors.toList());
-				
-//						.sorted(
-//								Comparator
-//								.comparingInt((postScore) -> {
-//		                    if (((postScore) postScore)
-//		                    		.getPost()
-//		                    		.getRemainedSkills()
-//		                    		.isEmpty()
-//		                    		&& 
-//		                    		((postScore) postScore)
-//		                    		.getPost()
-//		                    		.getRemainedQualifications()
-//		                    		.isEmpty()) {
-//		                    	
-//		                        return ((postScore) postScore)
-//		                        		.getScore();
-//		                    } else 
-//		                    {
-//		                    	return ((postScore) postScore)
-//		                    			.getPost()
-//		                    			.getRemainedSkills()
-//		                    			.size()
-//		                    			+((postScore) postScore)
-//		                    			.getPost()
-//		                    			.getRemainedQualifications()
-//		                    			.size();
-//		                    }
-//		                }).reversed()) // Reverse to get highest score first
-//		                .map(postScore::getPost) // Accessing the postDTO directly from postScore
-//		                .collect(Collectors.toList());
-
-				
-				// Map to store unique post IDs
 				Map<Long, postDTO> uniquePostsMap = new LinkedHashMap<>();
 				sortedPosts.forEach(post -> uniquePostsMap.put(post.getId(), post));
 				// Convert the map back to a list
@@ -1244,19 +1181,16 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 			        
 			    		jobSeekerSkillDTO jobSeekerSkillToInsert = new jobSeekerSkillDTO();
 				    	Skill skill = skillServiceI.findByName(skillDTO);
-				    	Skill insertedSkill=null;
+				    	Skill insertedSkill=skill;
 				    	if (skill == null) {
 				            skill = new Skill();
-				            skill.setSkillName(jobSeekerSkillToInsert.getSkillName());
-				           insertedSkill=skillServiceI.insertForJobSeekerOperation(skill);			          
-				        }else
-				        {
-					    		insertedSkill=skill;
-					    		jobSeekerSkillToInsert.setSkill(insertedSkill); // Also here.
-						        jobSeekerSkillToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
-						        
-						        jobSeekerSkillsToInsert.add(jobSeekerSkillToInsert);					    	
+				            skill.setSkillName(skillDTO);
+				           insertedSkill=skillServiceI.insertForJobSeekerOperation(skill);		
 				        }
+				    	
+				    	jobSeekerSkillToInsert.setSkill(insertedSkill); // Also here.
+				        jobSeekerSkillToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
+				        jobSeekerSkillsToInsert.add(jobSeekerSkillToInsert);		
 				       
 			    	
 			    }
@@ -1289,20 +1223,16 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 		    for (String qualificationDto : qualificationDTOs) {
 		        jobSeekerQualificationDTO jobSeekerQualificationToInsert = new jobSeekerQualificationDTO();
 		    	Qualification qualification = qualificationServiceI.findByName(qualificationDto);
-		    	Qualification insertedQualification=null; //initialized if qualification exists for insert
+		    	Qualification insertedQualification=qualification; //initialized if qualification exists for insert
 		        if (qualification == null) {
 		        	qualification = new Qualification();
-		        	qualification.setQualificationName(jobSeekerQualificationToInsert.getQualificationName());
+		        	qualification.setQualificationName(qualificationDto);
 		        	insertedQualification=qualificationServiceI.insert(qualification);
-		        }else
-		        {
-		        
-		        		insertedQualification=qualification;
-				        jobSeekerQualificationToInsert.setQualification(insertedQualification); // Also here.				        
-				        jobSeekerQualificationToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
-				        jobSeekerQualificationsToInsert.add(jobSeekerQualificationToInsert);	
-		        	
 		        }
+		        
+		        jobSeekerQualificationToInsert.setQualification(insertedQualification); // Also here.				        
+		        jobSeekerQualificationToInsert.setJobSeekerId(userId); // initialize jobSeeker object with jobSeeker id that at the dto
+		        jobSeekerQualificationsToInsert.add(jobSeekerQualificationToInsert);
 		        
 		        
 		    }

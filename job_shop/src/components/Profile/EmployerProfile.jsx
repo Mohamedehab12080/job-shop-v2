@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { KeyboardBackspace } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, Box, Tab } from "@mui/material";
+import { Avatar, Box, Grid, Tab, TextField } from "@mui/material";
 import { Button } from "@mui/material";
 import BussinessCetnerIcon from "@mui/icons-material/BusinessCenter";
 import LocationIcon from "@mui/icons-material/LocationOn";
@@ -16,6 +16,7 @@ import ShowFieldsModal from "../modals/companyModals/FieldsModals/ShowFieldsModa
 import { getEmployerProfile } from "../../store/company/Employer/Action";
 import ShowEmployerFieldsModal from "../modals/companyModals/FieldsModals/ShowEmployerFieldsModal";
 import ShowPostImageModal from "../HomeSection/posts/ShowPostImageModal";
+import PostCardCompany from "../HomeSection/posts/PostCardCompany";
 
 const EmployerProfile = () => {
   const [tabValue, setTabValue] = useState("1");
@@ -25,18 +26,21 @@ const EmployerProfile = () => {
   const navigate = useNavigate();
   const handleBack = () => navigate(-1);
   const { id } = useParams();
-  const auth=useSelector(state=>state.auth);
+  const auth = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const emp = useSelector((state) => state.emp);
-  const [openShowPostImageModal,setOpenShowPostImageModal]=React.useState(false);
+  const [openShowPostImageModal, setOpenShowPostImageModal] =
+    React.useState(false);
+  const [filterInputPost, setFilterInputPost] = React.useState("");
+  const [filteredPosts, setFilteredPosts] = useState([]);
+  const handleCloseShowPostImageModal = () => setOpenShowPostImageModal(false);
 
-  const handleCloseShowPostImageModal=()=>setOpenShowPostImageModal(false);
-  
-  const [imageForShow,setImageForShow]=useState("");
-  const handleOpenShowPostImageModal=(value)=>{
+  const [fetchedEmployerPosts, setFetchedEmployerPosts] = useState([]);
+  const [imageForShow, setImageForShow] = useState("");
+  const handleOpenShowPostImageModal = (value) => {
     setOpenShowPostImageModal(true);
     setImageForShow(value);
-};
+  };
   const [employerData, setEmployerData] = useState(null);
   const [contactList, setContactList] = useState([]);
   const [isRequestUser, setIsRequestUser] = useState(false);
@@ -50,19 +54,26 @@ const EmployerProfile = () => {
   const handleOpenContactsModal = () => setOpenContactsModal(true);
   const handleCloseContactsModal = () => setOpenContactsModal(false);
 
-  const [companyAdminId,setCompanyAdminId]=useState(0);
+  const [companyAdminId, setCompanyAdminId] = useState(0);
   const [coverImage, setCoverImage] = useState("");
   const [profileImage, setProfileImage] = useState("");
 
   useEffect(() => {
-    
     dispatch(getEmployerProfile(id));
   }, [dispatch, id]); // Dependency array ensures this effect runs only when id or dispatch changes
 
   // Log jobSeeker state changes
   useEffect(() => {
-    setEmployerData(emp.employerData);
-  }, [emp.employerData]); // Dependency array ensures this effect runs only when jobSeeker changes
+    if (emp) {
+      setEmployerData(emp.employerData);
+    }
+  }, [emp]); // Dependency array ensures this effect runs only when jobSeeker changes
+
+  useEffect(() => {
+    if (emp) {
+      setFetchedEmployerPosts(emp.employerPosts);
+    }
+  }, [emp]);
 
   useEffect(() => {
     if (employerData !== null) {
@@ -72,7 +83,7 @@ const EmployerProfile = () => {
       setCompanyAdminId(employerData.companyAdministratorId);
       setIsRequestUser(employerData.req_user);
     }
-    
+
     // setIsRequestUser(emp.isRequestUser);
   }, [emp.fields, employerData]);
 
@@ -90,6 +101,14 @@ const EmployerProfile = () => {
     }
   };
 
+  const handleFilterPosts = (input) => {
+    const filtered = fetchedEmployerPosts.filter((post) => {
+      return post.title.toLowerCase().includes(input.toLowerCase());
+    });
+    setFilteredPosts(filtered);
+    setFilterInputPost(input);
+  };
+
   return (
     <div>
       <section className={`z-50 flex items-center sticky top-0 bg-opacity-95`}>
@@ -101,7 +120,7 @@ const EmployerProfile = () => {
 
       <section>
         <img
-          onClick={()=>handleOpenShowPostImageModal(coverImage)}
+          onClick={() => handleOpenShowPostImageModal(coverImage)}
           className="w-[100%] h-[15rem] object-cover cursor-pointer"
           src={coverImage}
           alt="Cover Image"
@@ -111,34 +130,35 @@ const EmployerProfile = () => {
       <section className="pl-6">
         <div className="flex justify-between items-start mt-5 h-[5rem]">
           <Avatar
-           onClick={()=>handleOpenShowPostImageModal(profileImage)} className='transform -translate-y-24 cursor-pointer'
+            onClick={() => handleOpenShowPostImageModal(profileImage)}
+            className="transform -translate-y-24 cursor-pointer"
             alt="BOB"
             src={profileImage}
             sx={{ width: "10rem", height: "10rem", border: "4px solid white" }}
           />
-         {auth.user.id !== companyAdminId &&(
+          {auth.user.id !== companyAdminId && (
             <>
-                 {employerData !== null && employerData.req_user ? (
-                    <Button
-                    onClick={handleOpenProfileModel}
-                    variant="contained"
-                    sx={{ borderRadius: "20px" }}
-                    >
-                    Edit Profile
-                    </Button>
-                ) : (
-                    <Button
-                    onClick={handleFollowUser}
-                    variant="contained"
-                    sx={{ borderRadius: "20px" }}
-                    >
-                    {employerData !== null && employerData.followed
-                        ? "Unfollow"
-                        : "follow"}
-                    </Button>
-                )}
+              {employerData !== null && employerData.req_user ? (
+                <Button
+                  onClick={handleOpenProfileModel}
+                  variant="contained"
+                  sx={{ borderRadius: "20px" }}
+                >
+                  Edit Profile
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleFollowUser}
+                  variant="contained"
+                  sx={{ borderRadius: "20px" }}
+                >
+                  {employerData !== null && employerData.followed
+                    ? "Unfollow"
+                    : "follow"}
+                </Button>
+              )}
             </>
-         ) }
+          )}
         </div>
         <div>
           <div className="flex item-center">
@@ -148,7 +168,9 @@ const EmployerProfile = () => {
             <div className="flex items-center space-x-20">
               <div className="ml-10 flex items-center space-x-1 font-semibold">
                 <span>
-                  {employerData !== null && employerData.followers && employerData.followers.length > 0
+                  {employerData !== null &&
+                  employerData.followers &&
+                  employerData.followers.length > 0
                     ? employerData.followers.length
                     : 0}
                 </span>
@@ -156,7 +178,9 @@ const EmployerProfile = () => {
               </div>
               <div className="flex items-center space-x-1 font-semibold">
                 <span>
-                  {employerData !== null && employerData.followings &&employerData.followings.length > 0
+                  {employerData !== null &&
+                  employerData.followings &&
+                  employerData.followings.length > 0
                     ? employerData.followings.length
                     : 0}
                 </span>
@@ -241,14 +265,72 @@ const EmployerProfile = () => {
               </TabList>
             </Box>
             <TabPanel value="1">Fields</TabPanel>
-            <TabPanel value="2">Posts</TabPanel>
+            <TabPanel value="2">
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  className="mb-4"
+                  id="filterInputPost"
+                  name="filterInputPost"
+                  label="Filter Posts"
+                  value={filterInputPost}
+                  onChange={(e) => handleFilterPosts(e.target.value)}
+                />
+              </Grid>
+              {(
+                filterInputPost === ""
+                  ? filteredPosts
+                  : filteredPosts.length > 0
+              ) ? (
+                (filterInputPost === ""
+                  ? fetchedEmployerPosts
+                  : filteredPosts
+                ).map((p, index) => (
+                  <PostCardCompany
+                    key={index}
+                    id={p.id}
+                    employerId={p.employerId}
+                    employerUserName={p.employerUserName}
+                    Title={p.title}
+                    description={p.description}
+                    jobRequirements={p.jobRequirments}
+                    location={p.location}
+                    employmentType={p.employmentType}
+                    companyName={p.companyName}
+                    profileId={p.profileId}
+                    skills={p.skills}
+                    qualifications={p.qualifications}
+                    field={p.field}
+                    employerpicture={p.employerpicture}
+                    fieldName={p.fieldName}
+                    createdDate={p.createdDate}
+                    remainedSkills={p.remainedSkills}
+                    remainedQualifications={p.remainedQualifications}
+                    state={p.state}
+                    matchedQualifications={p.matchedQualifications}
+                    matchedSkills={p.matchedSkills}
+                    applicationCount={p.applicationCount}
+                    Experience={p.experience}
+                    postImage={p.postImage}
+                  />
+                ))
+              ) : (
+                <></> // Render nothing if there are no company posts to display
+              )}
+            </TabPanel>
+
             <TabPanel value="3">Employers</TabPanel>
           </TabContext>
         </Box>
       </section>
 
       <section>
-        <ProfileModal open={openProfileModal} handleClose={handleClose} data={employerData} Type={"employer"} />
+        <ProfileModal
+          open={openProfileModal}
+          handleClose={handleClose}
+          data={employerData}
+          Type={"employer"}
+        />
       </section>
 
       <section>
@@ -272,9 +354,11 @@ const EmployerProfile = () => {
       </section>
 
       <section>
-
-      <ShowPostImageModal openShowPostImageModal={openShowPostImageModal} handleCloseShowPostImageModal={handleCloseShowPostImageModal} postImage={imageForShow} />
-
+        <ShowPostImageModal
+          openShowPostImageModal={openShowPostImageModal}
+          handleCloseShowPostImageModal={handleCloseShowPostImageModal}
+          postImage={imageForShow}
+        />
       </section>
     </div>
   );

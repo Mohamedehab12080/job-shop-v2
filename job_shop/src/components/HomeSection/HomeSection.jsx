@@ -292,6 +292,7 @@ React.useEffect(()=>
                 jobSeekerId={auth.user.id}
                 Experience={p.experience}
                 postImage={p.postImage}
+                statusCode={p.statuseCode}
             />
         )
     ))
@@ -304,6 +305,7 @@ React.useEffect(()=>
                 employerId={p.employerId}
                 employerUserName={p.employerUserName}
                 Title={p.title}
+                statusCode={p.statuseCode}
                 description={p.description}
                 jobRequirements={p.jobRequirments}
                 location={p.location}
@@ -398,6 +400,7 @@ React.useEffect(()=>
                  jobSeekerId={auth.user.id}
                  Experience={p.experience}
                  postImage={p.postImage}
+                 statusCode={p.statuseCode}
              />
          )
      ))
@@ -425,6 +428,7 @@ React.useEffect(()=>
                  remainedSkills={p.remainedSkills}
                  remainedQualifications={p.remainedQualifications}
                  state={p.state}
+                 statusCode={p.statuseCode}
                  matchedQulifications={p.matchedQulifications}
                  matchedSkills={p.matchedSkills}
                  applicationCount={p.applicationCount}

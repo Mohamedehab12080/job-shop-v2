@@ -220,30 +220,6 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 	}
 
 	
-//	/**
-//	 * 
-//	 * @author BOBO
-//	 * @Function reset the password replace the old with the new
-//	 */
-//	@PostMapping("/reset-password")
-//	public String resetPassword(HttpServletRequest request)
-//	{
-//		String theToken=request.getParameter("token"); //getting the hidden input token from the password reset form
-//		String newPassword=request.getParameter("password");
-//		String verificationPasswordTokenValidateResult=iPasswordResetTokenService.validateToken(theToken);
-//		if(!verificationPasswordTokenValidateResult.equalsIgnoreCase("valid")) //validate the token if it is expired or invalid not found
-//		{
-//			return "redirect:/error?invalid_token"; 
-//		}
-//		User theUser=iPasswordResetTokenService.findUserByVerificationPasswordToken(theToken);//Find the user by the token if present
-//		if(theUser!=null)
-//		{
-//			// set the new password of the user and then update the user. 
-//			iPasswordResetTokenService.resetPassword(theUser, newPassword);
-//			return"redirect:/login?reset_success";
-//		}
-//		return "redirect:/error?not_found";
-//	}
 
 	  @PostMapping("/request/{email}")
 	    public ResponseEntity<?> requestReset(@PathVariable("email") String email) throws UnsupportedEncodingException, MessagingException {

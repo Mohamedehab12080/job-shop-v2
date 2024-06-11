@@ -1,5 +1,7 @@
 package com.example.JOBSHOP.JOBSHOP.Employer.employerProfile;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +15,8 @@ import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
 import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTO;
 import com.example.JOBSHOP.JOBSHOP.Employer.DTO.employerDTOMapper;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.Post.DTO.postMapper;
+import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
@@ -31,6 +35,8 @@ public class employerProfileController {
 	@Autowired
 	private userServiceInterface userServiceI;
 	
+	@Autowired
+	private postServiceInterface postServiceI;
 	
 	@GetMapping("/getInfo/{empId}")
 	public ResponseEntity<employerProfileResponse> getAllEmployerProfileInfo(
@@ -55,7 +61,15 @@ public class employerProfileController {
 			employerDTO employerDTO=employerDTOMapper.mapEmployerToDTO(employer);
 			employerDTO.setReq_user(userUtils.isReqUser(user,employer));
 			employerDTO.setFollowed(userUtils.isFollowedByReqUser(user, employer));
-			employerProfileResponse response=new employerProfileResponse( profile,isrequestUser, employerDTO); 
+			
+			employerProfileResponse response=new employerProfileResponse( 
+					profile,isrequestUser,
+					employerDTO,
+					postServiceI
+					.findByEmployerId(empId)
+					.stream()
+					.map(postMapper::mapPostTODTO)
+					.collect(Collectors.toList())); 
 			return new ResponseEntity<employerProfileResponse>(response,HttpStatus.OK);
 		}else 
 		{

@@ -244,13 +244,6 @@ public Post createAPost(Post post) {
 	                postField.setQualifications(new ArrayList<>(qualifications));
 	            }
 	            
-//	            postField.setPost(insertedPost);
-	            
-//	            CsvHandler csvHandler=new CsvHandler();
-//		        csvHandler.insertData(""+post.getId(), ""+post.getTitle(), postDTO.getSkills() ,"in site");
-		     // Read existing CSV file
-	            //D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\
-	          
 	     
 	        
 	     	        postFieldServiceI.insert(postField);
@@ -262,7 +255,7 @@ public Post createAPost(Post post) {
 	     				{
 	     					location locToInsert=new location();
 	     					locToInsert.setLocationValue(post.getLocation());
-	     					locationServiceI.insert(loc);
+	     					locationServiceI.insert(locToInsert);
 	     				}
 	     			}
 	     	       Post insertedPost = postServiceI.insert(post);
@@ -271,7 +264,7 @@ public Post createAPost(Post post) {
 	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
 	                  postServiceI.updatePostForCreate(post);
 	  	        }
-	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output.csv";
+	     	      String csvFilePath = "D:\\Partition E\\4th Year\\Graduation project\\AI\\jobs.csv";
 			        String[] newRowData = {""+insertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
 		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
 			        try {
@@ -281,10 +274,8 @@ public Post createAPost(Post post) {
 		                csvData = cvReader.readAll();
 		            }
 		            
-		            System.out.println("Csv Data : " + csvData);
 		            // Append new data to the CSV data
 		            csvData.add(newRowData);
-		            System.out.println("Csv Data After add : " + csvData);
 		            // Write updated data back to the CSV file
 		            FileWriter fileWriter = new FileWriter(csvFilePath);
 		            try (CSVWriter csvWriter = new CSVWriter(fileWriter)) {
@@ -303,72 +294,11 @@ public Post createAPost(Post post) {
 	        return null;
 	    }
 	}
-//	@Override
-//	@Transactional
-//	public Post createAPost(Employer user, postDTO postDTO) {
-//	    try {
-//	    	 Long companyAdminId = user.getCompanyAdmin().getId();
-//	         
-//	         // Fetch the company profile ID based on the company admin ID
-//	         Long profileId = companyProfileService.findByCompanyAdmin(companyAdminId).getId();
-//	         
-//	         // Set profileId and employerId in postDTO
-//	         postDTO.setProfileId(profileId);
-//	         postDTO.setEmployerId(user.getId());
-//	         
-//	         // Convert postDTO to Post entity and insert into database
-//	         Post post = convertDTOTOPOST(postDTO);
-//	         post.setEmployer(user); // Set the employer directly
-//	         
-//	         // Save the post entity to get its ID
-//	         Post insertedPost = postServiceI.insert(post);
-//	         
-//	         // Prepare and insert postField related to the inserted post
-//	         postField postField = postDTO.getPostField2();
-//	         
-//	         System.out.println("The Employer Field Id is : "+postField.getEmployerField().getId());
-//	         // Retrieve employerField based on field ID from postDTO
-//	         employerField employerField = employerFieldServiceI.findById(postDTO.getField());
-//	         
-//	         if (employerField == null) {
-//	             throw new IllegalArgumentException("Employer field with ID " + postDTO.getField() + " not found");
-//	         }
-//	         
-//	         // Populate skills and qualifications based on employerField data
-//	         if (postField.getSkills().isEmpty()) {
-//	             employerField.getCompanyField().getCompanyFieldSkills().forEach(skill -> postField.getSkills().add(skill.getCompanyFieldSkill().getSkillName()));
-//	         }
-//	         
-//	         if (postField.getQualifications().isEmpty()) {
-//	             employerField.getCompanyField().getCompanyFieldQualifications().forEach(qual -> postField.getQualifications().add(qual.getQualification().getQualificationName()));
-//	         }
-//	         
-//	         // Set postField attributes and associate with post
-//	         postField.setEmployerField(employerField);
-//	         postField.setPost(insertedPost);
-//	         
-//	         // Update post title with skills (if any)
-//	         if (!postField.getSkills().isEmpty()) {
-//	             post.setTitle(post.getTitle() + ", " + String.join(", ", postField.getSkills()));
-//	         }
-//	         
-//	         // Insert postField into database
-//	         postFieldServiceI.insert(postField);
-//	        return post;
-//	    } catch (DataIntegrityViolationException e) {
-//	        // Handle data integrity violation (e.g., foreign key constraint failure)
-//	        // Log the error and provide meaningful feedback
-//	        System.out.println("Exception from createAPost method: " + e.getMessage());
-//	        throw new IllegalArgumentException("Failed to create post due to data integrity violation");
-//	    } catch (Exception e) {
-//	        // Handle other unexpected exceptions
-//	        System.out.println("Exception from createAPost method: " + e.getMessage());
-//	        throw new IllegalArgumentException("Failed to create post: " + e.getMessage());
-//	    }
-//	}	
+	
+	
 	public class CsvHandler {
 
-	    private static final String CSV_FILE_PATH = "output.csv";
+	    private static final String CSV_FILE_PATH = "D:\\Partition E\\4th Year\\Graduation project\\AI\\jobs.csv";
 	    private static final String CSV_SEPARATOR = ",";
 
 	    private String[] headers;

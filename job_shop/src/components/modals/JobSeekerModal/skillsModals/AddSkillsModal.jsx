@@ -117,6 +117,7 @@ export default function AddSkillsModal({
 
   const handleSubmit = async (values) => {
     dispatch3(addSkillsQualifications(values));
+    console.log("Sent data  ", values);
   };
 
   const formik = useFormik({
@@ -132,12 +133,13 @@ export default function AddSkillsModal({
   const handleFilterSkills = (input) => {
     const filtered = fetchedSkills.filter(
       (skill) =>
+        skill && // Check if skill is not null
         !selectedSkills.includes(input) &&
         !skill.toLowerCase().includes(input.toLowerCase())
     );
     setFilteredSkills(filtered);
     setFilterInputSkills(input);
-  };
+  };  
 
   const handleFilterQuals = (input) => {
     const filtered = fetchedQuals.filter((qual) =>
