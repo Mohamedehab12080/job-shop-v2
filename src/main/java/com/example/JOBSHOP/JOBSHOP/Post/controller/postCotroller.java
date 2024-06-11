@@ -254,7 +254,7 @@ public class postCotroller {
 		User user=userServiceI.findUserByJwt(jwt);
 		if(user!=null)
 		{
-			return new ResponseEntity<>(jobSeekerService.callFlaskAPI(String.join(",", skills)),HttpStatus.OK);
+			return new ResponseEntity<>(jobSeekerService.callFlaskAPI(String.join(",", skills),user.getId()),HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("user Not found for this token :");

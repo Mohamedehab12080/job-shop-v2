@@ -71,11 +71,11 @@ const PostCardCompany = ({
   };
 
   const truncatedJobRequirements =
-    jobRequirements.length > 300
+    jobRequirements && jobRequirements.length > 300
       ? `${jobRequirements.substring(0, 300)}...`
       : jobRequirements;
   const truncatedDescription =
-    description.length > 300
+    description && description.length > 300
       ? `${description.substring(0, 300)}...`
       : description;
 
@@ -136,7 +136,7 @@ const PostCardCompany = ({
             ? Title.substring(0, Title.indexOf("{"))
             : Title || "No Title"}
         </Typography>
-        
+
         <Typography variant="body2" color="textSecondary" component="p">
           <strong>Description: </strong> {truncatedDescription}
         </Typography>
