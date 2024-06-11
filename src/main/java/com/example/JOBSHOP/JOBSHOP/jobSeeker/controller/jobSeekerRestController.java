@@ -219,16 +219,16 @@ public class jobSeekerRestController {
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
 		{
-			
+
+			// This class of applicationReturnedSkillsAndQualifications is the return type of the applyForPost(app) method
 			applicationReturnedSkillsAndQualifications applicationReturnedSkillsAndQualifications=jobSeekerServiceI.applyForPost(app);
-			
+
+			//Check if the application is acceptable for apply or not 
 			if(applicationReturnedSkillsAndQualifications.isMatched())
 			{
-//				postDTO postApplied=postMapper.mapPostTODTO(postServiceI.findById(app.getPostId()));
-//				
-//				if(postApplied !=null)
-//				{
+
 					User sendToUser=new User();
+					// if the application matched this service will send email to both the company and the job seeker tell them about the operation occured
 					sendToUser.setEmail(applicationReturnedSkillsAndQualifications.getEmployerEmail());
 					sendToUser.setUserName(applicationReturnedSkillsAndQualifications.getEmployerUserName());
 					registrationCompleteEventListener

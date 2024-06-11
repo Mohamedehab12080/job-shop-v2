@@ -260,7 +260,7 @@ public class postCotroller {
 			throw new UserException("user Not found for this token :");
 		}
 	}
-	
+	// this end point is the algorithm of matching between the jobseeker profile skills and qualifications with the posts related to these skills
 	@GetMapping("/findPostsWithProfileSkills/{id}")
 	public ResponseEntity<List <postDTO>> getPostss(
 			@PathVariable("id") Long id,
@@ -274,7 +274,8 @@ public class postCotroller {
 		{
 			throw new UserException("user not found for this token");
 		}
-		
+
+	}
 //		try {
 //			
 //			
@@ -292,7 +293,7 @@ public class postCotroller {
 //			System.out.println("Error at find posts : "+e);
 //			return null;
 //		}
-	}
+	
 //	@GetMapping("/findPostsWithProfileSkills/{id}")
 //	public List<postDTO> getPosts(@PathVariable Long id)
 //	{
