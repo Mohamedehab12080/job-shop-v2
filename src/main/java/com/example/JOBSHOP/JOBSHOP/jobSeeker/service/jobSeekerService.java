@@ -525,7 +525,6 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	  * The sorted method the score to sort the postScore objects. 
 	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
 	  */
-<<<<<<< HEAD
 	 @Override
 	 public List<postDTO> getPostsWithSkillsOnPublic(Long jobSeekerId) {
 
@@ -776,120 +775,6 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	     }
 	 }
 
-=======
-		@Override
-	public List<postDTO> getPostsWithSkillsOnPublic(Long jobSeekerId) {
-		// Fetch job seeker and their skills
-		jobSeeker jobSeeker = findById(jobSeekerId);
-		if(jobSeeker!=null) {
-			// Fetch job seeker skills and qualifications
-			Set<String> jobSeekerSkills = jobSeekerSkillServiceI.findByJobSeekerId(jobSeeker.getId())
-					.stream().map(this::convertJobSeekerSkillToDto)
-					.map(jobSeekerSkillDTO::getSkillName)
-					.collect(Collectors.toSet());
-
-			Set<String> jobSeekerQualifications = jobSeekerQualificationServiceI.findByJobSeekerId(jobSeeker.getId())
-					.stream().map(this::convertJobSeekerQualificationToDto)
-					.map(jobSeekerQualificationDTO::getQualificationName)
-					.collect(Collectors.toSet());
-
-			// Fetch posts related to job seeker skills
-			Set<postDTO> posts = jobSeekerSkills.stream()
-					.flatMap(skill -> postService.findByTitle(skill).stream())
-					.filter(post -> checkForApply(jobSeekerId, post))
-					.map(this::convertPostToDto)
-					.collect(Collectors.toSet());
-
-			if (posts.isEmpty()) {
-				return Collections.emptyList();
-			}
-
-			// Calculate and sort post scores
-			List<postDTO> sortedPosts = posts.stream()
-					.map(post -> {
-						// Extract post skills and qualifications
-						Set<String> postSkills = post.getSkills().stream()
-								.collect(Collectors.toSet());
-						Set<String> postQualifications = post.getQualifications().stream()
-								.collect(Collectors.toSet());
-
-						// Calculate score and remaining skills/qualifications
-						int score = calculateScore(
-								new ArrayList<>(postQualifications),
-								new ArrayList<>(postSkills),
-								new ArrayList<>(jobSeekerQualifications),
-								new ArrayList<>(jobSeekerSkills));
-
-						List<String> remainedSkills = applicationService
-								.returningRemainedSkillsForListOfPosts(
-										new ArrayList<>(postSkills),
-										new ArrayList<>(jobSeekerSkills));
-
-						List<String> remainedQualifications = applicationService
-								.returningRemainedQualificationsForPostList(
-										new ArrayList<>(postQualifications),
-										new ArrayList<>(jobSeekerQualifications));
-
-						// Update post with matched, remaining skills/qualifications, and state
-						List<String> matchedSkills = new ArrayList<>();
-						for (String matchedSkill : postSkills) {
-							if (!remainedSkills.contains(matchedSkill)) {
-								matchedSkills.add(matchedSkill);
-							}
-						}
-						post.setMatchedSkills(matchedSkills);
-
-						List<String> matchedQualifications = new ArrayList<>();
-						for (String matchedQualification : postQualifications) {
-							if (!remainedQualifications.contains(matchedQualification)) {
-								matchedQualifications.add(matchedQualification);
-							}
-						}
-						post.setMatchedQulifications(matchedQualifications);
-						post.setRemainedSkills(remainedSkills);
-						post.setRemainedQualifications(remainedQualifications);
-
-						// Set post state based on matching
-						if (!matchedSkills.isEmpty()) {
-							if ((matchedSkills.size() + matchedQualifications.size()) < ((postSkills.size() + postQualifications.size()) / 2)) {
-								post.setState(0);
-								post.setStatuseCode("Not match with : (" + (int) ((Double.valueOf((matchedSkills.size() + matchedQualifications.size())) / Double.valueOf((postSkills.size() + postQualifications.size()))) * 100) + "%)");
-							
-							} else {
-								post.setState(1);
-								post.setStatuseCode("Matched with : (" + (int) ((Double.valueOf((matchedSkills.size() + matchedQualifications.size())) / Double.valueOf((postSkills.size() + postQualifications.size()))) * 100) + "%)");
-							
-							}
-							return new postScore(post, score);
-						} else {
-							// If no matched skills, create a new postDTO with score
-							postDTO post2 = new postDTO();
-							return new postScore(post2, score);
-						}
-					})
-					// Sort posts based on matched skills and remaining skills
-					.sorted(Comparator.comparingInt(postScore -> {
-						postDTO post = ((postScore) postScore).getPost();
-						int matchedSkillsCount = post.getMatchedSkills().size() + post.getMatchedQulifications().size();
-						int remainedSkillsCount = post.getRemainedSkills().size() + post.getRemainedQualifications().size();
-						double ratio = (double) matchedSkillsCount / (matchedSkillsCount + remainedSkillsCount);
-						// Negative for higher matched skills and lower missedSkills posts first
-						return (int) (-ratio * 10000);
-					}))
-					.map(postScore -> ((postScore) postScore).getPost()) // Extract postDTO from postScore
-					.collect(Collectors.toList());
-
-			// Remove duplicate posts and return
-			Map<Long, postDTO> uniquePostsMap = new LinkedHashMap<>();
-			sortedPosts.forEach(post -> uniquePostsMap.put(post.getId(), post));
-			List<postDTO> uniquePostsList = new ArrayList<>(uniquePostsMap.values());
-			return uniquePostsList;
-		} else {
-			return Collections.emptyList();
-		}
-	}
-
->>>>>>> 26c4cc7c8f23264d70a84a0af4be98ec05e59a07
 	 /**
 	  * @author BOBO
 	  * The sorted method the score to sort the postScore objects. 

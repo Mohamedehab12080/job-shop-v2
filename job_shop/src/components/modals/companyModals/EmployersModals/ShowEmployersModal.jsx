@@ -18,6 +18,8 @@ import { useNavigate } from "react-router-dom";
 export default function ShowEmployerModal({
   openShowEmployerModal,
   handleCloseShowEmployerModal,
+  create,
+  employerEmail,
 }) {
   var [filteredEmployers, setFilteredEmployers] = React.useState([]);
   const [filterInputEmployer, setFilterInputField] = React.useState("");
@@ -49,6 +51,10 @@ export default function ShowEmployerModal({
     setAnchorEl(null);
   };
 
+  React.useEffect(() => {
+    if (create) {
+    }
+  }, [create]);
   React.useEffect(() => {
     if (openShowEmployerModal) {
       dispatch(getEmployers(auth.user.id));
@@ -107,88 +113,91 @@ export default function ShowEmployerModal({
             />
           </Grid>
           <section>
-            {(filterInputEmployer === ""
-              ? fetchedEmployers
-              : filteredEmployers
-            ).map((emp, index) => (
-              <>
-                <div>
-                  <hr></hr>
-                </div>
-                <div key={index} className="flex space-x-5">
-                  <Avatar
-                    onClick={() => navigate(`/employerProfile/${emp.id}`)}
-                    className="cursor-pointer"
-                    alt="userName"
-                    src={emp.picture}
-                  />
-                  <div className="w-full">
-                    <div className="flex justify-between items-center">
-                      <div className="flex cursor-pointer items-center space-x-2">
-                        <span className="font-semibold">{emp.userName}</span>
-                        <span className="text-gray-600">@{emp.email}</span>
-                      </div>
+            {(filterInputEmployer === "" ? fetchedEmployers : filteredEmployers)
+              // Ensure the newly created employer appears first
+              .sort((a, b) => {
+                if (create && a.email === employerEmail) return -1;
+                if (create && b.email === employerEmail) return 1;
+                return 0;
+              })
+              .map((emp, index) => (
+                <>
+                  <div>
+                    <hr></hr>
+                  </div>
+                  <div
+                    key={index}
+                    className={`flex space-x-5 ${
+                      create && emp.email === employerEmail
+                        ? "bg-yellow-100"
+                        : ""
+                    }`}
+                  >
+                    <Avatar
+                      onClick={() => navigate(`/employerProfile/${emp.id}`)}
+                      className="cursor-pointer"
+                      alt="userName"
+                      src={emp.picture}
+                    />
+                    <div className="w-full">
+                      <div className="flex justify-between items-center">
+                        <div className="flex cursor-pointer items-center space-x-2">
+                          <span className="font-semibold">{emp.userName}</span>
+                          <span className="text-gray-600">@{emp.email}</span>
+                        </div>
 
-                      <div>
-                        <Button
-                          id="basic-button"
-                          aria-controls={openMenu ? "basic-menu" : undefined}
-                          aria-haspopup="true"
-                          aria-expanded={openMenu ? "true" : undefined}
-                          onClick={handleClick}
-                        >
-                          <MoreHorizIcon />
-                        </Button>
-                        <Menu
-                          id="basic-menu"
-                          anchorEl={anchorEl}
-                          open={openMenu}
-                          onClose={handleClose}
-                          MenuListProps={{
-                            "aria-labelledby": "basic-button",
-                          }}
-                        >
-                          <MenuItem
-                            onClick={() => handleDeleteEmployer(emp.id)}
+                        <div>
+                          <Button
+                            id="basic-button"
+                            aria-controls={openMenu ? "basic-menu" : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={openMenu ? "true" : undefined}
+                            onClick={handleClick}
                           >
-                            Delete
-                          </MenuItem>
-                          <MenuItem onClick={() => handleEditEmployer(emp.id)}>
-                            Edit
-                          </MenuItem>
-                        </Menu>
+                            <MoreHorizIcon />
+                          </Button>
+                          <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={openMenu}
+                            onClose={handleClose}
+                            MenuListProps={{
+                              "aria-labelledby": "basic-button",
+                            }}
+                          >
+                            <MenuItem
+                              onClick={() => handleDeleteEmployer(emp.id)}
+                            >
+                              Delete
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => handleEditEmployer(emp.id)}
+                            >
+                              Edit
+                            </MenuItem>
+                          </Menu>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex">
-                      <p className="font-semibold text-gray-500"> Fields :</p>
-
-                      <ul className="flex flex-wrap">
-                        {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
-                          emp.fieldsNames.map((empField, index) => (
-                            <>
-                              <li>
-                                {" "}
+                      <div className="flex">
+                        <p className="font-semibold text-gray-500"> Fields :</p>
+                        <ul className="flex flex-wrap">
+                          {emp.fieldsNames && emp.fieldsNames.length > 0 ? (
+                            emp.fieldsNames.map((empField, index) => (
+                              <li key={index}>
                                 <p className="ml-2 text-gray-600">
                                   - {empField}
                                 </p>
                               </li>
-                            </>
-                            // <>
-                            /* <div className='flex'> 
-                    <p className='ml-2'>{index > 0 && " , "}</p>
-                    <p className='ml-2 text-gray-600'>{empField}</p>
-                    </div> */
-                            // </>
-                          ))
-                        ) : (
-                          <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
-                        )}
-                      </ul>
+                            ))
+                          ) : (
+                            <>Nooo</> // Placeholder for rendering when emp.employerFields is empty
+                          )}
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </>
-            ))}
+                </>
+              ))}
           </section>
         </Box>
       </Modal>

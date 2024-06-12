@@ -150,12 +150,7 @@ public class postCotroller {
 		User user =userServiceI.findUserByJwt(jwt);
 		if(user!=null && !user.getUserType().equals(Role.jobSeeker))
 		{
-			System.out.println("Size of Returned Best Applications : "+applicationServiceI
-					.getBestApplicationsForPost(
-							convertPost(
-									postService
-									.findById(id)
-									)).size());
+
 			return new 
 					ResponseEntity<List<applicationDTO>>(
 							applicationServiceI

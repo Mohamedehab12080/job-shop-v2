@@ -14,7 +14,7 @@ const style = (state) => ({
   left: "0%",
   transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
+  bgcolor: "background.paper",
   color: "black",
   border: "none",
   boxShadow: 24,
@@ -71,19 +71,21 @@ export default function MessageModal({
           mountOnEnter
           unmountOnExit
           timeout={{ enter: 500, exit: 500 }}
-          transitiontimingfunction="ease-in-out" 
+          transitiontimingfunction="ease-in-out"
           style={slideStyle}
         >
           <Box sx={style(state)}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                {state ? (
-                  <CheckCircleIcon style={{ marginRight: 8 ,color:'green'}} />
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {/* {state && response.toLowercase().includes("success") ? (
+                  <CheckCircleIcon style={{ marginRight: 8, color: "green" }} />
                 ) : (
-                  <ErrorIcon style={{ marginRight: 8,color:'red'}} />
-                )}
+                  <ErrorIcon style={{ marginRight: 8, color: "red" }} />
+                )} */}
                 {Title === "Education" && (
-                  <BusinessCenterIcon style={{ color: 'inherit', marginRight: 8 }} />
+                  <BusinessCenterIcon
+                    style={{ color: "inherit", marginRight: 8 }}
+                  />
                 )}
                 {Title}
               </div>

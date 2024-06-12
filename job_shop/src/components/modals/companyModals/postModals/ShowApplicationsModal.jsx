@@ -369,20 +369,7 @@ export default function ShowApplicationsModal({
                             <ul>
                               {app.skills && app.skills.length > 0 ? (
                                 app.skills.map((appSkill, index) => (
-                                  <li key={index}>
-                                    {isSkillMatched(
-                                      appSkill,
-                                      app.postSkills
-                                    ) ? (
-                                      <span style={{ color: "green" }}>
-                                        <CheckCircleIcon /> {appSkill}
-                                      </span>
-                                    ) : (
-                                      <span style={{ color: "red" }}>
-                                        <CancelIcon /> {appSkill}
-                                      </span>
-                                    )}
-                                  </li>
+                                  <li key={index}>{appSkill}</li>
                                 ))
                               ) : (
                                 <li>No Skills</li>
@@ -422,14 +409,24 @@ export default function ShowApplicationsModal({
                           </Typography>
                           <Typography variant="body1">
                             <strong>Post Experience:</strong>{" "}
-                            {app.postExperience}
+                            {app.postExperienc}
                           </Typography>
                           <Typography variant="body1">
                             <strong>Skills:</strong>
                             <ul>
                               {app.postSkills && app.postSkills.length > 0 ? (
                                 app.postSkills.map((postSkill, index) => (
-                                  <li key={index}>{postSkill}</li>
+                                  <li key={index}>
+                                    {isSkillMatched(postSkill, app.skills) ? (
+                                      <span style={{ color: "green" }}>
+                                        <CheckCircleIcon /> {postSkill}
+                                      </span>
+                                    ) : (
+                                      <span style={{ color: "red" }}>
+                                        <CancelIcon /> {postSkill}
+                                      </span>
+                                    )}
+                                  </li>
                                 ))
                               ) : (
                                 <li>No Skills</li>
@@ -443,7 +440,17 @@ export default function ShowApplicationsModal({
                               app.postQualifications.length > 0 ? (
                                 app.postQualifications.map(
                                   (postQual, index) => (
-                                    <li key={index}>{postQual}</li>
+                                    <li key={index}>
+                                    {isSkillMatched(postQual, app.qualifications) ? (
+                                      <span style={{ color: "green" }}>
+                                        <CheckCircleIcon /> {postQual}
+                                      </span>
+                                    ) : (
+                                      <span style={{ color: "red" }}>
+                                        <CancelIcon /> {postQual}
+                                      </span>
+                                    )}
+                                  </li>
                                   )
                                 )
                               ) : (

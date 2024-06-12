@@ -159,13 +159,21 @@ public class companyAdminRestController {
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().equals(Role.Admin))
 		{
-			companyAdminService.giveEmployerFields(
-					giveEmployerFiedldsRequest.getEmployerFields()
-					.stream()
-					.map(employerFieldMapper::mapDtoToInsertToEmployerField)
-					.collect(Collectors.toList()),10); // give employer Fields in batchs
-				
-			return new ResponseEntity<>("Employer has its fields now",HttpStatus.OK);
+			if(giveEmployerFiedldsRequest.getEmployerFields()!=null 
+					&& !giveEmployerFiedldsRequest.getEmployerFields().isEmpty())
+			{
+				companyAdminService.giveEmployerFields(
+						giveEmployerFiedldsRequest.getEmployerFields()
+						.stream()
+						.map(employerFieldMapper::mapDtoToInsertToEmployerField)
+						.collect(Collectors.toList()),10); // give employer Fields in batchs
+					
+				return new ResponseEntity<>("Employer has its fields success",HttpStatus.OK);
+			}else 
+			{
+				return new ResponseEntity<>("Failed To give employer empty list of fields",HttpStatus.OK);
+			}
+			
 		}else 
 		{
 			throw new UserException("user not found for this token");

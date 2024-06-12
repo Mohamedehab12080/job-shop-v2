@@ -293,13 +293,13 @@ const RecommendationPath = () => {
                 {(filterInputPost === "" ? posts : filteredPosts).map(
                   (p, index) => (
                     <PostCardJobSeeker
-                      key={index}
+                      key={p.id}
                       id={p.id}
                       employerId={p.employerId}
                       employerUserName={p.employerUserName}
                       Title={p.title}
                       description={p.description}
-                      jobRequirements={p.jobRequirements}
+                      jobRequirements={p.jobRequirments}
                       location={p.location}
                       employmentType={p.employmentType}
                       companyName={p.companyName}
@@ -313,12 +313,13 @@ const RecommendationPath = () => {
                       remainedSkills={p.remainedSkills}
                       remainedQualifications={p.remainedQualifications}
                       state={p.state}
-                      matchedQualifications={p.matchedQualifications}
+                      matchedQulifications={p.matchedQulifications}
                       matchedSkills={p.matchedSkills}
                       applicationCount={p.applicationCount}
                       jobSeekerId={auth.user.id}
-                      experience={p.experience}
+                      Experience={p.experience}
                       postImage={p.postImage}
+                      statusCode={p.statuseCode}
                     />
                   )
                 )}

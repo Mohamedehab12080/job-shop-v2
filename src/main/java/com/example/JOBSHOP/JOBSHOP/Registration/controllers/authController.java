@@ -214,8 +214,8 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		String token=jwtProvider.generateToken(authentication);
 		
 		AuthResponse res=new AuthResponse(token,true);
-		
 		return new ResponseEntity<AuthResponse>(res,HttpStatus.ACCEPTED);
+		
 		
 	}
 

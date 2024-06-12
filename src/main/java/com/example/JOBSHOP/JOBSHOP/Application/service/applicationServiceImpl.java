@@ -237,8 +237,11 @@ public class applicationServiceImpl implements applicationServiceInerface{
         // Extract applications from ApplicationScore objects
         List<applicationDTO> sortedApplications = new ArrayList<>();
         for (ApplicationScore applicationScore : applicationScores) {
-            sortedApplications.add(applicationScore.getApplication());
+        	applicationDTO applic=applicationScore.getApplication();
+        	applic.setPostTitle(Post.getTitle().substring(0,Post.getTitle().indexOf("{")));
+            sortedApplications.add(applic);
         }
+        
         return sortedApplications;
     }
 	
