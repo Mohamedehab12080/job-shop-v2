@@ -44,11 +44,11 @@ export const giveEmployerFields = (dataInsertion) => async (dispatch) => {
       `/api/company/giveEmployerFields`,
       dataInsertion
     );
-    dispatch({ type: GIVE_EMPLOYER_FIELDS_SUCCCESS, payload: data });
+    // dispatch({ type: GIVE_EMPLOYER_FIELDS_SUCCCESS, payload: data });
     console.log("Response : Give Employer : ", data);
   } catch (error) {
     console.error("Error : ", error);
-    dispatch({ type: GIVE_EMPLOYER_FIELDS_FAILURE, payload: error.message });
+    // dispatch({ type: GIVE_EMPLOYER_FIELDS_FAILURE, payload: error.message });
   }
 };
 
