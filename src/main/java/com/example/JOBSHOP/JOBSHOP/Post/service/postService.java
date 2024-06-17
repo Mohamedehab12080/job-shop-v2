@@ -36,8 +36,7 @@ public class postService implements postServiceInterface{
 	        String location = postSearch.getLocation();
 	        String employmentType = postSearch.getEmploymentType();
 	        Integer year = null;
-	        Integer month = null;
-	        
+	        Integer month = null;  
 	        List<Long> postIds=new ArrayList<Long>();
 			List<Post> posts=findPostsWithFieldName(postSearch.getFieldName());
 			if(posts!=null && !posts.isEmpty())

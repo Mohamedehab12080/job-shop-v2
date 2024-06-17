@@ -105,7 +105,7 @@ public class companyAdminService implements companyAdministratorServiceInterface
 		/**
 		 * 
 		 * @author BOB 
-		 * @Fucntion update companyAdministrator (companyName,userName,Password,Email,Contacts)
+		 * @Fucntion update companyAdministrator (companyName,userName,Email,Contacts)
 		 */
 		@Transactional
 		@Override

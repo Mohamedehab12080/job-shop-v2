@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
@@ -6,7 +6,6 @@ import Slide from "@mui/material/Slide";
 import BusinessCenterIcon from "@mui/icons-material/BusinessCenter";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
-import { useState } from "react";
 
 const style = (state) => ({
   position: "absolute",
@@ -56,6 +55,17 @@ export default function MessageModal({
     }
   }, [isOpen, handleCloseMessageModal]);
 
+  // Function to handle different types of responses
+  const renderResponse = (response) => {
+    if (typeof response === "string") {
+      return response;
+    } else if (typeof response === "object") {
+      return JSON.stringify(response);
+    } else {
+      return "Unknown response type";
+    }
+  };
+
   return (
     <div>
       <Modal
@@ -93,7 +103,7 @@ export default function MessageModal({
               </div>
             </Typography>
             <Typography id="modal-modal-description" sx={{ mt: 2, ml: 3 }}>
-              {response}
+              {renderResponse(response)}
             </Typography>
           </Box>
         </Slide>

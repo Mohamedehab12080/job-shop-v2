@@ -245,7 +245,7 @@ public Post createAPost(Post post) {
 	            }
 	            
 	     
-	        
+	            	
 	     	        postFieldServiceI.insert(postField);
 	     	        post.setPostFields(postField);
 	     	       if(post.getLocation() !=null && !post.getLocation().isEmpty())
@@ -258,6 +258,7 @@ public Post createAPost(Post post) {
 	     					locationServiceI.insert(locToInsert);
 	     				}
 	     			}
+	     	       
 	     	       Post insertedPost = postServiceI.insert(post);
 	     	       
 	     	      if (!skills.isEmpty()) {

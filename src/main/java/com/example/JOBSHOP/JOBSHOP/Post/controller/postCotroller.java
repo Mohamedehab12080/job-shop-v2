@@ -96,6 +96,7 @@ public class postCotroller {
 		User user =userServiceI.findUserByJwt(jwt);
 		if(user!=null)
 		{
+	        System.out.println("Title Sent : "+postSearch.getLocation());
 			List<Post> postList=postService.findPostsWithSearch(postSearch);
 			
 			List<postDTO> postListDto= postList.stream() 
