@@ -1,39 +1,39 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import Slide from '@mui/material/Slide';
-import { Edit, Email } from '@mui/icons-material';
-import EmailIcon from '@mui/icons-material/Email';
-import LanguageIcon from '@mui/icons-material/Language';
-import RecentActorsIcon from '@mui/icons-material/RecentActors';
-import ConnectWithoutContactIcon from '@mui/icons-material/ConnectWithoutContact';
-import { IconButton } from '@mui/material';
-import EditeContactsModal from './EditeContactsModal';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Modal from "@mui/material/Modal";
+import Slide from "@mui/material/Slide";
+import { Edit, Email } from "@mui/icons-material";
+import EmailIcon from "@mui/icons-material/Email";
+import LanguageIcon from "@mui/icons-material/Language";
+import RecentActorsIcon from "@mui/icons-material/RecentActors";
+import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
+import { IconButton } from "@mui/material";
+import EditeContactsModal from "./EditeContactsModal";
 
 const style = {
-  position: 'absolute',
-  top: '10%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
+  position: "absolute",
+  top: "10%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
   width: 400,
-  bgcolor: 'background.paper',
-  outline: 'none',
-  border: 'none',
+  bgcolor: "background.paper",
+  outline: "none",
+  border: "none",
   boxShadow: 24,
   p: 4,
-  maxHeight: '60vh',
+  maxHeight: "60vh",
   borderRadius: 4,
-  overflowY: 'auto',
-  height: '100%',
+  overflowY: "auto",
+  height: "100%",
 };
 
 const slideStyle = {
-  height: '100%',
-  overflowY: 'auto',
-  scrollbarWidth: 'none',
-  '&::-webkit-scrollbar': {
-    display: 'none',
+  height: "100%",
+  overflowY: "auto",
+  scrollbarWidth: "none",
+  "&::-webkit-scrollbar": {
+    display: "none",
   },
 };
 
@@ -74,7 +74,10 @@ export default function ContactsModal({
               </Typography>
               {isRequestUser && (
                 <div className="modal-content-container flex items-center mb-4">
-                  <IconButton onClick={handleOpenEditContacts} aria-label="Edit">
+                  <IconButton
+                    onClick={handleOpenEditContacts}
+                    aria-label="Edit"
+                  >
                     <Edit />
                   </IconButton>
                 </div>
@@ -84,15 +87,26 @@ export default function ContactsModal({
               {contactsList && contactsList.length > 0 ? (
                 contactsList.map((contact, index) => (
                   <div key={index} className="flex space-x-2">
-                    {contact.includes('@') ? (
+                    {contact.includes("@") ? (
                       <>
                         <EmailIcon />
-                        <a href={`mailto:${contact}`} className="text-xl font-bold">Email</a>
+                        <a
+                          href={`mailto:${contact}`}
+                          className="text-xl font-bold"
+                        >
+                          Email
+                        </a>
                       </>
-                    ) : contact.includes('http') ? (
+                    ) : contact.includes("http") ? (
                       <>
                         <LanguageIcon />
-                        <a href={contact} className="text-xl font-bold">Website</a>
+                        <a
+                          href={contact}
+                          target="_blank"
+                          className="text-xl font-bold"
+                        >
+                          Website
+                        </a>
                       </>
                     ) : (
                       <>

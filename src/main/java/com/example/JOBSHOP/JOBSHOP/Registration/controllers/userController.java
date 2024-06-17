@@ -1,5 +1,6 @@
 package com.example.JOBSHOP.JOBSHOP.Registration.controllers;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.JOBSHOP.JOBSHOP.Registration.exception.UserException;
 import com.example.JOBSHOP.JOBSHOP.Registration.service.userService;
@@ -89,29 +91,35 @@ public class userController {
 		}
 	}
 	
-	@GetMapping("/search")
-	public ResponseEntity<List<UserDTO>> SearchUsers(@RequestParam String query,
-			@RequestHeader("Authorization") String jwt) throws UserException
-	{
-		User reqUSer=userServiceI.findUserByJwt(jwt);
-		if(reqUSer!=null)
+		@RequestMapping("/search")
+		@ResponseBody
+		public ResponseEntity<?> SearchUsers(@RequestParam String query,
+				@RequestHeader("Authorization") String jwt) throws UserException
 		{
-			List<User> usersReturned=userServiceI.searchUser(query);
-			
-			if(!usersReturned.isEmpty())
+			User reqUSer=userServiceI.findUserByJwt(jwt);
+			if(reqUSer!=null)
 			{
+			
+				System.out.println("The Sent query : "+query);
+				List<User> usersReturned=userServiceI.searchUser(query);
+				System.out.println("REturned Users List : "+usersReturned);
 				List<UserDTO> userdtos=userDTOMapper.toUserDTos(usersReturned);
-				
-				return new ResponseEntity<>(userdtos,HttpStatus.ACCEPTED);
+//				System.out.println("REturned User : "+userdtos.get(0).getUserName());
+
+				return new ResponseEntity<>(userdtos,HttpStatus.OK);
+
+//				if(userdtos!=null && !userdtos.isEmpty())
+//				{
+//					return new ResponseEntity<>(usersReturned,HttpStatus.ACCEPTED);
+//				}else
+//				{
+//					return new ResponseEntity<>(Collections.emptyList(),HttpStatus.ACCEPTED);
+//				}
 			}else 
 			{
-				throw new UserException("user not found for this search");
+				throw new UserException("user not found for this token");
 			}
-		}else 
-		{
-			throw new UserException("user not found for this token");
 		}
-	}
 	
 	
 	@PutMapping("/updateContacts")

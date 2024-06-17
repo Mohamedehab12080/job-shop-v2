@@ -44,6 +44,7 @@ const initialState = {
   response: null,
   companyData: null,
   isRequestUser: false,
+  companyPosts: [],
 };
 export const companyReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -101,6 +102,7 @@ export const companyReducer = (state = initialState, action) => {
         fields: action.payload.companyFieldsNames,
         employers: action.payload.employersUserName,
         isRequestUser: action.payload.requestUser,
+        companyPosts: action.payload.posts,
       };
     case UPDATE_COMPANY_INFO_SUCCCESS:
       return {

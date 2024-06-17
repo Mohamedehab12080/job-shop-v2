@@ -15,7 +15,9 @@ public interface userRepository extends /*baseRepo<User, Long>*/ JpaRepository<U
 
 	Optional<User> findByEmail(String email); 
 
-    @Query("SELECT DISTINCT u FROM User u WHERE u.userName LIKE %:query% OR u.email LIKE %:query%")
-	List<User> searchUser(@Param("query") String query);
+	@Query("SELECT u FROM User u WHERE lower(u.userName) LIKE lower(concat('%',:query, '%'))")
+    List<User> searchUser(@Param("query") String query);
+//    @Query("SELECT u FROM User u WHERE lower(u.userName) LIKE lower(concat('%', :query, '%'))")
+//    List<User> searchUser(@Param("query") String query);
 	
 }

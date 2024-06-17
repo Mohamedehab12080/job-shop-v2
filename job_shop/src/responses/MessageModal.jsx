@@ -77,11 +77,13 @@ export default function MessageModal({
           <Box sx={style(state)}>
             <Typography id="modal-modal-title" variant="h6" component="h2">
               <div style={{ display: "flex", alignItems: "center" }}>
-                {/* {state && response.toLowercase().includes("success") ? (
+                {state ||
+                (typeof response === "string" &&
+                  response.toLowerCase().includes("success")) ? (
                   <CheckCircleIcon style={{ marginRight: 8, color: "green" }} />
                 ) : (
                   <ErrorIcon style={{ marginRight: 8, color: "red" }} />
-                )} */}
+                )}
                 {Title === "Education" && (
                   <BusinessCenterIcon
                     style={{ color: "inherit", marginRight: 8 }}

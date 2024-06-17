@@ -16,7 +16,10 @@ export const loginUser = (loginData) => async (dispactch) => {
       localStorage.setItem("jwt", data.jwt);
     }
     console.log("data returned : ", data);
-    dispactch({ type: LOGIN_USER_SUCCESS, payload: data.jwt });
+    dispactch({
+      type: LOGIN_USER_SUCCESS,
+      payload: data.jwt,
+    });
   } catch (error) {
     console.log("error", error);
     dispactch({ type: LOGIN_USER_FAILURE, payload: error });
@@ -47,9 +50,13 @@ export const registerJobSeekerUser =
       if (data.jwt) {
         localStorage.setItem("jwt", data.jwt);
       }
-      dispactch({ type: REGISTER_USER_SUCCESS, payload: data.jwt });
+
+      if (data.jwt === "") {
+        console.log("Error Message : ", data.message);
+      } else {
+        dispactch({ type: REGISTER_USER_SUCCESS, payload: data.jwt });
+      }
     } catch (error) {
-      console.log("error", error);
       dispactch({ type: REGISTER_USER_FAILURE, payload: error.message });
     }
   };
@@ -62,9 +69,11 @@ export const registrerCompanyUser =
       );
       if (data.jwt) {
         localStorage.setItem("jwt", data.jwt);
+        dispactch({ type: REGISTER_USER_SUCCESS, payload: data.jwt });
+      } else {
+        console.log("Error Message : ", data.message);
+        dispactch({ type: REGISTER_USER_FAILURE, payload: data.message });
       }
-      console.log("data returned : ", data);
-      dispactch({ type: REGISTER_USER_SUCCESS, payload: data.jwt });
     } catch (error) {
       console.log("error", error);
       dispactch({ type: REGISTER_USER_FAILURE, payload: error.message });
@@ -112,10 +121,13 @@ export const getUserProfile = (jwt) => async (dispactch) => {
         Authorization: `Bearer ${jwt}`,
       },
     });
-    dispactch({ type: GET_USER_PROFILE_SUCCESS, payload: data });
+    dispactch({
+      type: GET_USER_PROFILE_SUCCESS,
+      payload: data,
+    });
   } catch (error) {
     console.log("error", error);
-    dispactch({ type: GET_USER_PROFILE_FAILURE, payload: error.message });
+    dispactch({ type: GET_USER_PROFILE_FAILURE, payload: error });
   }
 };
 

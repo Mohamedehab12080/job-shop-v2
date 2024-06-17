@@ -270,7 +270,7 @@ const handleItemClick = (item) => {
           <div className="py-1 items-center" >
             <p className="mb-0">{auth.user?.userName}</p>
             <div>
-              <span className="mt-1 opacity-70">@{auth.user?.email.split(" ").join("_").toLowerCase()}</span>
+              {/* <span className="mt-1 opacity-70">@{auth.user?.email.split(" ").join("_").toLowerCase()}</span> */}
               </div>
           </div>
       <div>

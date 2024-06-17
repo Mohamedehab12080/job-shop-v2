@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.StackWalker.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -102,12 +103,14 @@ public class authController {
 public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		@RequestBody registerUserRequest jobSeeker) throws UserException, ParseException, IOException{
 		
-		Optional<User> isEmailExists=userRepository.findByEmail(jobSeeker.getEmail());
-		if(isEmailExists.isPresent())
-		{
-			throw new UserException("Email is already used with another account");
-		}
+	Optional<User> isEmailExists=userRepository.findByEmail(jobSeeker.getEmail());
+	if(isEmailExists.isPresent())
+	{
 		
+		AuthResponse res=new AuthResponse("",false,"Email is already used with another account");
+		return new ResponseEntity<AuthResponse>(res,HttpStatus.OK);
+	}
+	
 		jobSeeker realJobSeeker=new jobSeeker();
 		realJobSeeker.setPassword(passwordEncoder.encode(jobSeeker.getPassword()));
 		if(jobSeeker.getAddress() !=null && !jobSeeker.getAddress().isEmpty())
@@ -125,9 +128,10 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realJobSeeker.setEmail(jobSeeker.getEmail());
 		realJobSeeker.setUserName(jobSeeker.getUserName());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-		realJobSeeker.setBirthDate(dateFormat.parse(jobSeeker.getBirthDate().substring(0,9)));
-		realJobSeeker.setUserType(Role.jobSeeker);
-		realJobSeeker.setExperience(jobSeeker.getExperience());
+		String dateString = jobSeeker.getBirthDate().substring(0, 10); // Adjusted to substring(0, 10) to include yyyy-MM-dd
+		Date parsedDate = dateFormat.parse(dateString);
+		realJobSeeker.setBirthDate(dateFormat.parse(dateFormat.format(parsedDate)));
+	    realJobSeeker.setExperience(jobSeeker.getExperience());
 		realJobSeeker.setEmploymentState(jobSeeker.getEmploymentState());
 		realJobSeeker.setDescription(jobSeeker.getDescription());
 		realJobSeeker.setEducation(jobSeeker.getEducation());
@@ -137,13 +141,16 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realJobSeeker.setVerification(new varification());
 		realJobSeeker.setPicture(jobSeeker.getPicture());
 		realJobSeeker.setGender(jobSeeker.getGender());
+		realJobSeeker.setCreatedDate(LocalDateTime.now());
+		realJobSeeker.setRole(Role.jobSeeker);
+		realJobSeeker.setUserType(Role.jobSeeker);
 		jobSeeker savedJobSeeker=jobSeekerServiceI.insert(realJobSeeker);
 		Authentication authentication=new UsernamePasswordAuthenticationToken(jobSeeker.getEmail(), jobSeeker.getPassword());
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		
 		String token=jwtProvider.generateToken(authentication);
 		
-		AuthResponse res=new AuthResponse(token,true);
+		AuthResponse res=new AuthResponse(token,true,"");
 		
 		return new ResponseEntity<AuthResponse>(res,HttpStatus.CREATED);
 	}
@@ -153,17 +160,13 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 	public ResponseEntity<AuthResponse> createCompanyHandler(
 			@RequestBody registerUserRequest companyAdmin) throws UserException, IOException{
 		
-//		String email=jobSeeker.getEmail();
-//		String password=jobSeeker.getPassword();
-//		String userName=jobSeeker.getUserName();
-//		String userType=jobSeeker.getUserType().name();
-//		Date birthDate=jobSeeker.getBirthDate();
-//		List<String> contacts=jobSeeker.getContacts();
 		
 		Optional<User> isEmailExists=userRepository.findByEmail(companyAdmin.getEmail());
 		if(isEmailExists.isPresent())
 		{
-			throw new UserException("Email is already used with another account");
+			
+			AuthResponse res=new AuthResponse("",false,"Email is already used with another account");
+			return new ResponseEntity<AuthResponse>(res,HttpStatus.OK);
 		}
 		
 		companyAdministrator realCompanyAdmin=new companyAdministrator();
@@ -182,6 +185,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realCompanyAdmin.setEmail(companyAdmin.getEmail());
 		realCompanyAdmin.setUserName(companyAdmin.getUserName());
 		realCompanyAdmin.setUserType(Role.Admin);
+		realCompanyAdmin.setRole(Role.Admin);
 		realCompanyAdmin.setContacts(companyAdmin.getContacts());
 		realCompanyAdmin.setVerification(new varification());
 		realCompanyAdmin.setCompanyName(companyAdmin.getCompanyName());
@@ -189,6 +193,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		realCompanyAdmin.setPicture(companyAdmin.getPicture());
 		realCompanyAdmin.setDescription(companyAdmin.getDescription());
 		realCompanyAdmin.setGender(companyAdmin.getGender());
+		realCompanyAdmin.setCreatedDate(LocalDateTime.now());
 //		realCompanyAdmin.setPicture(picture.getBytes());
 		companyAdministrator savedCompany=companyAdminServiceI.insert(realCompanyAdmin);
 		
@@ -197,7 +202,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		
 		String token=jwtProvider.generateToken(authentication);
 		
-		AuthResponse res=new AuthResponse(token,true);
+		AuthResponse res=new AuthResponse(token,true,"");
 		
 		return new ResponseEntity<AuthResponse>(res,HttpStatus.CREATED);
 	}
@@ -213,7 +218,7 @@ public ResponseEntity<AuthResponse> createJobSeekerHandler(
 		
 		String token=jwtProvider.generateToken(authentication);
 		
-		AuthResponse res=new AuthResponse(token,true);
+		AuthResponse res=new AuthResponse(token,true,"");
 		return new ResponseEntity<AuthResponse>(res,HttpStatus.ACCEPTED);
 		
 		

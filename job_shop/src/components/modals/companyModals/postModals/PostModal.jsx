@@ -80,7 +80,7 @@ export default function PostModal({
   const [filterInputQualifications, setFilterInputQualifications] =
     React.useState("");
   const [fields, setFields] = React.useState([]);
-  const [selectedField, setSelectedField] = React.useState("");
+  const [selectedField, setSelectedField] = React.useState("null");
 
   const post = useSelector((state) => state.post);
   const dispatch = useDispatch();
@@ -640,6 +640,9 @@ export default function PostModal({
                     helperText={formik.touched.field && formik.errors.field}
                     variant="outlined"
                   >
+                    <MenuItem value="">
+                      <em>Select a Field</em>
+                    </MenuItem>
                     {fields.map((field, index) => (
                       <MenuItem key={index} value={field.fieldId}>
                         {field.fieldName}

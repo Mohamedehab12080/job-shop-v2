@@ -156,7 +156,12 @@ const PostCardCompany = ({
             <Typography variant="body2" color="textSecondary" component="p">
               <strong>Employment Type: </strong> {employmentType}
             </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
+            <Typography
+              className="mb-5"
+              variant="body2"
+              color="textSecondary"
+              component="p"
+            >
               <strong>Field: </strong> {fieldName}
             </Typography>
             <Box display="flex" alignItems="center">

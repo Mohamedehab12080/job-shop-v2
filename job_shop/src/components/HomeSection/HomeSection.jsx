@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Avatar, Box, Grid, Tab, TextField } from "@mui/material";
 import logo from "../common/images/default.jpg";
 import { useFormik } from "formik";
@@ -25,6 +25,7 @@ import { recommendedPosts } from "../../store/Post/recommededPost/Action";
 // import { uploadToCloudnary } from "../../Utils/UploadToCloudnary.";
 // import { responseUploadUrl } from "../../Utils/Server";
 import SearchIcon from "@mui/icons-material/Search";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const validationSchema = Yup.object().shape({
   content: Yup.string().required("Info is required"),
@@ -48,6 +49,11 @@ const HomeSection = () => {
 
   const dispatch4 = useDispatch();
 
+  // useEffect(() => {
+  //   if (location.pathname === "signin" || location.pathname === "signup") {
+  //     navigate("/");
+  //   }
+  // }, [auth]);
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
 
@@ -84,12 +90,6 @@ const HomeSection = () => {
   const handleFetchPosts = () => {
     setStatusOfPosts(true); // Set statusOfPosts to true on button click
   };
-
-  React.useEffect(() => {
-    dispatch4(
-      recommendedPosts("Event planning Vendor coordination Budget management ")
-    );
-  }, []);
 
   React.useEffect(() => {
     if (auth.user && auth.user.userType && auth.user.id) {

@@ -291,6 +291,7 @@ public class userService implements userServiceInterface{
 	@Override
 	public List<User> searchUser(String query) {
 		
+		System.out.println("SEARCH ::::: ; "+query);
 		return userRepository.searchUser(query);
 	}
 
