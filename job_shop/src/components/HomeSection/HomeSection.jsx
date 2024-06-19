@@ -258,10 +258,10 @@ const HomeSection = () => {
                     ? jobSeekerPosts
                     : filteredJobSeekerPosts
                   ).map(
-                    (p) =>
+                    (p, index) =>
                       p.companyName !== "" && (
                         <PostCardJobSeeker
-                          key={p.id}
+                          key={index}
                           id={p.id}
                           employerId={p.employerId}
                           employerUserName={p.employerUserName}
@@ -377,10 +377,10 @@ const HomeSection = () => {
                       ? jobSeekerPosts
                       : filteredJobSeekerPosts
                     ).map(
-                      (p) =>
+                      (p, index) =>
                         p.companyName !== "" && (
                           <PostCardJobSeeker
-                            key={p.id}
+                            key={index}
                             id={p.id}
                             employerId={p.employerId}
                             employerUserName={p.employerUserName}

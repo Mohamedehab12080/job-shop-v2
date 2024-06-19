@@ -63,6 +63,12 @@ export default function ShowApplicationsModal({
   const post = useSelector((state) => state.post);
   const jobSeeker = useSelector((state) => state.jobSeeker);
 
+  const [selectedSearchStatus, setSelectedSearchStatus] = React.useState("");
+  const [filteredApplicationsStatus, setFilteredApplicationsStatus] =
+    React.useState([]);
+  const [acceptStatusState, setAcceptStatusState] = React.useState(true);
+  const [rejectStatusState, setRejectStatusState] = React.useState(true);
+  const [progressStatusState, setProgressStatusState] = React.useState(true);
   const handleFilterApplications = (input) => {
     const filtered = fetchedApplications.filter((application) => {
       if (auth.user.userType !== "jobSeeker") {
@@ -134,6 +140,47 @@ export default function ShowApplicationsModal({
     return postSkills.includes(skill);
   };
 
+  const handleSearchApplications = (value) => {
+    switch (value) {
+      case "Accepted":
+        setAcceptStatusState(false);
+        setRejectStatusState(true);
+        setProgressStatusState(true);
+        break;
+      case "Rejected":
+        setAcceptStatusState(true);
+        setRejectStatusState(false);
+        setProgressStatusState(true);
+        break;
+      case "progress":
+        setAcceptStatusState(true);
+        setRejectStatusState(true);
+        setProgressStatusState(false);
+        break;
+      default:
+        setAcceptStatusState(true);
+        setRejectStatusState(true);
+        setProgressStatusState(true);
+        break;
+    }
+
+    if (value !== "progress") {
+      setSelectedSearchStatus(value);
+      const filtered = fetchedApplications.filter((application) => {
+        if (auth.user.userType === "jobSeeker") {
+          return application.statuseCode
+            .toLowerCase()
+            .includes(value.toLowerCase());
+        }
+        return false;
+      });
+      setFilteredApplicationsStatus(filtered);
+    } else {
+      setSelectedSearchStatus("");
+      setFilteredApplicationsStatus([]);
+    }
+  };
+
   return (
     <div>
       <Modal
@@ -183,10 +230,42 @@ export default function ShowApplicationsModal({
               />
             </Grid>
 
+            {auth.user.userType === "jobSeeker" && (
+              <Grid>
+                <div className="flex items-center justify-between mt-3">
+                  <Button
+                    id="basic-button"
+                    disabled={!acceptStatusState}
+                    onClick={() => handleSearchApplications("Accepted")}
+                  >
+                    Accepted Apps
+                  </Button>
+                  <Button
+                    id="basic-button"
+                    disabled={!progressStatusState}
+                    onClick={() => handleSearchApplications("progress")}
+                  >
+                    In progress Apps
+                  </Button>
+                  <Button
+                    id="basic-button"
+                    disabled={!rejectStatusState}
+                    onClick={() => handleSearchApplications("Rejected")}
+                  >
+                    Rejected Apps
+                  </Button>
+                </div>
+              </Grid>
+            )}
+
             <Grid container spacing={2}>
-              {(filterInputApplicants === ""
+              {(filterInputApplicants === "" || selectedSearchStatus === ""
                 ? fetchedApplications
-                : filteredApplicants
+                : filteredApplicants.length > 0
+                ? filteredApplicants
+                : filteredApplicationsStatus.length > 0
+                ? filteredApplicationsStatus
+                : []
               ).map((app) => (
                 <Grid item xs={12} key={app.id}>
                   <Card>
@@ -399,7 +478,6 @@ export default function ShowApplicationsModal({
                             width: 3,
                           }}
                         />
-
                         <Grid item xs={12} md={5}>
                           <Typography variant="subtitle1" fontWeight="bold">
                             Related Post
@@ -409,7 +487,7 @@ export default function ShowApplicationsModal({
                           </Typography>
                           <Typography variant="body1">
                             <strong>Post Experience:</strong>{" "}
-                            {app.postExperienc}
+                            {app.postExperience}
                           </Typography>
                           <Typography variant="body1">
                             <strong>Skills:</strong>
@@ -441,16 +519,19 @@ export default function ShowApplicationsModal({
                                 app.postQualifications.map(
                                   (postQual, index) => (
                                     <li key={index}>
-                                    {isSkillMatched(postQual, app.qualifications) ? (
-                                      <span style={{ color: "green" }}>
-                                        <CheckCircleIcon /> {postQual}
-                                      </span>
-                                    ) : (
-                                      <span style={{ color: "red" }}>
-                                        <CancelIcon /> {postQual}
-                                      </span>
-                                    )}
-                                  </li>
+                                      {isSkillMatched(
+                                        postQual,
+                                        app.qualifications
+                                      ) ? (
+                                        <span style={{ color: "green" }}>
+                                          <CheckCircleIcon /> {postQual}
+                                        </span>
+                                      ) : (
+                                        <span style={{ color: "red" }}>
+                                          <CancelIcon /> {postQual}
+                                        </span>
+                                      )}
+                                    </li>
                                   )
                                 )
                               ) : (

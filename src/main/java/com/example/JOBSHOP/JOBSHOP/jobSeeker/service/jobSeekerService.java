@@ -775,6 +775,91 @@ public class jobSeekerService implements jobSeekerServiceInterface{
 	     }
 	 }
 
+	 @Override
+	 public postDTO getPostByIdAndMatchJobSeekerWithPost(Long jobSeekerId,postDTO post)
+	 {
+		 
+		 try {
+			 if(checkForApply(jobSeekerId,postMapper.mapDTOToPost(post)))
+			 {
+				 Set<String> jobSeekerSkills = 
+		 	    		 jobSeekerSkillServiceI.findByJobSeekerId(jobSeekerId)
+		 	             .stream().map(this::convertJobSeekerSkillToDto)
+		 	             .map(jobSeekerSkillDTO::getSkillName)
+		 	             .collect(Collectors.toSet());
+					System.out.println("Job Seeker Skills : "+jobSeekerSkills);
+					
+					Set<String> jobSeekerQualifications=
+							jobSeekerQualificationServiceI.findByJobSeekerId(jobSeekerId)
+							.stream().map(this::convertJobSeekerQualificationToDto)
+							.map(jobSeekerQualificationDTO::getQualificationName)
+							.collect(Collectors.toSet());
+					System.out.println("Job Seeker Qualifications : "+jobSeekerQualifications);
+									
+				 	Set<String> postSkills = post.getSkills().stream()
+		                    .collect(Collectors.toSet());
+				 	
+		            Set<String> postQualifications = post.getQualifications().stream()
+		                    .collect(Collectors.toSet());
+
+		            
+		            List<String>remainedSkills=applicationService
+		            							.returningRemainedSkillsForListOfPosts(
+		            									new ArrayList<String>(postSkills),
+		            									new ArrayList<String>(jobSeekerSkills));
+		            
+		            List<String> remainedQualifications=applicationService
+		            									.returningRemainedQualificationsForPostList(
+		            											new ArrayList<String>(postQualifications),
+		            											new ArrayList<String>(jobSeekerQualifications));
+		            List<String> matchedSkills=new ArrayList<String>();
+		            for(String matchedSkill:postSkills)
+		            {
+		            	if(!remainedSkills.contains(matchedSkill))
+		            	{
+		            		matchedSkills.add(matchedSkill);
+		            	}
+		            }
+		            post.setMatchedSkills(matchedSkills);
+		            List<String> matchedQualifications=new ArrayList<String>();
+		            for(String matchedQualification:postQualifications)
+		            {
+		            	if(!remainedQualifications.contains(matchedQualification))
+		            	{
+		            		matchedQualifications.add(matchedQualification);
+		            	}
+		            }
+		            post.setMatchedQulifications(matchedQualifications);
+		            post.setRemainedSkills(remainedSkills);
+		            post.setRemainedQualifications(remainedQualifications);
+		            
+		            if(!matchedSkills.isEmpty())
+		            {
+		            	if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
+			            {
+		            		  post.setState(0);
+		            			post.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+					           
+			            }else 
+			            {
+			            	  post.setState(1);   
+				            	post.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");     
+			            }
+			          
+		            }
+		            
+		            return post;
+			 }else 
+			 {
+				 	post.setState(0);
+		            return post;
+			 }
+			 
+		} catch (Exception e) {
+			System.out.println("Error in post by id match : "+e);
+			return null;
+		}
+	 }
 	 /**
 	  * @author BOBO
 	  * The sorted method the score to sort the postScore objects. 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SearchIcon from "@mui/icons-material/Search";
 import { Brightness4, Close, Search } from "@mui/icons-material";
+import Switch from "@mui/material/Switch";
+
 import {
   Button,
   Grid,
@@ -42,6 +44,18 @@ const RightSection = () => {
   const [openSearchModal, setOpenSearchModal] = useState(false);
   const handleOpenSearchModal = () => setOpenSearchModal(true);
   const handleCloseSearchModal = () => setOpenSearchModal(false);
+  const [checked, setChecked] = React.useState(false);
+  const handleChange = (event) => {
+    setChecked(event.target.checked);
+  };
+  useEffect(() => {
+    if (checked) {
+      formik.setFieldValue("employmentType", "Remote");
+    } else {
+      formik.setFieldValue("employmentType", "Close");
+    }
+  }, [checked]);
+
   const handleRemoveField = () => {
     setSelectedField("");
     formik.setFieldValue("fieldName", "");
@@ -207,30 +221,52 @@ const RightSection = () => {
                       </IconButton>
                     </Grid>
                   )}
+
                   <Grid item xs={12} container>
                     <div
                       className="skills-scroll-container sapce-y-2 ml-3 mt-3 "
                       style={{ maxHeight: "200px", overflowY: "auto" }}
                     >
-                      {Array.isArray(fieldsToDisplay) &&
-                        fieldsToDisplay.length > 0 &&
-                        fieldsToDisplay
-                          .filter(
-                            (field) =>
-                              field !== "" && !selectedField.includes(field)
-                          )
-                          .map((field, index) => (
-                            <Button
-                              className="m-2"
-                              key={index}
-                              variant="outlined"
-                              onClick={() => handleAddField(field)}
-                            >
-                              {field}
-                            </Button>
-                          ))}
+                      <ul
+                        style={{
+                          listStyleType: "none",
+                          display: "flex",
+                          flexDirection: "row",
+                          alignItems: "center",
+                          overflowX: "auto",
+                          whiteSpace: "nowrap",
+                          padding: 0,
+                        }}
+                      >
+                        {Array.isArray(fieldsToDisplay) &&
+                          fieldsToDisplay.length > 0 &&
+                          fieldsToDisplay
+                            .filter(
+                              (field) =>
+                                field !== "" && !selectedField.includes(field)
+                            )
+                            .map((field, index) => (
+                              <li
+                                key={index}
+                                style={{
+                                  marginRight: "2px",
+                                  marginBottom: "4px",
+                                }}
+                              >
+                                <Button
+                                  className="m-2"
+                                  key={index}
+                                  variant="outlined"
+                                  onClick={() => handleAddField(field)}
+                                >
+                                  {field}
+                                </Button>
+                              </li>
+                            ))}
+                      </ul>
                     </div>
                   </Grid>
+
                   <Grid
                     item
                     xs={12}
@@ -267,10 +303,23 @@ const RightSection = () => {
                         ))}
                     </TextField>
                   </Grid>
-                  <Grid>
-                    
+                  <Grid className="mt-2">
+                    <div className="flex items-center justify-between">
+                      {" "}
+                      <h4>Employment Type : </h4>
+                      <h5 className="ml-2 mt-2">
+                        {formik.values.employmentType}
+                      </h5>
+                      <Switch
+                        className="mt-1"
+                        checked={checked}
+                        onChange={handleChange}
+                        inputProps={{ "aria-label": "controlled" }}
+                      />
+                    </div>
                   </Grid>
-                  <div className="py-5">
+
+                  <div className="py-2">
                     <Grid item container justifyContent="center">
                       <Button type="submit" variant="contained" color="primary">
                         <Search /> Submit

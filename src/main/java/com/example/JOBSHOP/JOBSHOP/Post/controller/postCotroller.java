@@ -119,7 +119,22 @@ public class postCotroller {
 		User user=userServiceI.findUserByJwt(jwt);
 		if(user!=null)
 		{
-			return new ResponseEntity<postDTO>(postMapper.mapPostTODTO(postService.findById(postId)),HttpStatus.OK);
+			if(!user.getUserType().equals(Role.jobSeeker))
+			{
+				return new ResponseEntity<postDTO>(
+						jobSeekerService
+						.getPostByIdAndMatchJobSeekerWithPost(
+								user
+								.getId(),
+								postMapper
+								.mapPostTODTO(
+										postService
+										.findById(postId))),HttpStatus.OK);
+			}else 
+			{
+				return new ResponseEntity<postDTO>(postMapper.mapPostTODTO(postService.findById(postId)),HttpStatus.OK);
+
+			}
 		}else 
 		{
 			throw new UserException("User not found for this token");

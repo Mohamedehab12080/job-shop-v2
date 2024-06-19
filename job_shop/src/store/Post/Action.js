@@ -139,7 +139,7 @@ export const deleteApplication = (applicationsId) => async (dispatch) => {
 };
 export const rejectApplication = (applicationsId) => async (dispatch) => {
   try {
-    const { data } = await api.delete(
+    const { data } = await api.put(
       `/api/Post/rejectApplication/${applicationsId}`
     );
     dispatch({ type: REJECT_APPLICATION_SUCCESS, payload: data });

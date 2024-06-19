@@ -217,13 +217,19 @@ const PostCardJobSeeker = ({
                       >
                         Matched Skills:
                       </Typography>
-                      <ul>
+                      <ol>
                         {matchedSkills.map((skill, index) => (
-                          <li key={index} className="mr-0">
-                            - {skill}
+                          <li
+                            key={index}
+                            style={{
+                              listStyleType: "disc",
+                              marginLeft: "0.5em", // Reduced margin to bring content closer to the disc
+                            }}
+                          >
+                            {skill}
                           </li>
                         ))}
-                      </ul>
+                      </ol>
                     </div>
                   )}
                 </Box>
@@ -249,7 +255,7 @@ const PostCardJobSeeker = ({
                       >
                         Missed Skills:
                       </Typography>
-                      <ul>
+                      <ol>
                         {remainedSkills.map((skill, index) => (
                           <li
                             key={index}
@@ -258,12 +264,23 @@ const PostCardJobSeeker = ({
                             style={{
                               cursor: "pointer",
                               textDecoration: "underline",
+                              listStyleType: "none",
+                              display: "flex",
+                              alignItems: "center",
                             }}
                           >
-                            {`->`} {skill}
+                            <span
+                              style={{
+                                content: '"\u25E6"', // Unicode for empty circle
+                                marginRight: "0.5em",
+                              }}
+                            >
+                              &#9675;
+                            </span>
+                            {skill}
                           </li>
                         ))}
-                      </ul>
+                      </ol>
                     </div>
                   )}
                 </Box>

@@ -45,4 +45,6 @@ public interface jobSeekerServiceInterface {
 	  * Higher values (indicating more matched skills and fewer remaining skills) will come first due to the negative sign and the nature of the ratio.
 	  */
 	List<postDTO> getPostsFromSearchAndJobSeekerSkills(Long jobSeekerId, List<postDTO> postDtoList);
+
+	postDTO getPostByIdAndMatchJobSeekerWithPost(Long jobSeekerId, postDTO post);
 } 
