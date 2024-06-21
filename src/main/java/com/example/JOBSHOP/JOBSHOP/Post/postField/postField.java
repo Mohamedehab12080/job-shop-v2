@@ -4,19 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntity;
-import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
-import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.fields.Field;
-import com.example.JOBSHOP.JOBSHOP.skills.Skill;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobModel;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.criteria.Fetch;
 
 @Entity
 public class postField extends baseEntity<Long>{
@@ -28,18 +23,20 @@ public class postField extends baseEntity<Long>{
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="field_id")
 	private Field field;
-	
+	  
+	@ManyToOne
+	@JoinColumn(name="jobModel_id")
+	private jobModel jobModel;
 	
 //	@OneToOne
 //	@JoinColumn(name="Post_id")
 //	private Post post;
 	
 	
-	
+	@Column(length = 512) 
 	private List<String> skills=new ArrayList<String>();
-	
+	@Column(length = 512) 
 	private List<String> qualifications=new ArrayList<String>();
-	
 	
 //	public Post getPost() {
 //		return post;
@@ -47,8 +44,16 @@ public class postField extends baseEntity<Long>{
 //	public void setPost(Post post) {
 //		this.post = post;
 //	}
+	
+	
 	public List<String> getQualifications() {
 		return qualifications;
+	}
+	public jobModel getJobModel() {
+		return jobModel;
+	}
+	public void setJobModel(jobModel jobModel) {
+		this.jobModel = jobModel;
 	}
 	public void setQualifications(List<String> qualifications) {
 		this.qualifications = qualifications;

@@ -24,11 +24,15 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFiel
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.DTO.companyFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.service.companyFieldQualificationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.companyFieldJob;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.service.companyFieldJobServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.service.companyFieldSkillsServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
 import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.fields.Field;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobModel;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.service.jobServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.fields.service.fieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.skills.Skill;
 import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
@@ -66,6 +70,12 @@ public class companyFieldService implements companyFieldServiceInterface{
 	 
 	 @Autowired
 	 private fieldServiceInterface fieldServiceI;
+	 
+	 @Autowired
+	 private jobServiceInterface jobServiceI;
+	 
+	 @Autowired
+	 private companyFieldJobServiceInterface companyFieldJobServiceI;
 //	 public postField findPostFieldWithFieldName(String fieldName)
 //	 {
 //		 return postFieldService.findByEmployerField(companyFieldRepository.findIdByFieldName(fieldName));
@@ -144,8 +154,8 @@ public class companyFieldService implements companyFieldServiceInterface{
 		@Override
 		public companyField insertCompanyFieldAndSkillsAndQualifications(Long companyAdminId,
 				companyFieldDTO dto) {
-		    // Create companyAdmin 
-		    companyAdministrator companyAdmin = new companyAdministrator();
+
+			companyAdministrator companyAdmin = new companyAdministrator();
 		    companyAdmin.setId(companyAdminId);
 		    
 		    //companyField object
@@ -176,7 +186,7 @@ public class companyFieldService implements companyFieldServiceInterface{
 			    {
 			    	Set<String> newQuals = new HashSet<>(dto.getQualifications());//Set of new skills that will be inserted 
 				    
-				    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that conatains existing qual the Qual name and qual object
+				    Map<String, Qualification> existingQuals = new HashMap<>(); //Map that contains existing qual the Qual name and qual object
 				   
 				    List<Qualification> qualificationsToInsert = new ArrayList<>();
 				    
@@ -280,6 +290,89 @@ public class companyFieldService implements companyFieldServiceInterface{
 			    return null;
 		   }
 		    		}
+		/**
+		 * @author BOBO
+		 * @implNote insert companyField and Jobs
+		 */
+		public companyField insertCompanyFieldWithJobs(Long companyAdminId,
+				companyFieldDTO dto) {
+
+			companyAdministrator companyAdmin = new companyAdministrator();
+		    companyAdmin.setId(companyAdminId);
+		    
+		    //companyField object
+		    companyField com = new companyField();
+		    Field field=fieldServiceI.findByName(dto.getFieldName());
+		    if(field!=null)
+		    {
+		     com.setField(field);			   
+		    }else 
+		    {
+		    	Field field2=new Field();
+		    	field2.setFieldName(dto.getFieldName());
+		    	Field insertedField=fieldServiceI.insertForCompanyOperation(field2);
+		    	field=insertedField;
+		    	com.setField(insertedField);
+		    } 
+		    com.setField(field);
+	    	 if(findByFieldIdAndCompanyId(field.getId(),companyAdmin.getId())==null)
+			   {
+	    		 	com.setCompanyAdministrator(companyAdmin);
+				   companyField returnedcompanyField=companyFieldRepository.save(com); //insert the companyField containing fieldName and companyAdmin.   
+				   
+				    if(!dto.getJobs().isEmpty()) 
+				    {
+				    	   
+				    	 Set<String> newJobs = new HashSet<>(dto.getJobs());
+						    
+						    Map<String, jobModel> existingJobs = new HashMap<>(); 
+
+						    List<jobModel> jobToInsert = new ArrayList<>();
+					    for(String newJob:newJobs) 
+					    {
+					    	System.out.println("JOBS TO INSERT : "+dto.getJobs());
+					    	jobModel jobSearch= jobServiceI.findByName(newJob);
+					    	if(jobSearch!=null) 
+					    	{
+					    		existingJobs.put(jobSearch.getName(), jobSearch); 
+					    	}
+					    	
+					    	if (!existingJobs.containsKey(newJob)) {
+					            jobModel newJobObj = new jobModel();
+					            newJobObj.setName(newJob);
+					            jobToInsert.add(newJobObj);
+					        }
+					    }
+					    
+					    
+					    
+					    jobServiceI.insertAll(jobToInsert); 
+
+					    List<jobModel> allJobs = new ArrayList<>(existingJobs.values());
+					    allJobs.addAll(jobToInsert);
+
+					    List<companyFieldJob> companyFieldJobs = new ArrayList<>();
+					    for (jobModel job : allJobs) {
+					        companyFieldJob companyFieldJob = new companyFieldJob();
+					        companyFieldJob.setCompanyField(com);
+					        companyFieldJob.setJobModel(job);
+					        companyFieldJobs.add(companyFieldJob);
+					    }
+					    
+					    companyFieldJobServiceI.insertAll(companyFieldJobs);
+					    
+
+				    }
+				    
+
+				 		    // Return the inserted companyField object
+				    return returnedcompanyField;
+			   }else
+			   {
+				   return null;
+			   }
+
+		  }
 		
 //		/**
 //		 * 

@@ -71,14 +71,16 @@ const RightSection = () => {
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch3(fetchLocations());
+        if (openSearch) {
+          await dispatch3(fetchLocations());
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
       }
     };
 
     fetchData();
-  }, [dispatch3]);
+  }, [dispatch3, openSearch]);
 
   useEffect(() => {
     let updatedLocations = [...locationReducer.locations];
@@ -329,13 +331,15 @@ const RightSection = () => {
                 </div>
               </form>
             </Slide>
-            <SearchModal
-              openShowSearchUsersModal={openSearchModal}
-              handleCloseShowSearchUsersModal={handleCloseSearchModal}
-            />
           </Grid>
         </>
       )}
+      <section>
+        <SearchModal
+          openShowSearchUsersModal={openSearchModal}
+          handleCloseShowSearchUsersModal={handleCloseSearchModal}
+        />
+      </section>
     </div>
   );
 };

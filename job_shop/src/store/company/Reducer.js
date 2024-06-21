@@ -71,6 +71,7 @@ export const companyReducer = (state = initialState, action) => {
     case GIVE_EMPLOYER_FIELDS_FAILURE:
     case GET_COMPANY_INFO_FAILURE:
     case UPDATE_COMPANY_INFO_FAILURE:
+      console.log("EROR PRR : ", action.payload);
       return { ...state, loading: false, error: action.payload };
 
     case CREATE_FIELD_SUCCCESS:

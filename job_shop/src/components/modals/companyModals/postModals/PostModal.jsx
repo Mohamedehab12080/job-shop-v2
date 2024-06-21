@@ -3,7 +3,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
 import { useFormik } from "formik";
-import { IconButton, MenuItem, Slide } from "@mui/material";
+import { IconButton, InputAdornment, MenuItem, Slide } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import TextField from "@mui/material/TextField";
 import Grid from "@mui/material/Grid";
@@ -11,9 +11,14 @@ import axios from "axios";
 import * as Yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { getEmployerFields } from "../../../../store/company/Employer/Action";
-import { createPost, editPost } from "../../../../store/Post/Action";
+import {
+  createPost,
+  createPostWithJob,
+  editPost,
+} from "../../../../store/Post/Action";
 import { uploadToCloudnary } from "../../../../Utils/UploadToCloudnary.";
 import { library } from "@fortawesome/fontawesome-svg-core";
+import AddIcon from "@mui/icons-material/Add";
 import {
   faSpinner,
   faCheckCircle,
@@ -80,8 +85,9 @@ export default function PostModal({
   const [filterInputQualifications, setFilterInputQualifications] =
     React.useState("");
   const [fields, setFields] = React.useState([]);
+  const [jobs, setJobs] = React.useState([]);
   const [selectedField, setSelectedField] = React.useState("null");
-
+  const [selectedJob, setSelectedJob] = React.useState("null");
   const post = useSelector((state) => state.post);
   const dispatch = useDispatch();
 
@@ -107,6 +113,7 @@ export default function PostModal({
 
   const [messageAfterSave, setMessageAfterSave] = React.useState("");
   const [postState, setPostState] = React.useState(false);
+
   React.useEffect(() => {
     const fetchData = async () => {
       try {
@@ -123,20 +130,22 @@ export default function PostModal({
   React.useEffect(() => {
     if (openPostModal) {
       setFields(emp.fields);
-      console.log("Fetched Fields : ", emp.fields);
+      console.log("Fetched Fields Front : ", emp.fields);
     }
   }, [openPostModal, emp]);
 
   React.useEffect(() => {
     const fetchData = async () => {
       try {
-        await dispatch3(fetchLocations());
+        if (openPostModal) {
+          await dispatch3(fetchLocations());
+        }
       } catch (error) {
         console.error("Error fetching locations:", error);
       }
     };
     fetchData();
-  }, [dispatch3]);
+  }, [dispatch3, openPostModal]);
 
   React.useEffect(() => {
     setLocations(locationReducer.locations);
@@ -152,13 +161,6 @@ export default function PostModal({
     setLocations(updatedLocations);
   }, [locationReducer.locations]);
 
-  React.useEffect(() => {
-    // Ensure selectedField is set to a valid option if it's not already
-    if (!selectedField && fields.length > 0) {
-      setSelectedField(fields[0].fieldId); // Set to the first available option
-    }
-  }, [fields, selectedField]);
-
   const renderIcon = () => {
     if (uploadStatus === "uploading") {
       return <FontAwesomeIcon icon="spinner" spin />; // Display spinner icon while uploading
@@ -170,35 +172,31 @@ export default function PostModal({
       return <FontAwesomeIcon icon="cloud-upload-alt" />; // Default upload icon
     }
   };
-  // React.useEffect(() => {
-
-  //   // Fetch fields when the component mounts
-  //   if(openPostModal)
-  //   {
-  //     fetchFields();
-  //   }
-  // }, []); // Empty dependency array ensures the effect runs only once after initial render
-
-  // const fetchFields = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:8089/employer/findFields/2"
-  //     ); // Replace '/api/findFields/1' with your actual endpoint
-  //     setFields(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching fields:", error);
-  //   }
-  // };
 
   const handleFieldSelect = (value) => {
-    const field = fields.find((field) => field.fieldId === Number(value));
-    setSelectedField(value);
-    console.log("Selected Field ID : ", field.fieldId);
-    skillsOptions = field.skills;
-    setFilteredSkills(field.skills);
-    qualificationOptions = field.qualifications;
-    setFilteredQualifications(field.qualifications);
-    formik.setFieldValue("field", field.fieldId);
+    if (value) {
+      const field = fields.find((field) => field.fieldId === Number(value));
+      setSelectedField(value);
+      console.log("Selected Field ID : ", field.fieldId);
+      setJobs(field.companyFieldJobDTOs || []);
+      formik.setFieldValue("field", value);
+    }
+  };
+
+  const handleCompanyFieldJobSelect = (value) => {
+    if (value) {
+      if (selectedSkills) {
+        setSelectedSkills([]);
+      }
+      const job = jobs.find((job) => job.jobId === Number(value));
+      setSelectedJob(value);
+      console.log("Selected Job ID : ", job.jobId);
+      skillsOptions = job.skillsName || [];
+      setFilteredSkills(job.skillsName || []);
+      qualificationOptions = job.qualificationsName || [];
+      setFilteredQualifications(job.qualificationsName || []);
+      formik.setFieldValue("jobId", job.jobId);
+    }
   };
 
   const handleOther = (location) => {
@@ -263,7 +261,7 @@ export default function PostModal({
             postImage: imageUrl,
           };
           console.log("values : ", updatedValues);
-          dispatch(createPost(updatedValues));
+          dispatch(createPostWithJob(updatedValues));
           setDisabled(true);
           if (post.response.id !== 0) {
             actions.resetForm();
@@ -362,49 +360,52 @@ export default function PostModal({
       jobRequirments: "",
       employmentType: "",
       experience: "",
+      jobId: 0,
     },
     validationSchema: validationSchema,
     onSubmit: handleSubmit,
   });
 
   React.useEffect(() => {
-    if (operationType === "edit" && openPostModal && fields.length > 0) {
-      if (Title.includes("{")) {
-        formik.setFieldValue("title", Title.substring(0, Title.indexOf("{")));
-      } else {
-        formik.setFieldValue("title", Title);
-      }
+    if (operationType === "edit" && openPostModal) {
+      // Initialize form fields only if fields are loaded
+      if (fields.length > 0) {
+        if (Title.includes("{")) {
+          formik.setFieldValue("title", Title.substring(0, Title.indexOf("{")));
+        } else {
+          formik.setFieldValue("title", Title);
+        }
 
-      formik.setFieldValue("description", description);
-      formik.setFieldValue("location", location);
-      console.log("field ID : ", field);
-      const fieldObj = fields.find(
-        (fieldObj) => fieldObj.fieldName === fieldName
-      );
-      if (fieldObj) {
-        setSelectedField(fieldObj);
-        // console.log("Selected Field ID : ",fieldObj.id);
-        skillsOptions = fieldObj.skills;
-        setFilteredSkills(fieldObj.skills);
-        qualificationOptions = fieldObj.qualifications;
-        setFilteredQualifications(fieldObj.qualifications);
-        formik.setFieldValue("field", fieldObj.fieldId);
+        formik.setFieldValue("description", description);
+        formik.setFieldValue("location", location);
+
+        const fieldObj = fields.find(
+          (fieldObj) => fieldObj.fieldName === fieldName
+        );
+        if (fieldObj) {
+          setSelectedField(fieldObj.fieldId);
+          skillsOptions = fieldObj.skills;
+          setFilteredSkills(fieldObj.skills);
+          qualificationOptions = fieldObj.qualifications;
+          setFilteredQualifications(fieldObj.qualifications);
+          formik.setFieldValue("field", fieldObj.fieldId);
+        }
+
+        formik.setFieldValue("skills", skills);
+        setSelectedSkills(skills);
+        formik.setFieldValue("qualifications", qualifications);
+        setSelectedQualifications(qualifications);
+        formik.setFieldValue("jobRequirments", jobRequirments);
+        formik.setFieldValue("employmentType", employmentType);
+        formik.setFieldValue("experience", Experience);
+        formik.setFieldValue("postImage", postImage);
+        setPreview(postImage);
       }
-      formik.setFieldValue("skills", skills);
-      setSelectedSkills(skills);
-      formik.setFieldValue("qualifications", qualifications);
-      setSelectedQualifications(qualifications);
-      console.log("JOB REQUIREMENTS : ", jobRequirments);
-      formik.setFieldValue("jobRequirments", jobRequirments);
-      formik.setFieldValue("employmentType", employmentType);
-      formik.setFieldValue("experience", Experience);
-      formik.setFieldValue("postImage", postImage);
-      setPreview(postImage);
     }
   }, [
     openPostModal,
     operationType,
-    id,
+    fields, // Added fields as a dependency
     Title,
     description,
     Experience,
@@ -415,7 +416,26 @@ export default function PostModal({
     qualifications,
     field,
     postImage,
+    fieldName, // Added fieldName as a dependency
   ]);
+
+  // Add another useEffect to handle the case when fields are loaded
+  React.useEffect(() => {
+    if (operationType === "edit" && openPostModal && fields.length > 0) {
+      // This block runs when fields are loaded
+      const fieldObj = fields.find(
+        (fieldObj) => fieldObj.fieldName === fieldName
+      );
+      if (fieldObj) {
+        setSelectedField(fieldObj.fieldId);
+        skillsOptions = fieldObj.skills;
+        setFilteredSkills(fieldObj.skills);
+        qualificationOptions = fieldObj.qualifications;
+        setFilteredQualifications(fieldObj.qualifications);
+        formik.setFieldValue("field", fieldObj.fieldId);
+      }
+    }
+  }, [fields, openPostModal, operationType, fieldName]);
   const handleAddSkill = (skill) => {
     if (!selectedSkills.includes(skill)) {
       const updatedSkills = [...selectedSkills, skill];
@@ -479,6 +499,26 @@ export default function PostModal({
     setFilterInputQualifications("");
   };
 
+  const handleAddManualQual = (value) => {
+    if (
+      filterInputQualifications !== "" &&
+      !selectedQualifications.includes(value)
+    ) {
+      const updatedQuals = [...selectedQualifications, value];
+      setSelectedQualifications(updatedQuals);
+      formik.setFieldValue("qualifications", updatedQuals);
+      setFilterInputQualifications("");
+    }
+  };
+
+  const handleAddManualSkill = (value) => {
+    if (filterInputSkills !== "" && !selectedSkills.includes(value)) {
+      const updatedSkills = [...selectedSkills, value];
+      setSelectedSkills(updatedSkills);
+      formik.setFieldValue("skills", updatedSkills);
+      setFilterInputSkills("");
+    }
+  };
   return (
     <div>
       <Modal
@@ -634,15 +674,12 @@ export default function PostModal({
                     id="field"
                     name="field"
                     label="Select a Field"
-                    value={selectedField}
+                    value={selectedField || ""}
                     onChange={(event) => handleFieldSelect(event.target.value)}
                     error={formik.touched.field && Boolean(formik.errors.field)}
                     helperText={formik.touched.field && formik.errors.field}
                     variant="outlined"
                   >
-                    <MenuItem value="">
-                      <em>Select a Field</em>
-                    </MenuItem>
                     {fields.map((field, index) => (
                       <MenuItem key={index} value={field.fieldId}>
                         {field.fieldName}
@@ -654,29 +691,24 @@ export default function PostModal({
                   <TextField
                     fullWidth
                     select
-                    id="experience"
-                    name="experience"
-                    label="Experience"
-                    value={formik.values.experience}
-                    onChange={formik.handleChange}
+                    id="job"
+                    name="job"
+                    label="Select a Job"
+                    value={selectedJob || ""}
+                    onChange={(event) =>
+                      handleCompanyFieldJobSelect(event.target.value)
+                    }
+                    error={formik.touched.jobId && Boolean(formik.errors.jobId)}
+                    helperText={formik.touched.jobId && formik.errors.jobId}
                     variant="outlined"
-                    error={
-                      formik.touched.experience &&
-                      Boolean(formik.errors.experience)
-                    }
-                    helperText={
-                      formik.touched.experience && formik.errors.experience
-                    }
                   >
-                    <MenuItem value="No">No</MenuItem>
-                    <MenuItem value="1-2">1-2</MenuItem>
-                    <MenuItem value="2-5">2-5</MenuItem>
-                    <MenuItem value="5-8">5-8</MenuItem>
-                    <MenuItem value="8-10">8-10</MenuItem>
-                    <MenuItem value="more than 10">more than 10</MenuItem>
+                    {jobs.map((job, index) => (
+                      <MenuItem key={index} value={job.jobId}>
+                        {job.jobName}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
-
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -692,8 +724,22 @@ export default function PostModal({
                     helperText={
                       formik.touched.filterSkills && formik.errors.filterSkills
                     }
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              handleAddManualSkill(filterInputSkills.trim())
+                            }
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
+
                 <Grid item xs={12}>
                   <div className="selected-skills-container">
                     {selectedSkills.length > 0 ? (
@@ -743,6 +789,21 @@ export default function PostModal({
                     label="Filter Qualifications"
                     value={filterInputQualifications}
                     onChange={(e) => handleFilterQualifications(e.target.value)}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() =>
+                              handleAddManualQual(
+                                filterInputQualifications.trim()
+                              )
+                            }
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
                   />
                 </Grid>
                 <Grid item xs={12}>
@@ -791,6 +852,32 @@ export default function PostModal({
                         </Button>
                       ))}
                   </div>
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    select
+                    id="experience"
+                    name="experience"
+                    label="Experience"
+                    value={formik.values.experience}
+                    onChange={formik.handleChange}
+                    variant="outlined"
+                    error={
+                      formik.touched.experience &&
+                      Boolean(formik.errors.experience)
+                    }
+                    helperText={
+                      formik.touched.experience && formik.errors.experience
+                    }
+                  >
+                    <MenuItem value="No">No</MenuItem>
+                    <MenuItem value="1-2">1-2</MenuItem>
+                    <MenuItem value="2-5">2-5</MenuItem>
+                    <MenuItem value="5-8">5-8</MenuItem>
+                    <MenuItem value="8-10">8-10</MenuItem>
+                    <MenuItem value="more than 10">more than 10</MenuItem>
+                  </TextField>
                 </Grid>
 
                 <Grid item xs={12}>

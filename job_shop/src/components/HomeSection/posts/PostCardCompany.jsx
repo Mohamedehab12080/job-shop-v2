@@ -11,7 +11,9 @@ import {
   MenuItem,
   Typography,
   Divider,
+  Button,
 } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import {
   MoreHoriz as MoreHorizIcon,
   Group as GroupIcon,
@@ -23,6 +25,7 @@ import ConfirmMessage from "../../../responses/ConfirmMessage";
 import ShowApplicationsModal from "../../modals/companyModals/postModals/ShowApplicationsModal";
 import ShowPostImageModal from "./ShowPostImageModal";
 import PostModal from "../../modals/companyModals/postModals/PostModal";
+import ShowSkillsModal from "../../Profile/ShowSkillsModal";
 
 const PostCardCompany = ({
   id,
@@ -43,6 +46,7 @@ const PostCardCompany = ({
   applicationCount,
   postImage,
   statusCode,
+  jobName,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const openMenu = Boolean(anchorEl);
@@ -57,6 +61,19 @@ const PostCardCompany = ({
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
 
+  const [openShowSkillsModal, setOpenShowSkillsModal] = useState(false);
+  const handleOpenShowSkillsModal = () => setOpenShowSkillsModal(true);
+  const handleCloseShowSkillsModal = () => setOpenShowSkillsModal(false);
+
+  const MAX_DISPLAY_LENGTH = 70; // Example maximum length before tooltip appears
+
+  // Function to truncate text if it exceeds the maximum length
+  const truncateText = (text, maxLength) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "..."; // Adjust ellipsis as needed
+    }
+    return text;
+  };
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -145,78 +162,197 @@ const PostCardCompany = ({
         </Typography>
         {!hidden && (
           <>
-            <Divider sx={{ my: 2 }} />
-            <Typography variant="body2" color="textSecondary" component="p">
-              <strong>Experience: </strong> {Experience} Years
-            </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
-              <FmdGoodIcon sx={{ mr: 0.5 }} /> <strong>Location: </strong>{" "}
-              {location}
-            </Typography>
-            <Typography variant="body2" color="textSecondary" component="p">
-              <strong>Employment Type: </strong> {employmentType}
-            </Typography>
-            <Typography
-              className="mb-5"
-              variant="body2"
-              color="textSecondary"
-              component="p"
+            <div
+              style={{
+                overflowX: "auto", // Enable horizontal scrolling if content overflows
+                display: "flex", // Display children elements in a row
+                flexDirection: "row", // Align children in a row
+                alignItems: "center", // Align items vertically center
+                padding: "5%",
+                margin: "5%",
+                gap: "2px", // Add gap between children for spacing
+                flexWrap: "nowrap", // Prevent wrapping to next row
+              }}
             >
-              <strong>Field: </strong> {fieldName}
-            </Typography>
-            <Box display="flex" alignItems="center">
-              <Box flexGrow={1}>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  <strong>Skills:</strong>
-                </Typography>
-                <ul
-                  style={{
-                    listStyleType: "none",
-                    paddingInlineStart: 0,
-                    marginBottom: 0,
+              {/* Each Typography component */}
+              <Typography
+                className="p-2"
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ minWidth: "200px" }} // Set a minimum width to avoid collapsing
+              >
+                <strong>Experience: </strong> {Experience} Years
+              </Typography>
+
+              <Typography
+                className="p-2"
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ minWidth: "200px" }}
+              >
+                <FmdGoodIcon sx={{ mr: 0.5 }} /> <strong>Location: </strong>{" "}
+                {location}
+              </Typography>
+
+              <Typography
+                className="p-2"
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ minWidth: "200px" }}
+              >
+                <strong>Employment Type: </strong> {employmentType}
+              </Typography>
+
+              <Typography
+                className="p-2"
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ minWidth: "200px" }}
+              >
+                <strong>Field: </strong> {fieldName}
+              </Typography>
+
+              <Typography
+                className="p-2"
+                variant="body2"
+                color="textSecondary"
+                component="p"
+                style={{ minWidth: "200px" }}
+              >
+                <strong>Job Name : </strong> {jobName}
+              </Typography>
+            </div>
+
+            <Box sx={{ overflowX: "auto", width: "100%" }}>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                {/* Left Section - Skills */}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  sx={{
+                    minWidth: 0,
+                    p: 2,
+                    mr: 2,
+                    flexShrink: 0,
+                    flexBasis: "70%",
+                    position: "relative", // Ensure the container is relative for tooltip positioning
                   }}
                 >
-                  {skills.map((skill, index) => (
-                    <li key={index}>
-                      <Typography component="span" sx={{ mr: 1 }}>
-                        &bull;
-                      </Typography>
-                      {skill}
-                    </li>
-                  ))}
-                </ul>
-              </Box>
-              <Divider
-                orientation="vertical"
-                flexItem
-                sx={{
-                  mx: 2,
-                  height: "80%", // Adjust the height as per your design
-                  backgroundColor: "black", // Change the color to black
-                  borderLeft: "1px solid black", // Add a border for visibility
-                }}
-              />
-              <Box flexGrow={1}>
-                <Typography variant="body2" color="textSecondary" component="p">
-                  <strong>Qualifications:</strong>
-                </Typography>
-                <ul
-                  style={{
-                    listStyleType: "none",
-                    paddingInlineStart: 0,
-                    marginBottom: 0,
+                  <Grid item container justifyContent="center">
+                    <Button
+                      onClick={handleOpenShowSkillsModal}
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                    >
+                      Show
+                    </Button>
+                  </Grid>
+                  <Box
+                    flexGrow={1}
+                    sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      <strong>Skills:</strong>
+                    </Typography>
+                    <ul
+                      style={{
+                        listStyleType: "none",
+                        paddingInlineStart: 0,
+                        marginBottom: 0,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {skills.map((skill, index) => (
+                        <li key={index}>
+                          <Tooltip
+                            title={
+                              skill.length > MAX_DISPLAY_LENGTH
+                                ? skill
+                                : undefined
+                            }
+                            placement="top"
+                          >
+                            <span>
+                              <Typography component="span" sx={{ mr: 1 }}>
+                                &bull;
+                              </Typography>
+                              {truncateText(skill, MAX_DISPLAY_LENGTH)}
+                            </span>
+                          </Tooltip>
+                        </li>
+                      ))}
+                    </ul>
+                  </Box>
+                </Box>
+
+                {/* Right Section - Qualifications */}
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  sx={{
+                    minWidth: 0,
+                    p: 2,
+                    ml: 2,
+                    flexShrink: 0,
+                    flexBasis: "50%",
+                    position: "relative", // Ensure the container is relative for tooltip positioning
                   }}
                 >
-                  {qualifications.map((qualification, index) => (
-                    <li key={index}>
-                      <Typography component="span" sx={{ mr: 1 }}>
-                        &bull;
-                      </Typography>
-                      {qualification}
-                    </li>
-                  ))}
-                </ul>
-              </Box>
+                  <Box
+                    flexGrow={1}
+                    sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                  >
+                    <Typography
+                      variant="body2"
+                      color="textSecondary"
+                      component="p"
+                    >
+                      <strong>Qualifications:</strong>
+                    </Typography>
+                    <ul
+                      style={{
+                        listStyleType: "none",
+                        paddingInlineStart: 0,
+                        marginBottom: 0,
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      {qualifications.map((qualification, index) => (
+                        <li key={index}>
+                          <Tooltip
+                            title={
+                              qualification.length > MAX_DISPLAY_LENGTH
+                                ? qualification
+                                : undefined
+                            }
+                            placement="top"
+                          >
+                            <span>
+                              <Typography component="span" sx={{ mr: 1 }}>
+                                &bull;
+                              </Typography>
+                              {truncateText(qualification, MAX_DISPLAY_LENGTH)}
+                            </span>
+                          </Tooltip>
+                        </li>
+                      ))}
+                    </ul>
+                  </Box>
+                </Box>
+              </div>
             </Box>
           </>
         )}
@@ -284,6 +420,12 @@ const PostCardCompany = ({
         Title="DELETE CONFIRM"
         postId={id}
         operationType="deletePost"
+      />
+      <ShowSkillsModal
+        openShowSkillsModal={openShowSkillsModal}
+        handleCloseShowSkillsModal={handleCloseShowSkillsModal}
+        skills={skills}
+        qualifications={qualifications}
       />
     </Card>
   );

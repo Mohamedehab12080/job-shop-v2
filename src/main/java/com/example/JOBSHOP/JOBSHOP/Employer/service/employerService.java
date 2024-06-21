@@ -35,15 +35,34 @@ import com.example.JOBSHOP.JOBSHOP.Post.postField.service.postFieldServiceInterf
 import com.example.JOBSHOP.JOBSHOP.Post.service.postServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Registration.controllers.registerUserRequest;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.companyFieldJob;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.companyFieldJobSkills.companyFieldJobSkill;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.service.companyFieldJobServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.service.companyFieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
+import com.example.JOBSHOP.JOBSHOP.degrees.Qualification;
+import com.example.JOBSHOP.JOBSHOP.degrees.service.qualificationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobModel;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.jobQualificationModel;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.DTO.jobQualificationDTO;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.DTO.jobQualificationMapper;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.service.jobQualificationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.jobSkillModel;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.DTO.jobSkillModelDTOMapper;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.service.jobSkillModelServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.service.jobServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.location.location;
 import com.example.JOBSHOP.JOBSHOP.location.service.locationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.skills.Skill;
+import com.example.JOBSHOP.JOBSHOP.skills.service.skillServiceInterface;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
 import com.opencsv.CSVWriter;
 import com.opencsv.exceptions.CsvValidationException;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -66,6 +85,27 @@ public class employerService implements employerServiceInterface{
 	
 	@Autowired
 	private locationServiceInterface locationServiceI;
+	
+	@Autowired
+	private skillServiceInterface skillServiceI;
+	
+	@Autowired
+	private jobServiceInterface jobServiceI;
+	
+	@Autowired
+	private companyFieldServiceInterface companyFieldServiceI;
+	
+	@Autowired
+	private companyFieldJobServiceInterface companyFieldJobServiceI;
+	
+	@Autowired
+	private jobSkillModelServiceInterface jobSkillModelServiceI;
+	
+	@Autowired
+	private jobQualificationServiceInterface jobQualificationServiceI;
+	
+	@Autowired
+	private qualificationServiceInterface qualificationServiceI;
 	
 	@Override
 	public Employer insert(Employer employer)
@@ -225,8 +265,16 @@ public Post createAPost(Post post) {
 	          employerField employerField = employerFieldServiceI.findById(user.getId(), postDTO.getField());
 		        System.out.println("The user id and Field id  : "+user.getId()+" : : : "+postDTO.getField());
 
-	            if (postField.getSkills().isEmpty()) {
-	                employerField.getCompanyField().getCompanyFieldSkills().forEach(skill -> skills.add(skill.getCompanyFieldSkill().getSkillName()));
+	            if (postField.getSkills().isEmpty()) {		
+	                employerField
+	                .getCompanyField()
+	                .getCompanyFieldSkills()
+	                .forEach(
+	                		skill ->
+	                			skills
+	                				.add(skill
+	                						.getCompanyFieldSkill()
+	                						.getSkillName()));
 	                postField.setSkills(new ArrayList<>(skills));
 	            }else 
 	            {
@@ -234,15 +282,15 @@ public Post createAPost(Post post) {
 	                postField.setSkills(new ArrayList<>(skills));
 	            }
 	            
-	            if (postField.getQualifications().isEmpty()) {
-	                employerField.getCompanyField().getCompanyFieldQualifications().forEach(qual -> qualifications.add(qual.getQualification().getQualificationName()));
-	                postField.setQualifications(new ArrayList<>(qualifications));
-	            }
-	            else 
-	            {
-	            	postField.getQualifications().forEach(qual-> qualifications.add(qual));
-	                postField.setQualifications(new ArrayList<>(qualifications));
-	            }
+//	            if (postField.getQualifications().isEmpty()) {
+//	                employerField.getCompanyField().getCompanyFieldQualifications().forEach(qual -> qualifications.add(qual.getQualification().getQualificationName()));
+//	                postField.setQualifications(new ArrayList<>(qualifications));
+//	            }
+//	            else 
+//	            {
+//	            	postField.getQualifications().forEach(qual-> qualifications.add(qual));
+//	                postField.setQualifications(new ArrayList<>(qualifications));
+//	            }
 	            
 	     
 	            	
@@ -265,7 +313,7 @@ public Post createAPost(Post post) {
 	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
 	                  postServiceI.updatePostForCreate(post);
 	  	        }
-	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output.csv";
+	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output2.csv";
 			        String[] newRowData = {""+insertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
 		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
 			        try {
@@ -295,8 +343,334 @@ public Post createAPost(Post post) {
 	        return null;
 	    }
 	}
+//	
+//
+//	@Override
+//	@Transactional
+//	public Post createAPostWithJobs(Employer user,postDTO postDTO) {
+//	    try {
+//	    	
+//	    	postDTO.setProfileId(
+//	    			companyProfileService
+//	    			.findByCompanyAdmin
+//	    			(user.getCompanyAdmin().getId())
+//	    			.getId());
+//	    	postDTO.setEmployerId(user.getId());
+//	        Post post = convertDTOTOPOST(postDTO);
+//	        
+//	        
+//	        postField postField=postDTO.getPostField2();
+//	        	
+//	        Set<String> skills = new HashSet<>();
+//	        Set<String> qualifications = new HashSet<>();
+//	        employerField employerField = employerFieldServiceI.findById(user.getId(), postDTO.getField());
+//
+//	        jobModel jobModel=jobServiceI.findById(postDTO.getJobId());
+//	        
+//	        System.out.println("Field Id : "+postField.getField().getId()+" user ID : "+user.getCompanyAdmin().getId());
+//	        
+//	        companyField compF=companyFieldServiceI.findByFieldIdAndCompanyId(postField.getField().getId(),user.getCompanyAdmin().getId());
+//	       
+//	        
+//	        if(jobModel!=null)
+//	        {
+//	        	
+//	        }else 
+//	        {
+//	        	jobModel jobModelForInsert=new jobModel();
+//	        	jobModelForInsert.setName(postDTO.getJobName());
+//	        	jobModel=jobServiceI.insert(jobModelForInsert);
+//	        }
+//	        	postField.setJobModel(jobModel);
+//	        	
+//	        	
+//	        if(compF!=null)
+//        	{
+//	        	System.out.println("company Field Returned ");
+//    	        companyFieldJob companyFieldJob=companyFieldJobServiceI.findByJobModelIdAndCompanyFieldId(jobModel.getId(),compF.getId());
+//    	        if(companyFieldJob!=null)
+//    	        {
+//    	        	System.out.println("company Field Job Returned ");
+//    	        }else
+//    	        {
+//    	        	companyFieldJob companyFieldJobForInsert=new companyFieldJob();
+//    	        	companyFieldJobForInsert.setCompanyField(compF);
+//    	        	companyFieldJobForInsert.setJobModel(jobModel);
+//    	        	companyFieldJob=companyFieldJobServiceI.insert(companyFieldJobForInsert);
+//    	        }
+//    	       
+//    	            	        
+//    	            	        
+//    	        if (postField.getSkills().isEmpty()) {
+//    	        		jobSkillModelServiceI.findByJobModelId(jobModel.getId()).stream().map(jobSkillModelDTOMapper::mapJobSkillModelToDTO).collect(Collectors.toList()).forEach(skill->skills.add(skill.getSkillName()));;
+//    	                postField.setSkills(new ArrayList<>(skills));
+//    	            }else 
+//    	            {
+//    	            	postField.getSkills().forEach(skill-> skills.add(skill));
+//    	            	for(String skill:skills)
+//    	    	        {
+//    	    	        	Skill skillObj=skillServiceI.findByName(skill);
+//    	    	        	if(skillObj!=null)
+//    	    	        	{
+//    	    	        		
+//    	    	        	}else 
+//    	    	        	{
+//    	    	        		Skill skillToInsert=new Skill();
+//    	    	        		skillToInsert.setSkillName(skill);
+//    	    	        		skillObj=skillServiceI.insertForJobSeekerOperation(skillObj);
+//    	    	        	}
+//    	    	        	
+//    	    	        	jobSkillModel jobSkillModel= jobSkillModelServiceI.findByJobModelIdAndSkillId(jobModel.getId(),skillObj.getId());
+//    	    	        	if(jobSkillModel!=null)
+//    	    	        	{
+//    	    	        		
+//    	    	        	}else
+//    	    	        	{
+//    	    	        		jobSkillModel jobSkillModelForInsert=new jobSkillModel();
+//    	    	        		jobSkillModelForInsert.setJobModel(jobModel);
+//    	    	        		jobSkillModelForInsert.setSkill(skillObj);
+//    	    	        		jobSkillModel=jobSkillModelServiceI.insert(jobSkillModelForInsert);
+//    	    	        	}
+//    	    	        }
+//    	    	        
+//    	                postField.setSkills(new ArrayList<>(skills));
+//    	            }
+//    	            
+//    	            if (postField.getQualifications().isEmpty()) {
+//    	            	jobQualificationServiceI.findByJobModelId(jobModel.getId()).stream().map(jobQualificationMapper::mapJobQualificationToDTO).collect(Collectors.toList()).forEach(qual -> qualifications.add(qual.getQualificationName()));
+//    	                postField.setQualifications(new ArrayList<>(qualifications));
+//    	            }
+//    	            else 
+//    	            {
+//    	            	postField.getQualifications().forEach(qual-> qualifications.add(qual));
+//    	            	for(String qual:qualifications)
+//    	    	        {
+//    			        	System.out.println("company Qualifications Sent : "+qual);
+//    	    	        	Qualification qualificationObj=qualificationServiceI.findByName(qual);
+//    	    	        	if(qualificationObj!=null)
+//    	    	        	{
+//
+//    	    	        	}else
+//    	    	        	{
+//    	    	        		Qualification qualific=new Qualification();
+//    	    	        		qualific.setQualificationName(qual);
+//    	    	        		qualificationObj=qualificationServiceI.insert(qualificationObj);
+//    	    	        	}
+//    	    	        	
+//    	    	        	jobQualificationModel jobQualModel=jobQualificationServiceI.findByJobModelIdAndQualificationId(jobModel.getId(),qualificationObj.getId());
+//    	    	        	if(jobQualModel!=null)
+//    	    	        	{
+//    	    	        		
+//    	    	        	}else 
+//    	    	        	{
+//    	    	        		jobQualificationModel jobQualModelInsert=new jobQualificationModel();
+//    	    	        		jobQualModelInsert.setJobModel(jobModel);
+//    	    	        		jobQualModelInsert.setQualification(qualificationObj);
+//    	    	        		jobQualModel=jobQualificationServiceI.insert(jobQualModelInsert);
+//    	    	        	}
+//    	    	        }
+//
+//    	                postField.setQualifications(new ArrayList<>(qualifications));
+//    	            }
+//
+//    	     	        postFieldServiceI.insert(postField);
+//    	     	        post.setPostFields(postField);
+//    	     	       if(post.getLocation() !=null && !post.getLocation().isEmpty())
+//    	     			{
+//    	     				location loc=locationServiceI.findByValue(post.getLocation());
+//    	     				if(loc ==null)
+//    	     				{
+//    	     					location locToInsert=new location();
+//    	     					locToInsert.setLocationValue(post.getLocation());
+//    	     					locationServiceI.insert(locToInsert);
+//    	     				}
+//    	     			}
+//    	     	       
+//    	     	       Post insertedPost = postServiceI.insert(post);
+//    	     	       
+//    	     	      if (!skills.isEmpty()) {
+//    	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
+//    	                  postServiceI.updatePostForCreate(post);
+//    	  	        }
+//    	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output.csv";
+//    			        String[] newRowData = {""+insertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
+//    		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
+//    			        try {
+//    			        FileReader fileReader = new FileReader(csvFilePath);
+//    		            List<String[]> csvData=new ArrayList<String[]>();
+//    		            try (CSVReader cvReader = new CSVReaderBuilder(fileReader).build()) {
+//    		                csvData = cvReader.readAll();
+//    		            }
+//    		            
+//    		            // Append new data to the CSV data
+//    		            csvData.add(newRowData);
+//    		            // Write updated data back to the CSV file
+//    		            FileWriter fileWriter = new FileWriter(csvFilePath);
+//    		            try (CSVWriter csvWriter = new CSVWriter(fileWriter)) {
+//    		                csvWriter.writeAll(csvData);
+//    		            }
+//
+//    		            System.out.println("New row added successfully.");
+//
+//    		        } catch (IOException | CsvValidationException e) {
+//    		            System.out.println("ERror : "+e.getMessage());
+//    		        }
+//
+//    	        return post;
+//
+//        	}else 
+//        	{
+//        		return null;
+//        	}
+//	        
+//	      	    } catch (Exception e) {
+//	        System.out.println("Exception from createAPost method: " + e);
+//	        return null;
+//	    }
+//	}
 	
-	
+	@Override
+	@Transactional
+	public Post createAPostWithJobs(Employer user, postDTO postDTO) {
+	    try {
+	        postDTO.setProfileId(
+	                companyProfileService
+	                        .findByCompanyAdmin(user.getCompanyAdmin().getId())
+	                        .getId()
+	        );
+	        postDTO.setEmployerId(user.getId());
+	        Post post = convertDTOTOPOST(postDTO);
+
+	        postField postField = postDTO.getPostField2();
+
+	        Set<String> skills = new HashSet<>();
+	        Set<String> qualifications = new HashSet<>();
+	        employerField employerField = employerFieldServiceI.findById(user.getId(), postDTO.getField());
+
+	        jobModel jobModel = jobServiceI.findById(postDTO.getJobId());
+
+	        System.out.println("Field Id : " + postField.getField().getId() + " user ID : " + user.getCompanyAdmin().getId());
+
+	        companyField compF = companyFieldServiceI.findByFieldIdAndCompanyId(postField.getField().getId(), user.getCompanyAdmin().getId());
+
+	        if (jobModel == null) {
+	            jobModel jobModelForInsert = new jobModel();
+	            jobModelForInsert.setName(postDTO.getJobName());
+	            jobModel = jobServiceI.insert(jobModelForInsert);
+	        }
+
+	        postField.setJobModel(jobModel);
+
+	        if (compF != null) {
+	            System.out.println("company Field Returned ");
+	            companyFieldJob companyFieldJob = companyFieldJobServiceI.findByJobModelIdAndCompanyFieldId(jobModel.getId(), compF.getId());
+	            if (companyFieldJob == null) {
+	                companyFieldJob companyFieldJobForInsert = new companyFieldJob();
+	                companyFieldJobForInsert.setCompanyField(compF);
+	                companyFieldJobForInsert.setJobModel(jobModel);
+	                companyFieldJob = companyFieldJobServiceI.insert(companyFieldJobForInsert);
+	            }
+
+	            // Handle skills
+	            if (postField.getSkills().isEmpty()) {
+	                jobSkillModelServiceI.findByJobModelId(jobModel.getId())
+	                        .stream()
+	                        .map(jobSkillModelDTOMapper::mapJobSkillModelToDTO)
+	                        .collect(Collectors.toList())
+	                        .forEach(skill -> skills.add(skill.getSkillName()));
+	                postField.setSkills(new ArrayList<>(skills));
+	            } else {
+	                postField.getSkills().forEach(skill -> skills.add(skill));
+	                for (String skill : skills) {
+	                    Skill skillObj = skillServiceI.findByName(skill);
+	                    if (skillObj == null) {
+	                        Skill skillToInsert = new Skill();
+	                        skillToInsert.setSkillName(skill);
+	                        skillObj = skillServiceI.insertForJobSeekerOperation(skillToInsert);
+	                    }
+
+	                    jobSkillModel jobSkillModel = jobSkillModelServiceI.findByJobModelIdAndSkillId(jobModel.getId(), skillObj.getId());
+	                    if (jobSkillModel == null) {
+	                        jobSkillModel jobSkillModelToInsert = new jobSkillModel();
+	                        jobSkillModelToInsert.setJobModel(jobModel);
+	                        jobSkillModelToInsert.setSkill(skillObj);
+	                        jobSkillModel = jobSkillModelServiceI.insert(jobSkillModelToInsert);
+	                    }
+	                }
+	            }
+
+	            // Handle qualifications
+	            if (postField.getQualifications().isEmpty()) {
+	                jobQualificationServiceI.findByJobModelId(jobModel.getId())
+	                        .stream()
+	                        .map(jobQualificationMapper::mapJobQualificationToDTO)
+	                        .collect(Collectors.toList())
+	                        .forEach(qual -> qualifications.add(qual.getQualificationName()));
+	                postField.setQualifications(new ArrayList<>(qualifications));
+	            } else {
+	                postField.getQualifications().forEach(qual -> qualifications.add(qual));
+	                for (String qual : qualifications) {
+	                    Qualification qualificationObj = qualificationServiceI.findByName(qual);
+	                    if (qualificationObj == null) {
+	                        Qualification qualificationToInsert = new Qualification();
+	                        qualificationToInsert.setQualificationName(qual);
+	                        System.out.println("Value To insert : " + qual);
+	                        qualificationObj = qualificationServiceI.insert(qualificationToInsert);
+	                    }
+
+	                    jobQualificationModel jobQualModel = jobQualificationServiceI.findByJobModelIdAndQualificationId(jobModel.getId(), qualificationObj.getId());
+	                    if (jobQualModel == null) {
+	                        jobQualificationModel jobQualificationModelObj = new jobQualificationModel();
+	                        jobQualificationModelObj.setJobModel(jobModel);
+	                        jobQualificationModelObj.setQualification(qualificationObj);
+	                        jobQualificationServiceI.insert(jobQualificationModelObj);
+	                    }
+	                }
+	            }
+
+	            postField.setJobModel(jobModel);
+	            postField = postFieldServiceI.insert(postField);
+
+	            post.setPostFields(postField);
+	            Post InsertedPost= postServiceI.insert(post);
+	            if (!skills.isEmpty()) {
+	  	        	post.setTitle(post.getTitle() + "{ " + skills.stream().collect(Collectors.joining(", "))+" }");
+	                  postServiceI.updatePostForCreate(post);
+	  	        }
+	     	      String csvFilePath = "D:\\Programming\\Springboot\\GraduationProject\\JOBSHOP\\src\\main\\java\\com\\example\\JOBSHOP\\JOBSHOP\\Employer\\service\\output2.csv";
+			        String[] newRowData = {""+InsertedPost.getId(),postDTO.getTitle(), String.join(",", postDTO.getSkills()), "in site"};
+		        		System.out.println("data for insert : :  : "+Arrays.toString(newRowData));
+			        try {
+			        FileReader fileReader = new FileReader(csvFilePath);
+		            List<String[]> csvData=new ArrayList<String[]>();
+		            try (CSVReader cvReader = new CSVReaderBuilder(fileReader).build()) {
+		                csvData = cvReader.readAll();
+		            }
+		            
+		            // Append new data to the CSV data
+		            csvData.add(newRowData);
+		            // Write updated data back to the CSV file
+		            FileWriter fileWriter = new FileWriter(csvFilePath);
+		            try (CSVWriter csvWriter = new CSVWriter(fileWriter)) {
+		                csvWriter.writeAll(csvData);
+		            }
+
+		            System.out.println("New row added successfully.");
+
+		        } catch (IOException | CsvValidationException e) {
+		            System.out.println("ERror : "+e.getMessage());
+		        }
+
+	        return post;
+
+	        } else {
+	            throw new EntityNotFoundException("Company field not found");
+	        }
+	    } catch (Exception e) {
+	        throw new RuntimeException("Failed to create post with jobs", e);
+	    }
+	}
+
 	public class CsvHandler {
 
 	    private static final String CSV_FILE_PATH = "D:\\Partition E\\4th Year\\Graduation project\\AI\\jobs.csv";

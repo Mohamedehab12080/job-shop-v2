@@ -14,6 +14,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Avatar, Grid, MenuItem, TextField } from "@mui/material";
 import Menu from "@mui/material/Menu";
 import { useNavigate } from "react-router-dom";
+import MessageModal from "../../../../responses/MessageModal";
 
 export default function ShowEmployerModal({
   openShowEmployerModal,
@@ -31,6 +32,10 @@ export default function ShowEmployerModal({
   const openMenu = Boolean(anchorEl);
   const [fetchedEmployers, setFetchedEmployers] = React.useState([]);
   const navigate = useNavigate();
+  const [submitted, setSubMitted] = React.useState(false);
+  const [message, setMessage] = React.useState("");
+  const [openMessageModal, setOpenMessageModal] = React.useState(false);
+  const handleCloseMessageModal = () => setOpenMessageModal(false);
 
   const handleFilterEmployers = (input) => {
     const filtered = fetchedEmployers.filter((employer) => {
@@ -69,6 +74,15 @@ export default function ShowEmployerModal({
     }
   }, [comp, openShowEmployerModal]);
 
+  React.useEffect(() => {
+    if (openShowEmployerModal && comp.error !== null) {
+      setMessage(comp.error);
+      setOpenMessageModal(true);
+      setSubMitted(false);
+    } else {
+      setSubMitted(true);
+    }
+  }, [comp, openShowEmployerModal]);
   const handleDeleteEmployer = (employerId) => {
     // console.log("Field For Delete : ",fieldId)
     dispatch2(deleteEmployer(employerId));
@@ -114,8 +128,7 @@ export default function ShowEmployerModal({
           </Grid>
           <section>
             {(filterInputEmployer === "" ? fetchedEmployers : filteredEmployers)
-              // Ensure the newly created employer appears first
-              .sort((a, b) => {
+              ?.sort((a, b) => {
                 if (create && a.email === employerEmail) return -1;
                 if (create && b.email === employerEmail) return 1;
                 return 0;
@@ -198,6 +211,13 @@ export default function ShowEmployerModal({
                   </div>
                 </>
               ))}
+            <MessageModal
+              openMessageModal={openMessageModal}
+              handleCloseMessageModal={handleCloseMessageModal}
+              state={false}
+              response={message}
+              Title={"Create Employer"}
+            />
           </section>
         </Box>
       </Modal>

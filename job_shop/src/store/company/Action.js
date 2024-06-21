@@ -31,7 +31,13 @@ export const createEmployer = (employerData) => async (dispatch) => {
       `/api/company/createEmployer`,
       employerData
     );
-    dispatch({ type: CREATE_EMPLOYER_SUCCCESS, payload: data });
+    if (data.response) {
+      console.log("Data Create EMployer : ", data);
+      dispatch({ type: CREATE_EMPLOYER_FAILURE, payload: data.response });
+    } else {
+      console.log("Data Create Employer Success : ", data);
+      dispatch({ type: CREATE_EMPLOYER_SUCCCESS, payload: data });
+    }
   } catch (error) {
     console.error("Error : ", error);
     dispatch({ type: CREATE_EMPLOYER_FAILURE, payload: error.message });
@@ -105,7 +111,16 @@ export const createField = (fieldData) => async (dispatch) => {
     dispatch({ type: CREATE_FIELD_FAILURE, payload: error.message });
   }
 };
-
+export const createFieldWithJobs = (fieldData) => async (dispatch) => {
+  try {
+    const { data } = await api.post(`/api/company/createField2`, fieldData);
+    console.log("Field creation with jobs successful:", data);
+    dispatch({ type: CREATE_FIELD_SUCCCESS, payload: data });
+  } catch (error) {
+    console.error("Error : ", error);
+    dispatch({ type: CREATE_FIELD_FAILURE, payload: error.message });
+  }
+};
 export const getAllFields = (compId) => async (dispatch) => {
   try {
     console.log("company ID  : ", compId);

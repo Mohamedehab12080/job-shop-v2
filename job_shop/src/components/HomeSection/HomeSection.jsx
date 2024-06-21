@@ -135,20 +135,6 @@ const HomeSection = () => {
     reader.readAsDataURL(file);
   };
 
-  // const handleSendFile=async(e)=>
-  //   {
-  //     e.preventDefault();
-  //     if(!preview) return;
-  //     try {
-  //       const res=await axios.post("http://localhost:8000/upload",{
-  //         image_url:preview,
-  //       });
-  //       console.log("response : ",res);
-  //     } catch (error) {
-  //       console.log("Error in handleSendFile : ",error);
-  //     }
-  //   };
-
   const handleSelectImage = async (event) => {
     setUploadingImage(true);
     event.preventDefault();
@@ -288,6 +274,7 @@ const HomeSection = () => {
                           Experience={p.experience}
                           postImage={p.postImage}
                           statusCode={p.statuseCode}
+                          jobName={p.jobName}
                         />
                       )
                   )
@@ -326,6 +313,7 @@ const HomeSection = () => {
                       applicationCount={p.applicationCount}
                       Experience={p.experience}
                       postImage={p.postImage}
+                      jobName={p.jobName}
                     />
                   ))
                 ) : (
@@ -407,6 +395,7 @@ const HomeSection = () => {
                             Experience={p.experience}
                             postImage={p.postImage}
                             statusCode={p.statuseCode}
+                            jobName={p.jobName}
                           />
                         )
                     )
@@ -445,6 +434,7 @@ const HomeSection = () => {
                         applicationCount={p.applicationCount}
                         Experience={p.experience}
                         postImage={p.postImage}
+                        jobName={p.jobName}
                       />
                     ))
                   ) : (

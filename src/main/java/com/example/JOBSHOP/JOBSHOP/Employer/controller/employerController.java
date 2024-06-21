@@ -7,6 +7,7 @@ import java.io.IOException;
 
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import java.util.stream.Collectors;
@@ -57,8 +58,18 @@ import com.example.JOBSHOP.JOBSHOP.Registration.service.serviceInterfaces.userSe
 import com.example.JOBSHOP.JOBSHOP.User.model.Role;
 import com.example.JOBSHOP.JOBSHOP.User.model.User;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.DTO.companyAdministratorDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.companyFieldJob;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTOMapper;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.service.companyFieldJobServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.DTO.jobQualificationDTO;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.DTO.jobQualificationMapper;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobQualifications.service.jobQualificationServiceInterface;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.DTO.jobSkillModelDTO;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.DTO.jobSkillModelDTOMapper;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.service.jobSkillModelServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.response.ApiResponse;
 
 
@@ -79,6 +90,12 @@ public class employerController {
 	private userServiceInterface userServiceI;
 	@Autowired
 	private companyProfileService companyProfileService;
+	@Autowired
+	private companyFieldJobServiceInterface companyFieldJobServiceI;
+	@Autowired
+	private jobSkillModelServiceInterface jobSkillModelServiceI;
+	@Autowired
+	private jobQualificationServiceInterface jobQualificationServiceI;
 	
 	@GetMapping("/findProfile/{id}")
 	public ResponseEntity<employerProfileDTO> findProfile(@PathVariable Long id
@@ -200,6 +217,33 @@ public class employerController {
 		}
 	}
 	
+	@PostMapping("/postWithJob")
+	public ResponseEntity<?> createAPostWithJobs(
+			@RequestBody postDTO post,
+			@RequestHeader("Authorization")String jwt)throws UserException,postException
+	{
+		User user =userServiceI.findUserByJwt(jwt);
+		if(user!=null && user.getUserType().name().equals("Employer"))
+		{
+			Employer emp=employerService.findById(user.getId());
+			Post savedPost=employerService.createAPostWithJobs(emp,post);
+			System.out.println("saved Post Null "+savedPost.getId());
+			Post returnedPost=postService.findById(savedPost.getId());
+			post.setId(returnedPost.getId());
+			post.setCompanyName(companyProfileService
+					.findById(post.getProfileId())
+					.getCompanyAdministrator()
+					.getCompanyName());
+			post.setEmployerUserName(user.getUserName());
+			System.out.println("Field Name From inserting post DTo  : "+post.getFieldName());
+			post.setFieldName(employerFieldService.findById(user.getId(),post.getField()).getCompanyField().getField().getFieldName());
+			return new ResponseEntity<>(post,HttpStatus.CREATED);
+		}else
+		{
+			throw new UserException("User not found for this token");
+		}
+	}
+	
 	@PutMapping("/updatePost/{postId}")
 	public ResponseEntity<?> updatePost(
 			@PathVariable("postId") Long postId,
@@ -242,6 +286,7 @@ public class employerController {
 		
 		if(user!=null && user.getUserType().name().equals("Employer"))
 		{
+			
 			postService.deleteById(id);
 			ApiResponse res=new ApiResponse("Post deleted successfully",true);
 			return new ResponseEntity<ApiResponse>(res,HttpStatus.OK);
@@ -280,10 +325,37 @@ public class employerController {
 				
 		if(user!=null)
 		{
-			List <employerField> listFields=employerFieldService.findAllEmployerFieldsWithId(id);
-			return new ResponseEntity<>(listFields.stream()
+			List <employerFieldShowDTO> listFields=employerFieldService.findAllEmployerFieldsWithId(id).stream()
 					.map(this::convertToEmployerFieldDTO)
-					.collect(Collectors.toList()),HttpStatus.OK);
+					.collect(Collectors.toList());
+			List <employerFieldShowDTO> updatedListFields=new ArrayList<employerFieldShowDTO>();
+			for(employerFieldShowDTO empF:listFields)
+			{
+				List<companyFieldJobDTO> dtos=companyFieldJobServiceI.findByCompanyFieldId(empF.getCompanyFieldId()).stream().map(companyFieldJobDTOMapper::mapcompanyFieldJobToDTO).collect(Collectors.toList());
+				List<companyFieldJobDTO> updatedDTOS2=new ArrayList<companyFieldJobDTO>();
+				for(companyFieldJobDTO dtosJ:dtos)
+				{
+					List<jobSkillModelDTO> jobSkillDTO=jobSkillModelServiceI.findByJobModelId(dtosJ.getJobId()).stream().map(jobSkillModelDTOMapper::mapJobSkillModelToDTO).collect(Collectors.toList());
+					List<String>skillsName=new ArrayList<String>();
+					for(jobSkillModelDTO dtoSkill:jobSkillDTO)
+					{
+						skillsName.add(dtoSkill.getSkillName());
+					}
+					dtosJ.setSkillsName(skillsName);
+					System.out.println("Skills Name From Call : "+skillsName);
+					List<jobQualificationDTO> jobQualificationDtos=jobQualificationServiceI.findByJobModelId(dtosJ.getJobId()).stream().map(jobQualificationMapper::mapJobQualificationToDTO).collect(Collectors.toList());
+					List<String> qualficiationsName=new ArrayList<String>();
+					for(jobQualificationDTO dtoQual:jobQualificationDtos)
+					{
+						qualficiationsName.add(dtoQual.getQualificationName());
+					}
+					dtosJ.setQualificationsName(qualficiationsName);
+					updatedDTOS2.add(dtosJ);
+				}
+				empF.setCompanyFieldJobDTOs(updatedDTOS2);
+				updatedListFields.add(empF);
+			}
+			return new ResponseEntity<>(updatedListFields,HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("user not found for this token");
@@ -309,7 +381,22 @@ public class employerController {
 	
 	private employerFieldShowDTO convertToEmployerFieldDTO(employerField employerField)
 	{
-		return employerFieldMapper.mapEmployerFieldToDTO(employerField);
+		employerFieldShowDTO showDto=employerFieldMapper.mapEmployerFieldToDTO(employerField);
+		
+		List<String> jobsName=new ArrayList<String>();
+		List<companyFieldJobDTO> companayFieldJobs=companyFieldJobServiceI
+													.findByCompanyFieldId(
+															employerField
+															.getCompanyField()
+															.getId())
+															.stream()
+															.map(companyFieldJobDTOMapper::mapcompanyFieldJobToDTO)
+															.collect(Collectors.toList());
+		for(companyFieldJobDTO fieldJobDto :companayFieldJobs) {
+			jobsName.add(fieldJobDto.getJobName());
+		}
+		showDto.setFieldJobs(jobsName);
+		return showDto;
 	}
 
 	private employerProfileDTO convertEmployerProfileToDTO(employerProfile employerProfile)

@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -50,12 +51,19 @@ import com.example.JOBSHOP.JOBSHOP.companyAdministrator.DTO.companyAdministrator
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyField;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.DTO.companyFieldDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.DTO.companyFieldMapper;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.companyFieldJob;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTO;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTOMapper;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.service.companyFieldJobServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.service.companyFieldService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.companyProfile;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.DTO.companyProfileDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.DTO.companyProfileMapper;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyProfile.service.companyProfileService;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.service.companyAdminService;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.DTO.jobSkillModelDTO;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.DTO.jobSkillModelDTOMapper;
+import com.example.JOBSHOP.JOBSHOP.fields.jobs.jobSkill.service.jobSkillModelServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.response.AuthResponse;
 
 import org.springframework.security.core.Authentication;
@@ -89,6 +97,12 @@ public class companyAdminRestController {
 	private userServiceInterface userServiceI;
 	@Autowired
 	private followService followService;
+	
+	@Autowired
+	private jobSkillModelServiceInterface jobSkillModelServiceI;
+	@Autowired
+	private companyFieldJobServiceInterface companyFieldJobServiceI;
+	
 //	@DeleteMapping("/deleteEmployer/{id}")
 //	public int deleteEmployerWithIdQuery(@PathVariable Long id)
 //	{
@@ -107,8 +121,28 @@ public class companyAdminRestController {
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null)
 		{
-			return new ResponseEntity<List<companyFieldDTO>>(companyFieldService.findCompanyFieldsWithAdminId(compId)
-				.stream().map(this::convertCompanyField).collect(Collectors.toList()),HttpStatus.OK);
+			List<companyFieldDTO> comp=companyFieldService.findCompanyFieldsWithAdminId(compId).stream()
+					.map(this::convertCompanyField)
+					.collect(Collectors.toList());
+			
+			List<companyFieldDTO>updatedDTOS=new ArrayList<companyFieldDTO>();
+			for(companyFieldDTO dtoF:comp)
+			{
+				List<companyFieldJobDTO> dtos=companyFieldJobServiceI.findByCompanyFieldId(dtoF.getId()).stream().map(companyFieldJobDTOMapper::mapcompanyFieldJobToDTO).collect(Collectors.toList());
+				List<companyFieldJobDTO>updatedDTOS2=new ArrayList<companyFieldJobDTO>();
+				for(companyFieldJobDTO dtosJ:dtos)
+				{
+					List<jobSkillModelDTO> jobSkillDTO=jobSkillModelServiceI.findByJobModelId(dtosJ.getJobId()).stream().map(jobSkillModelDTOMapper::mapJobSkillModelToDTO).collect(Collectors.toList());
+					List<String>skillsName=new ArrayList<String>();
+					jobSkillDTO.stream().filter(skillJob->skillsName.add(skillJob.getSkillName()));
+					dtosJ.setSkillsName(skillsName);
+					updatedDTOS2.add(dtosJ);
+				}
+				dtoF.setCompanyFieldJobDTOs(updatedDTOS2);
+				updatedDTOS.add(dtoF);
+			}
+			
+			return new ResponseEntity<List<companyFieldDTO>>(updatedDTOS,HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("User not found for this token");
@@ -212,55 +246,76 @@ public class companyAdminRestController {
 			Employer employer=null;
 			List<employerField> employerFields=new ArrayList<employerField>();
 			
-			if(employerRequest!=null)
+			Optional<User> user=userServiceI.findByEmail(employerRequest.getEmail());
+			if(!user.isPresent())
 			{
+				if(employerRequest!=null)
+				{
 
-				  employerDto.setAddress(employerRequest.getAddress());
-				  companyAdministrator compAdm=new companyAdministrator();
-				  compAdm.setId(reqUSer.getId());
-				  employerDto.setCompanyAdmin(compAdm);
-				  employerDto.setCompanyAdministratorId(reqUSer.getId());
-				  employerDto.setContacts(employerRequest.getContacts());
-				  employerDto.setUserName(employerRequest.getUserName());
-				  employerDto.setEmail(employerRequest.getEmail());
-				  employerDto.setPassword(passwordEncoder.encode(employerRequest.getPassword()));
-				  employerDto.setUserType(Role.Employer);
-				  employerDto.setCreatedDate(LocalDateTime.now());
-				  employerFields=employerRequest
-						  .getEmployerFields()
-						  .stream()
-						  .map(employerFieldMapper::mapDtoToInsertToEmployerField)
-						  .collect(Collectors.toList()); //getting employerFields From Request Body
-				  employer=employerService.insert(employerDTOMapper.mapDTOToEmployer(employerDto));
-//				  Authentication authentication=new UsernamePasswordAuthenticationToken(employerDto.getEmail(),employerDto.getPassword());
-//				  SecurityContextHolder.getContext().setAuthentication(authentication);
-//					
-//					String token=jwtProvider.generateToken(authentication);
-//					
-//					res=new AuthResponse(token,true);
-					
-			}
-			 
-			 if(employer!=null)
-			 {
-				 for (int i = 0; i < employerFields.size(); i++) {
-					 employerFields.get(i).setEmployer(employer);
+					  employerDto.setAddress(employerRequest.getAddress());
+					  companyAdministrator compAdm=new companyAdministrator();
+					  compAdm.setId(reqUSer.getId());
+					  employerDto.setCompanyAdmin(compAdm);
+					  employerDto.setCompanyAdministratorId(reqUSer.getId());
+					  employerDto.setContacts(employerRequest.getContacts());
+					  employerDto.setUserName(employerRequest.getUserName());
+					  employerDto.setEmail(employerRequest.getEmail());
+					  employerDto.setPassword(passwordEncoder.encode(employerRequest.getPassword()));
+					  employerDto.setUserType(Role.Employer);
+					  employerDto.setCreatedDate(LocalDateTime.now());
+					  employerFields=employerRequest
+							  .getEmployerFields()
+							  .stream()
+							  .map(employerFieldMapper::mapDtoToInsertToEmployerField)
+							  .collect(Collectors.toList()); //getting employerFields From Request Body
+					  employer=employerService.insert(employerDTOMapper.mapDTOToEmployer(employerDto));
 				}
-				 companyAdminService.giveEmployerFields(employerFields,10);
-				 return new ResponseEntity<>(employer,HttpStatus.CREATED);
-			 }
-			 else 
-			 {
-				 return ResponseEntity.badRequest().build();
-			 }
+				 
+				 if(employer!=null)
+				 {
+					 for (int i = 0; i < employerFields.size(); i++) {
+						 employerFields.get(i).setEmployer(employer);
+					}
+					 companyAdminService.giveEmployerFields(employerFields,10);
+					 return new ResponseEntity<>(employer,HttpStatus.CREATED);
+				 }
+				 else 
+				 {
+					 return ResponseEntity.badRequest().build();
+				 }
 
-		}else 
-		{
-			throw new UserException("user not found for this token");
-		}
-			
+			}else 
+			{
+				responseHelper responseHelper=new responseHelper();
+				responseHelper.setResponse("This Email already used");
+				responseHelper.setState(false);
+				return new ResponseEntity< >(responseHelper,HttpStatus.OK);
+			}
+			}else 
+			{
+				throw new UserException("user not found for this token");	
+			}
+				
 	}
 	
+	private static class responseHelper{
+		private String response;
+		private boolean state;
+		
+		public String getResponse() {
+			return response;
+		}
+		public void setResponse(String response) {
+			this.response = response;
+		}
+		public boolean isState() {
+			return state;
+		}
+		public void setState(boolean state) {
+			this.state = state;
+		}
+	
+	}
 	/**
 	 * 
 	 * @Author BOB
@@ -317,7 +372,36 @@ public class companyAdminRestController {
 			}
 			
 		}
-
+		/**
+		 * 
+		 * @author BOB 
+		 * @function Create company Field  (Tested) with its Jobs
+		 */
+			@PostMapping("/createField2")//(Tested)
+			public ResponseEntity<?> insertField2(
+					@RequestBody @Valid companyFieldDTO companyField
+					,BindingResult bind,@RequestHeader("Authorization") String jwt) throws UserException
+			{
+				User reqUSer=userServiceI.findUserByJwt(jwt);
+				if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
+				{
+					System.out.println("JOBS FOR JOBS : "+companyField.getJobs());
+						companyField insertedCompanyField=companyFieldService
+								.insertCompanyFieldWithJobs(reqUSer.getId(),companyField);
+						if(insertedCompanyField!=null)
+						{
+							return ResponseEntity.ok(convertCompanyField(insertedCompanyField));
+						}else
+						{
+							return ResponseEntity.badRequest().body("Already exist");
+						}
+					
+				}else
+				{
+					throw new UserException("User not found for this token");
+				}
+				
+			}
 	/**
 	 * 
 	 * @author BOB
@@ -330,10 +414,10 @@ public class companyAdminRestController {
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("Admin"))
 		{
-			List<companyField> comp=companyFieldService.findCompanyFieldsWithAdminId(reqUSer.getId());
-			return comp.stream()
+			List<companyFieldDTO> comp=companyFieldService.findCompanyFieldsWithAdminId(reqUSer.getId()).stream()
 					.map(this::convertCompanyField)
-					.collect(Collectors.toList()); 
+					.collect(Collectors.toList());
+					return comp; 
 		}else 
 		{
 			throw new UserException("user not found for this token");
@@ -346,7 +430,18 @@ public class companyAdminRestController {
 	 */
 	private companyFieldDTO convertCompanyField(companyField companyField)
 	{
-		return companyFieldMapper.mapCompanyFieldToDTO(companyField);
+		List<companyFieldJobDTO> companyFieldJobs=
+				companyFieldJobServiceI
+				.findByCompanyFieldId(
+						companyField.getId()).stream().map(companyFieldJobDTOMapper::mapcompanyFieldJobToDTO).collect(Collectors.toList());
+		List<String> jobNames=new ArrayList<String>();
+		for(companyFieldJobDTO dto:companyFieldJobs)
+		{
+			jobNames.add(dto.getJobName());
+		}
+		companyFieldDTO compField=companyFieldMapper.mapCompanyFieldToDTO(companyField);
+		compField.setJobs(jobNames);
+		return compField;
 	}
 	
 //	

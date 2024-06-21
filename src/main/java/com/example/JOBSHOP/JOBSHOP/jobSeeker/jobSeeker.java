@@ -54,10 +54,6 @@ public class jobSeeker extends User{
 	
 	private Date birthDate;
 	
-	
-	
-	
-	
  	public String getDescription() {
 		return description;
 	}
@@ -92,15 +88,6 @@ public class jobSeeker extends User{
 	{
 		super();
 	}
-//	public jobSeeker(String education, String employmentState, String experience, List<String> skills,
-//			List<Application> applications) {
-//		super();
-//		this.education = education;
-//		this.employmentState = employmentState;
-//		this.experience = experience;
-//		this.skills = skills;
-//		this.applications = applications;
-//	}
 	public String getEducation() {
 		return education;
 	}

@@ -33,6 +33,7 @@ public class companyAdministrator extends User{
 	@Column(name="companyAdministrator_companyFields")
 	private List<companyField> companyFields=new ArrayList<companyField>();
 	
+	@Column(length = 500)
 	private String description;
 	
 	

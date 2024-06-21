@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.example.JOBSHOP.JOBSHOP.Base.baseEntityDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.Qualification.companyFieldQualification;
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTO;
 import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.skill.companyFieldSkill;
 import com.example.JOBSHOP.JOBSHOP.fields.Field;
 
@@ -23,12 +24,29 @@ public class companyFieldDTO extends baseEntityDTO<Long>{
 	private List <String> qualifications=new ArrayList<String>();
 	private List<String> skills=new ArrayList<String>();
 	
+	private List<String>jobs=new ArrayList<String>();
+	
+	private List<companyFieldJobDTO> companyFieldJobDTOs=new ArrayList<companyFieldJobDTO>();
 	Map<Long,String> skillsMap=new HashMap<Long, String>();
 	
 	private List<companyFieldSkill> companyFieldSkills=new ArrayList<companyFieldSkill>();
 	private List<companyFieldQualification> companyFieldQualifications=new ArrayList<companyFieldQualification>();
 	
 	
+	
+	public List<companyFieldJobDTO> getCompanyFieldJobDTOs() {
+		return companyFieldJobDTOs;
+	}
+	public void setCompanyFieldJobDTOs(List<companyFieldJobDTO> companyFieldJobDTOs) {
+		this.companyFieldJobDTOs = companyFieldJobDTOs;
+	}
+	public List<String> getJobs() {
+		
+		return jobs;
+	}
+	public void setJobs(List<String> jobs) {
+		this.jobs = jobs;
+	}
 	public Long getFieldId() {
 		return fieldId;
 	}

@@ -20,6 +20,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import ShowEmployerModal from "./ShowEmployersModal";
 import { fetchAllFields } from "../../../../store/fields/Action";
+import MessageModal from "../../../../responses/MessageModal";
 
 const style = {
   position: "absolute",
@@ -55,7 +56,6 @@ export default function CreateEmployerModal({
   const comp = useSelector((state) => state.comp);
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
-
   const [employerEmailToShow, setEmployerEmailToShow] = useState("");
   const [createState, setCreateState] = useState(false);
   const [openShowEmployerModal, setOpenShowEmployerModal] =
@@ -431,10 +431,10 @@ export default function CreateEmployerModal({
                             <div className="ml-2">{field.fieldName}</div>
 
                             <ul className="flex flex-wrap space-x-2 mt-3">
-                              {field.skills && field.skills.length > 0 ? (
-                                field.skills.map((skill, index) => (
+                              {field.jobs && field.jobs.length > 0 ? (
+                                field.jobs.map((job, index) => (
                                   <div className="flex" key={index}>
-                                    <li key={index}>- {skill}</li>
+                                    <li key={index}>- {job}</li>
                                   </div>
                                 ))
                               ) : (
@@ -472,6 +472,7 @@ export default function CreateEmployerModal({
                 </Grid> */}
               </Grid>
             </form>
+
             <section>
               <ShowEmployerModal
                 openShowEmployerModal={openShowEmployerModal}

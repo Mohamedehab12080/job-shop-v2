@@ -16,14 +16,22 @@ import Grid from "@mui/material/Grid";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useEffect } from "react";
-import { createField, getAllFields } from "../../../../store/company/Action";
+import {
+  createField,
+  createFieldWithJobs,
+  getAllFields,
+} from "../../../../store/company/Action";
 import { findAllSkills } from "../../../../store/skills/Action";
 import { getQualifications } from "../../../../store/qualifications/Action";
 import AddIcon from "@mui/icons-material/Add";
 import ShowFieldsModal from "./ShowFieldsModal";
 import * as Yup from "yup";
 import SearchableDropdown from "./SearchableDropDown";
-import { fetchAllFields } from "../../../../store/fields/Action";
+import {
+  fetchAllFields,
+  fetchAllFieldsForCreateFields,
+} from "../../../../store/fields/Action";
+import { findAllJobs } from "../../../../store/Jobs/Action";
 const slideStyle = {
   height: "100%",
   overflowY: "auto",
@@ -42,9 +50,12 @@ export default function CreateFieldModal({
   const handleCloseShowFielsModal = () => setOpenShowFieldsModal(false);
 
   var [selectedSkills, setSelectedSkills] = React.useState([]);
+  var [selectedJobs, setSelectedJobs] = React.useState([]);
   var [filteredSkills, setFilteredSkills] = React.useState([]);
+  var [filteredJobs, setFilteredJobs] = React.useState([]);
   var [filteredFields, setFilteredFields] = React.useState([]);
   const [filterInputSkills, setFilterInputSkills] = React.useState("");
+  const [filterInputJobs, setFilterInputJobs] = React.useState("");
   const [filterInputFields, setFilterInputFields] = React.useState("");
   // const [anchorEl, setAnchorEl] = useState(null);
   const comp = useSelector((state) => state.comp);
@@ -53,13 +64,16 @@ export default function CreateFieldModal({
   const dispatch2 = useDispatch();
   const dispatch3 = useDispatch();
   const skills = useSelector((state) => state.skills);
+  const jobRed = useSelector((state) => state.jobRed);
   const quals = useSelector((state) => state.quals);
   const [fields, setFields] = useState([]);
   const [fetchedSkills, setFetchedSkills] = useState([]);
+  const [fetchedJobs, setFetchedJobs] = useState([]);
   const [displayedSkills, setDisplayedSkills] = useState([]);
   const [displayedFields, setDisplayedFields] = useState([]);
   const [fetchedQuals, setFetchedQuals] = useState([]);
   const [displayedQuals, setDisplayedQuals] = useState([]);
+  const [displayedJobs, setDisplayedJobs] = useState([]);
   var [selectedQuals, setSelectedQuals] = React.useState([]);
   var [filteredQuals, setFilteredQuals] = React.useState([]);
   const [filterInputQuals, setFilterInputQuals] = React.useState("");
@@ -68,7 +82,7 @@ export default function CreateFieldModal({
   const [selectedField, setSelectedField] = React.useState("");
   const dispatch4 = useDispatch();
   const fieldReducer = useSelector((state) => state.fieldReducer);
-
+  const dispatch5 = useDispatch();
   const handleAddManualField = (value) => {
     if (filterInputFields !== "" && !selectedField.includes(value)) {
       setSelectedField(value);
@@ -76,26 +90,38 @@ export default function CreateFieldModal({
       setFilterInputFields("");
     }
   };
-  // useEffect(()=>
-  // {
-  //   if(openCreateFieldModal)
-  //   {
-  //     dispatch4(fetchAllFields());
-
-  //   }
-  // },[openCreateFieldModal.dispatch4])
 
   useEffect(() => {
     if (openCreateFieldModal) {
-      setFetchedFields(fieldReducer.fields);
+      dispatch5(fetchAllFieldsForCreateFields());
     }
-  }, [openCreateFieldModal, fieldReducer.fields]);
+  }, [dispatch5, openCreateFieldModal]);
+
+  useEffect(() => {
+    if (openCreateFieldModal) {
+      dispatch4(findAllJobs());
+    }
+  }, [dispatch4, openCreateFieldModal]);
+
+  useEffect(() => {
+    if (openCreateFieldModal) {
+      setFetchedFields(fieldReducer.fieldsForCreate);
+      console.log("Fetched Fields Front : ", fieldReducer.fieldsForCreate);
+    }
+  }, [openCreateFieldModal, fieldReducer.fieldsForCreate]);
+
   useEffect(() => {
     if (openCreateFieldModal) {
       dispatch2(findAllSkills());
       dispatch3(getQualifications());
     }
   }, [openCreateFieldModal, dispatch2, dispatch3]);
+
+  useEffect(() => {
+    if (openCreateFieldModal) {
+      setFetchedJobs(jobRed.jobs);
+    }
+  }, [openCreateFieldModal, jobRed]);
 
   useEffect(() => {
     if (openCreateFieldModal) {
@@ -112,33 +138,12 @@ export default function CreateFieldModal({
   useEffect(() => {
     setDisplayedSkills(fetchedSkills.slice(0, 10));
     setDisplayedQuals(fetchedQuals.slice(0, 10));
-  }, [fetchedSkills, fetchedQuals]);
+    setDisplayedJobs(fetchedJobs.slice(0, 10));
+  }, [fetchedSkills, fetchedQuals, fetchedJobs]);
 
   useEffect(() => {
     setDisplayedFields(fetchedFields.slice(0, 10));
   }, [fetchedFields]);
-
-  // React.useEffect(()=>
-  // {
-  //   if(openCreateFieldModal)
-  //   {
-  //     fetchSkills();
-  //   }
-  // });
-  // const fetchSkills=async()=>
-  // {
-  //   try {
-  //     const response =await axios.get(`http://localhost:8089/api/skills/findAllJWT`,
-  //   {headers:{
-  //     "Authorization":`Bearer ${jwt}`
-  //   }
-  // });
-  //     console.log("skills from kosom el back : ",response.data)
-  //     // setFetchedSkills(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching fields:", error);
-  //   }
-  // }
 
   const handleAddField = (value) => {
     if (!selectedField.includes(value)) {
@@ -151,21 +156,17 @@ export default function CreateFieldModal({
       const updatedSkills = [...selectedSkills, skill];
       setSelectedSkills(updatedSkills);
       if (updatedSkills) {
-        // if(displayedSkills.length===0)
-        // {
-        //   setDisplayedSkills(fetchedSkills.slice(fetchedSkills.indexOf(skill)+1,fetchedSkills.indexOf(skill)+6));
-        // }
-        // let startIndex=fetchedSkills.length;
-        // for(let item of displayedSkills)
-        // {
-        //   let index=fetchedSkills.indexOf(item);
-        //   if(index!==-1 && index<startIndex)
-        //   {
-        //     startIndex=index;
-        //   }
-        // }
-        // setDisplayedQuals(fetchedSkills.slice(startIndex))
         formik.setFieldValue("skills", updatedSkills);
+      }
+    }
+  };
+
+  const handleAddJob = (job) => {
+    if (!selectedJobs.includes(job)) {
+      const updatedJobs = [...selectedJobs, job];
+      setSelectedJobs(updatedJobs);
+      if (updatedJobs) {
+        formik.setFieldValue("jobs", updatedJobs);
       }
     }
   };
@@ -180,12 +181,16 @@ export default function CreateFieldModal({
       (skill) => skill !== skillToRemove
     );
     setSelectedSkills(updatedSkills);
-    // if(displayedSkills.length===0)
-    // {
-    //   setDisplayedSkills(fetchedSkills.slice(fetchedSkills.indexOf(skillToRemove),fetchedSkills.indexOf(skillToRemove)+5))
-    // }
     if (updatedSkills) {
       formik.setFieldValue("skills", updatedSkills);
+    }
+  };
+
+  const handleRemoveJob = (jobToRemove) => {
+    const updatedJobs = selectedJobs.filter((job) => job !== jobToRemove);
+    setSelectedJobs(updatedJobs);
+    if (updatedJobs) {
+      formik.setFieldValue("jobs", updatedJobs);
     }
   };
 
@@ -219,6 +224,24 @@ export default function CreateFieldModal({
     setFilteredSkills(filtered);
     setFilterInputSkills(input);
   };
+
+  const handleFilterJobs = (input) => {
+    const normalizedInput = input.toLowerCase();
+
+    if (fetchedJobs) {
+      const filtered = fetchedJobs.filter((job) => {
+        if (
+          job.toLowerCase().includes(normalizedInput) &&
+          !selectedSkills.includes(normalizedInput)
+        ) {
+          return job;
+        }
+      });
+      setFilteredJobs(filtered);
+      setFilterInputJobs(input);
+    }
+  };
+
   // const handleClickAway=()=>
   //   {
   //     setAnchorEl(null);
@@ -259,6 +282,15 @@ export default function CreateFieldModal({
     }
   };
 
+  const handleAddManualJob = (value) => {
+    if (filterInputJobs !== "" && !selectedJobs.includes(value)) {
+      const updatedJobs = [...selectedJobs, value];
+      setSelectedJobs(updatedJobs);
+      formik.setFieldValue("jobs", updatedJobs);
+      setFilterInputJobs("");
+    }
+  };
+
   // const handleAddManualField=(value)=>
   //   {
   //     if(filterInputFields !== "" && !selectedField.includes(value))
@@ -277,23 +309,23 @@ export default function CreateFieldModal({
     setFilterInputQuals(input);
   };
 
-  const validationSchema = Yup.object().shape({
-    fieldName: Yup.string().required("FieldName Is required"),
-    qualifications: Yup,
-  });
   const formik = useFormik({
     initialValues: {
       fieldName: "",
       companyAdministratorId: auth.user.id,
       qualifications: [],
       skills: [],
+      jobs: [],
     }, // Initialize field with an empty string or appropriate initial value    },
     onSubmit: async (values) => {
-      if (values.fieldName !== "" && values.skills.length > 0) {
-        await dispatch(createField(values));
+      if (values.fieldName !== "" && values.jobs.length > 0) {
+        console.log("VALUES : ", values);
+        await dispatch(createFieldWithJobs(values));
         formik.resetForm();
         setSelectedQuals([]);
         setSelectedSkills([]);
+        setSelectedJobs([]);
+        setSelectedField([]);
         handleOpenShowFieldsModal();
       }
     },
@@ -438,6 +470,79 @@ export default function CreateFieldModal({
               <Grid item xs={12}>
                 <TextField
                   fullWidth
+                  id="filterJobs"
+                  name="filterJobs"
+                  label="Filter Jobs"
+                  value={filterInputJobs}
+                  onChange={(e) => handleFilterJobs(e.target.value)}
+                  error={
+                    formik.touched.filterJobs &&
+                    Boolean(formik.errors.filterJobs)
+                  }
+                  helperText={
+                    formik.touched.filterJobs && formik.errors.filterJobs
+                  }
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() =>
+                            handleAddManualJob(filterInputJobs.trim())
+                          }
+                        >
+                          <AddIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+              </Grid>
+
+              <Grid item xs={12}>
+                <div className="selected-skills-container">
+                  {selectedJobs.length > 0 ? (
+                    selectedJobs.map((job, index) => (
+                      <div key={index} className="selected-skill">
+                        <span>{job}</span>
+                        <IconButton
+                          onClick={() => handleRemoveJob(job)}
+                          aria-label="delete"
+                          size="small"
+                        >
+                          <Close />
+                        </IconButton>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="error-message">
+                      At least one job is required
+                    </div>
+                  )}
+                </div>
+              </Grid>
+
+              <Grid item xs={12}>
+                <div
+                  className="skills-scroll-container"
+                  style={{ maxHeight: "200px", overflowY: "auto" }}
+                >
+                  {(filterInputJobs === "" ? displayedJobs : filteredJobs)
+                    .filter((job) => !selectedJobs.includes(job))
+                    .map((job, index) => (
+                      <Button
+                        key={index}
+                        variant="outlined"
+                        onClick={() => handleAddJob(job)}
+                      >
+                        {job}
+                      </Button>
+                    ))}
+                </div>
+              </Grid>
+              {/* 
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
                   id="filterSkills"
                   name="filterSkills"
                   label="Filter Skills"
@@ -465,6 +570,7 @@ export default function CreateFieldModal({
                   }}
                 />
               </Grid>
+
               <Grid item xs={12}>
                 <div className="selected-skills-container">
                   {selectedSkills.length > 0 ? (
@@ -557,7 +663,7 @@ export default function CreateFieldModal({
                     </div>
                   )}
                 </div>
-              </Grid>
+              </Grid> 
               <Grid item xs={12}>
                 <div
                   className="skills-scroll-container"
@@ -576,6 +682,7 @@ export default function CreateFieldModal({
                     ))}
                 </div>
               </Grid>
+              */}
               <Grid item container justifyContent="center">
                 <Button type="submit" variant="contained" color="primary">
                   Save

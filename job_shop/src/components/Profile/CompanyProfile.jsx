@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { KeyboardBackspace } from "@mui/icons-material";
 import { useNavigate, useParams } from "react-router-dom";
-import { Avatar, Box, Grid, Tab, TextField } from "@mui/material";
+import { Avatar, Box, Grid, IconButton, Tab, TextField } from "@mui/material";
 import { Button } from "@mui/material";
 import BussinessCetnerIcon from "@mui/icons-material/BusinessCenter";
 import LocationIcon from "@mui/icons-material/LocationOn";
@@ -16,6 +16,7 @@ import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact
 import ShowFieldsModal from "../modals/companyModals/FieldsModals/ShowFieldsModal";
 import ShowPostImageModal from "../HomeSection/posts/ShowPostImageModal";
 import PostCardCompany from "../HomeSection/posts/PostCardCompany";
+import { Close } from "@mui/icons-material";
 
 const CompanyProfile = () => {
   const [tabValue, setTabValue] = useState("1");
@@ -121,13 +122,18 @@ const CompanyProfile = () => {
 
   const handleFilterByField = (fieldName) => {
     if (fieldName === "") {
-      // If fieldName is empty, reset to original filteredPosts
       setFilteredPostsByField(filteredPosts);
     } else {
-      // Filter posts based on fieldName
-      const filtered = filteredPosts.filter((p) => p.fieldName === fieldName);
+      const filtered = fetchedCompanyPosts.filter(
+        (p) => p.fieldName === fieldName
+      );
+      setSelectedFiterFields(fieldName);
       setFilteredPostsByField(filtered);
     }
+  };
+
+  const handleRemoveField = () => {
+    setSelectedFiterFields("");
   };
   return (
     <div>
@@ -264,19 +270,37 @@ const CompanyProfile = () => {
             </Box>
             <TabPanel value="1">Fields</TabPanel>
             <TabPanel value="2">
+              <Grid item>
+                {selectedFilterFields !== "" && (
+                  <>
+                    <div>
+                      <span>{selectedFilterFields}</span>
+                      <IconButton
+                        onClick={() => handleRemoveField()}
+                        aria-label="delete"
+                        size="small"
+                      >
+                        <Close />
+                      </IconButton>
+                    </div>
+                  </>
+                )}
+              </Grid>
               <Grid container spacing={2} alignItems="center">
                 {/* Map through unique fieldNames to render buttons */}
-                {getUniqueFieldNames().map((fieldName, index) => (
-                  <Grid item key={index}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleFilterByField(fieldName)}
-                    >
-                      {fieldName}
-                    </Button>
-                  </Grid>
-                ))}
+                {getUniqueFieldNames()
+                  .filter((fieldName) => fieldName !== selectedFilterFields)
+                  .map((fieldName, index) => (
+                    <Grid item key={index}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => handleFilterByField(fieldName)}
+                      >
+                        {fieldName}
+                      </Button>
+                    </Grid>
+                  ))}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -317,6 +341,7 @@ const CompanyProfile = () => {
                           applicationCount={p.applicationCount}
                           experience={p.experience}
                           postImage={p.postImage}
+                          jobName={p.jobName}
                         />
                       </Grid>
                     ))
@@ -349,6 +374,7 @@ const CompanyProfile = () => {
                           applicationCount={p.applicationCount}
                           experience={p.experience}
                           postImage={p.postImage}
+                          jobName={p.jobName}
                         />
                       </Grid>
                     ))
@@ -379,6 +405,7 @@ const CompanyProfile = () => {
                           applicationCount={p.applicationCount}
                           experience={p.experience}
                           postImage={p.postImage}
+                          jobName={p.jobName}
                         />
                       </Grid>
                     ))}

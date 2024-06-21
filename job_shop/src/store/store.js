@@ -11,6 +11,7 @@ import { fieldsReducer } from "./fields/Reducer";
 import { locationsReducer } from "./location/Reducer";
 import { recommedReducer } from "./Post/recommededPost/Reducer";
 import { searchReducer } from "./Search/Reducer";
+import { jobReducer } from "./Jobs/Reducer";
 const rootReducers = combineReducers({
   auth: authReducer,
   post: postReducer,
@@ -23,6 +24,7 @@ const rootReducers = combineReducers({
   locationReducer: locationsReducer,
   recommedRed: recommedReducer,
   searchRed: searchReducer,
+  jobRed: jobReducer,
 });
 
 export const store = legacy_createStore(rootReducers, applyMiddleware(thunk));

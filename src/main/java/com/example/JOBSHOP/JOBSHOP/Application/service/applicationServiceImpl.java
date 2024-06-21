@@ -130,7 +130,7 @@ public class applicationServiceImpl implements applicationServiceInerface{
 		        .stream()
 		        .filter(app -> {
 		            // Check if statusCode is not 'Rejected' or is null
-		            return app.getStatusCode() == null || app.getStatusCode().equals("Accepted") || !app.getStatusCode().equals("Rejected");
+		            return app.getStatusCode() == null || app.getStatusCode().equals("Accepted") || app.getStatusCode().equals("Rejected");
 		        })
 		        .collect(Collectors.toList()); // Collect the filtered applications into a List
 
@@ -204,11 +204,26 @@ public class applicationServiceImpl implements applicationServiceInerface{
 					 {
 						 if((matchedSkills.size()+matchedQualifications.size())<((postSkills.size()+postQualifications.size())/2))
 				            {
-			            			applicationdto.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+			            			if(applicationdto.getStatuseCode()!=null && applicationdto.getStatuseCode().equals("Rejected"))
+			            			{
+			            				applicationdto.setStatuseCode("Rejected Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+			            			}else 
+			            			{
+			            				applicationdto.setStatuseCode("Not match with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+			            			}
 			            		
 				            }else 
-				            {                  //(matchedSkills.size()+matchedQualifications.size())/
-				            	applicationdto.setStatuseCode("Matched with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+				            {
+				            	if(applicationdto.getStatuseCode()!=null && applicationdto.getStatuseCode().equals("Accepted"))
+				            	{
+					            	applicationdto.setStatuseCode("Accepted with : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+				            	}else if(applicationdto.getStatuseCode()!=null && applicationdto.getStatuseCode().equals("Rejected"))
+				            	{
+					            	applicationdto.setStatuseCode("Rejected with  : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+				            	}else
+				            	{
+					            	applicationdto.setStatuseCode("Matched with  : ("+(int)((Double.valueOf((matchedSkills.size()+matchedQualifications.size()))/Double.valueOf((postSkills.size()+postQualifications.size())))*100)+"%)");
+				            	}
 				            } 
 					 }else
 					 {

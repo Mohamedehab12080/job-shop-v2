@@ -28,10 +28,7 @@ const PostCard = () => {
     const navigate=useNavigate();
   return (
     <div className=''>
-        {/* <div className='flex items-center font-semibold text-gray-700 py-2'>
-            <RepeatIcon/>
-            
-        </div> */}
+
         <div className='flex space-x-5'>
             <Avatar 
                 onClick={()=>navigate(`/profile/${6}`)}

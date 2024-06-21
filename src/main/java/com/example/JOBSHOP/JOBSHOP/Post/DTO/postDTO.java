@@ -30,6 +30,9 @@ public class postDTO extends baseEntityDTO<Long>{
 	private String employerUserName;
 	private String employerEmail;
 	public String format;
+	private String jobName;
+	private Long jobId;
+	
 //	private companyProfile companyProfile;
 //	
 	private String companyName;
@@ -47,12 +50,30 @@ public class postDTO extends baseEntityDTO<Long>{
 	private List<String> qualifications;
 	private String experience;
 //	private List<postField> postFields=new ArrayList<postField>();
-	
-	
-	
 
+	
     public String getFieldName() {
 		return fieldName;
+	}
+
+
+	public String getJobName() {
+		return jobName;
+	}
+
+
+	public void setJobName(String jobName) {
+		this.jobName = jobName;
+	}
+
+
+	public Long getJobId() {
+		return jobId;
+	}
+
+
+	public void setJobId(Long jobId) {
+		this.jobId = jobId;
 	}
 
 

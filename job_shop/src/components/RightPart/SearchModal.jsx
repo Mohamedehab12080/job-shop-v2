@@ -42,17 +42,16 @@ export default function SearchModal({
   const searchResults = useSelector((state) => state.searchRed);
 
   const handleFilterUsers = (input) => {
+    setFilterInputUser(input);
     dispatch(searchUsers(input));
   };
 
   React.useEffect(() => {
-    if (openShowSearchUsersModal) {
-      setFilterInputUser(searchValue);
-    }
-  }, [searchValue, openShowSearchUsersModal]);
-
-  React.useEffect(() => {
-    if (openShowSearchUsersModal && searchResults.users) {
+    if (
+      openShowSearchUsersModal &&
+      filterInputUser !== "" &&
+      searchResults.users
+    ) {
       setFilteredUsers(searchResults.users);
     }
   }, [searchResults, openShowSearchUsersModal]);

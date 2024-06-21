@@ -1,6 +1,9 @@
 package com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerFieldShowDTO;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import com.example.JOBSHOP.JOBSHOP.companyAdministrator.companyField.companyFieldJob.DTO.companyFieldJobDTO;
 
 public class employerFieldShowDTO {
 
@@ -10,8 +13,28 @@ public class employerFieldShowDTO {
 	private List<String>Skills;
 	private List<String>qualifications;
 	private Long fieldId;
+	private Long companyFieldId;
+	private List<String> fieldJobs;
+	private List<companyFieldJobDTO> companyFieldJobDTOs=new ArrayList<companyFieldJobDTO>();
 	
-	
+	public Long getCompanyFieldId() {
+		return companyFieldId;
+	}
+	public void setCompanyFieldId(Long companyFieldId) {
+		this.companyFieldId = companyFieldId;
+	}
+	public List<companyFieldJobDTO> getCompanyFieldJobDTOs() {
+		return companyFieldJobDTOs;
+	}
+	public void setCompanyFieldJobDTOs(List<companyFieldJobDTO> companyFieldJobDTOs) {
+		this.companyFieldJobDTOs = companyFieldJobDTOs;
+	}
+	public List<String> getFieldJobs() {
+		return fieldJobs;
+	}
+	public void setFieldJobs(List<String> fieldJobs) {
+		this.fieldJobs = fieldJobs;
+	}
 	public Long getFieldId() {
 		return fieldId;
 	}

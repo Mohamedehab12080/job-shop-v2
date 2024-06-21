@@ -42,6 +42,16 @@ export const createPost = (postData) => async (dispatch) => {
   }
 };
 
+export const createPostWithJob = (postData) => async (dispatch) => {
+  try {
+    const { data } = await api.post(`/api/employer/postWithJob`, postData);
+    console.log("Created Post With job  Response  : ", data);
+    dispatch({ type: CREATE_POST_SUCCESS, payload: data });
+  } catch (error) {
+    console.error("Error : ", error);
+    dispatch({ type: CREATE_POST_FAILURE, payload: error.message });
+  }
+};
 export const editPost = (postId, postData) => async (dispatch) => {
   try {
     const { data } = await api.put(
@@ -73,6 +83,7 @@ export const fetchMatchedPosts = (userId) => async (dispatch) => {
       `/api/Post/findPostsWithProfileSkills/${userId}`
     );
     dispatch({ type: FETCH_MATCHED_POSTS_SUCCESS, payload: data });
+    console.log("Data from back  : " + data);
   } catch (error) {
     console.error("Error : ", error);
     dispatch({ type: FETCH_MATCHED_POSTS_FAILURE, payload: error.message });

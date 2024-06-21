@@ -7,16 +7,14 @@ import Profile from "../Profile/Profile";
 import RightSection from "../RightPart/RightSection";
 import { Route, Routes } from "react-router-dom";
 import PostDetails from "../PostDetails/PostDetails";
-import Authentication from "../Authentication/Authentication";
 import CompanyProfile from "../Profile/CompanyProfile";
 import EmployerProfile from "../Profile/EmployerProfile";
-import ForgotPassword from "../Authentication/RequestReset";
-import RequestReset from "../Authentication/RequestReset";
-import ResetPassword from "../Authentication/ResetPassword";
-import RecommendationModal from "../modals/companyModals/postModals/RecommedationModal";
 import RecommendationPath from "../HomeSection/RecommendationPath";
 
 export const Home = () => {
+
+  
+
   return (
     <Grid container className="px-5 lg:px-36 justify-between">
       {/* Left Navigation */}

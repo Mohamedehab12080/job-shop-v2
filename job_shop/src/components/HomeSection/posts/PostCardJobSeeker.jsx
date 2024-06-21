@@ -54,6 +54,7 @@ const PostCardJobSeeker = ({
   jobSeekerId,
   postImage,
   statusCode,
+  jobName,
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -164,7 +165,12 @@ const PostCardJobSeeker = ({
               ? Title.substring(0, Title.indexOf("{"))
               : Title || "No Title"}
           </Typography>
-          <Typography variant="body2" color="textSecondary" component="p">
+          <Typography
+            className="mb-3"
+            variant="body2"
+            color="textSecondary"
+            component="p"
+          >
             <strong>Description: </strong> {truncatedDescription}
           </Typography>
           <Typography variant="body2" color="textSecondary" component="p">
@@ -173,34 +179,68 @@ const PostCardJobSeeker = ({
           {!hidden && (
             <>
               <Divider sx={{ my: 2, backgroundColor: "black" }} />
-              <div style={{ display: "flex", flexDirection: "row" }}>
+              <div
+                style={{
+                  overflowX: "auto", // Enable horizontal scrolling if content overflows
+                  display: "flex", // Display children elements in a row
+                  flexDirection: "row", // Align children in a row
+                  alignItems: "center", // Align items vertically center
+                  padding: "5%",
+                  margin: "5%",
+                  gap: "2px", // Add gap between children for spacing
+                  flexWrap: "nowrap", // Prevent wrapping to next row
+                }}
+              >
+                {/* Each Typography component */}
                 <Typography
+                  className="p-2"
                   variant="body2"
                   color="textSecondary"
                   component="p"
-                  style={{ marginRight: "1rem" }}
+                  style={{ minWidth: "200px" }} // Set a minimum width to avoid collapsing
                 >
                   <strong>Experience: </strong> {Experience} Years
                 </Typography>
+
                 <Typography
+                  className="p-2"
                   variant="body2"
                   color="textSecondary"
                   component="p"
-                  style={{ marginRight: "1rem" }}
+                  style={{ minWidth: "200px" }}
                 >
                   <FmdGoodIcon sx={{ mr: 0.5 }} /> <strong>Location: </strong>{" "}
                   {location}
                 </Typography>
+
                 <Typography
+                  className="p-2"
                   variant="body2"
                   color="textSecondary"
                   component="p"
-                  style={{ marginRight: "1rem" }}
+                  style={{ minWidth: "200px" }}
                 >
                   <strong>Employment Type: </strong> {employmentType}
                 </Typography>
-                <Typography variant="body2" color="textSecondary" component="p">
+
+                <Typography
+                  className="p-2"
+                  variant="body2"
+                  color="textSecondary"
+                  component="p"
+                  style={{ minWidth: "200px" }}
+                >
                   <strong>Field: </strong> {fieldName}
+                </Typography>
+
+                <Typography
+                  className="p-2"
+                  variant="body2"
+                  color="textSecondary"
+                  component="p"
+                  style={{ minWidth: "200px" }}
+                >
+                  <strong>Job Name : </strong> {jobName}
                 </Typography>
               </div>
 

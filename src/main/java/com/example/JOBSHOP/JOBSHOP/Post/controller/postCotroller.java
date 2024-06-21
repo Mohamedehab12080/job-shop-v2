@@ -25,6 +25,11 @@ import com.example.JOBSHOP.JOBSHOP.Application.DTO.applicationMapper;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceImpl;
 import com.example.JOBSHOP.JOBSHOP.Application.service.applicationServiceInerface;
 import com.example.JOBSHOP.JOBSHOP.Employer.Employer;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerField;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldDTO;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.DTO.employerFieldMapper;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.employerFieldShowDTO.employerFieldShowDTO;
+import com.example.JOBSHOP.JOBSHOP.Employer.employerField.service.employerFieldServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Employer.service.employerServiceInterface;
 import com.example.JOBSHOP.JOBSHOP.Post.Post;
 import com.example.JOBSHOP.JOBSHOP.Post.DTO.postDTO;
@@ -70,6 +75,9 @@ public class postCotroller {
 	
 	@Autowired
 	private registrationCompleteEventListener registrationCompleteEventListener;
+	
+	@Autowired
+	private employerFieldServiceInterface employerFieldServiceI;
 	
 //	@GetMapping("/findByTitle/{title}")
 //	public List<postDTO> findAllPostsWithTitle(@PathVariable String title)
@@ -280,6 +288,7 @@ public class postCotroller {
 		User reqUSer=userServiceI.findUserByJwt(jwt);
 		if(reqUSer!=null && reqUSer.getUserType().name().equals("jobSeeker"))
 		{
+			System.out.println("Method called success : ");
 			return new ResponseEntity<List<postDTO>>(jobSeekerService.getPostsWithSkillsOnPublic(id),HttpStatus.OK); // this list will be sent to the thymeleaf with model.addAttribute("posts",postDtoList)
 		}else 
 		{
@@ -428,15 +437,14 @@ public class postCotroller {
 				companyAdminId=user.getId();
 			}
 			companyProfile compPR=companyProfileService.findByCompanyAdmin(companyAdminId);
-			List<Post> postList=postService.findByCompanyProfile(compPR.getId());
-			return new ResponseEntity<List<postDTO>>(
-					postList
+			List<postDTO> postList=postService.findByCompanyProfile(compPR.getId())
 					.stream()
 					.map(postMapper::mapPostTODTO)
 					.collect(
 							Collectors
-							.toList())
-					,HttpStatus.OK);
+							.toList());
+			return new ResponseEntity<List<postDTO>>(
+					postList,HttpStatus.OK);
 		}else 
 		{
 			throw new UserException("user not found for this token or your type not allowed");

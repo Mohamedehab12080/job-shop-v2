@@ -21,12 +21,10 @@ public class employerField extends baseEntity<Long>{
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JsonBackReference
     @JoinColumn(name="employer_id")
-	//@NotNull
 	private Employer employer;
 	
 	@ManyToOne
 	@JoinColumn(name="companyField_id")
-	//@NotNull
 	private companyField companyField;
 	
 	public Employer getEmployer() {

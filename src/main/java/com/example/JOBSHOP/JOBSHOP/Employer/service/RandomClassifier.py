@@ -19,6 +19,13 @@ nltk.download('stopwords')
 
 app = Flask(__name__)
 
+# Global variables to store the model components
+global_model_data = {
+    'label_encoder': None,
+    'vectorizer': None,
+    'rf_model': None
+}
+
 def cleanup(sentence):
     cleaned_sentences = []
     for sent in sentence:
@@ -41,10 +48,13 @@ def convert_to_serializable(obj):
     else:
         return str(obj)
 
-def match_skills_to_jobs(user_skills):
+def load_data():
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    csv_file_path = os.path.join(current_directory, 'output.csv')
-    data = pd.read_csv(csv_file_path)
+    csv_file_path = os.path.join(current_directory, 'output2.csv')
+    return pd.read_csv(csv_file_path)
+
+def train_model():
+    data = load_data()
 
     label_encoder = LabelEncoder()
     data['job_title_encoded'] = label_encoder.fit_transform(data['Job Title'])
@@ -57,12 +67,28 @@ def match_skills_to_jobs(user_skills):
     rf_model.fit(X_train, y_train)
 
     predictions = rf_model.predict(X_test)
-    print("Classification Report:")
-    print(classification_report(y_test, predictions))
+    report = classification_report(y_test, predictions, output_dict=True, zero_division='warn')
+    
+    accuracy = report['accuracy']  # Extract accuracy from the report
 
+    global_model_data['label_encoder'] = label_encoder
+    global_model_data['vectorizer'] = vectorizer
+    global_model_data['rf_model'] = rf_model
+
+    return report, accuracy  # Return both report and accuracy
+
+
+def match_skills_to_jobs(user_skills):
+    label_encoder = global_model_data['label_encoder']
+    vectorizer = global_model_data['vectorizer']
+    rf_model = global_model_data['rf_model']
+
+    data = load_data()
+
+    skills_matrix = vectorizer.transform(cleanup(data['skills']))
     user_skills_matrix = vectorizer.transform(cleanup([user_skills]))
     similarity_scores = cosine_similarity(user_skills_matrix, skills_matrix)
-    matched_indices = (similarity_scores >= 0.6).nonzero()[1]
+    matched_indices = (similarity_scores >= 0.4).nonzero()[1]
 
     results = []
     if matched_indices.size > 0:
@@ -82,7 +108,6 @@ def match_skills_to_jobs(user_skills):
                         "jobTitle": row_dict_serializable["Job Title"],
                         "rowType": row_dict_serializable["rowType"]
                     })
-
     return json.dumps(results, indent=4)
 
 @app.route('/match-skills', methods=['POST'])
@@ -92,5 +117,16 @@ def match_skills():
     matched_jobs_json = match_skills_to_jobs(user_skills_input.lower())
     return jsonify(json.loads(matched_jobs_json))
 
+@app.route('/train-model', methods=['POST'])
+def train_model_endpoint():
+    report, accuracy = train_model()
+    response = {
+        'report': report,
+        'accuracy': accuracy
+    }
+    return jsonify(response)
+
 if __name__ == '__main__':
+    # Train the model at the startup
+    train_model()
     app.run(debug=True)

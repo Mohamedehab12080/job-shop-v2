@@ -31,4 +31,6 @@ public interface employerServiceInterface {
 
 	Employer insertPicture(Long id, String picture);
 
+	Post createAPostWithJobs(Employer user, postDTO postDTO);
+
 }

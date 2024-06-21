@@ -184,7 +184,7 @@ const RecommendationPath = () => {
       `}</style>
       <section>
         <Typography variant="h4" className="py-7 font-bold opacity-90">
-          Home
+          Recommendations
         </Typography>
       </section>
       <form onSubmit={formik.handleSubmit}>
@@ -284,8 +284,11 @@ const RecommendationPath = () => {
                 onChange={handleChange}
                 aria-label="lab API tabs example"
               >
-                <Tab label="Recommended posts" value="1" />
-                <Tab label="Recommended jobs" value="2" />
+                <Tab label={`Recommended posts(${posts?.length})`} value="1" />
+                <Tab
+                  label={`Recommended jobs(${modelResponse?.length})`}
+                  value="2"
+                />
               </TabList>
             </Box>
             <TabPanel key="1" value="1">
@@ -293,7 +296,7 @@ const RecommendationPath = () => {
                 {(filterInputPost === "" ? posts : filteredPosts).map(
                   (p, index) => (
                     <PostCardJobSeeker
-                      key={p.id}
+                      key={index}
                       id={p.id}
                       employerId={p.employerId}
                       employerUserName={p.employerUserName}
@@ -320,6 +323,7 @@ const RecommendationPath = () => {
                       Experience={p.experience}
                       postImage={p.postImage}
                       statusCode={p.statuseCode}
+                      jobName={p.jobName}
                     />
                   )
                 )}
@@ -327,25 +331,36 @@ const RecommendationPath = () => {
             </TabPanel>
             <TabPanel key="2" value="2">
               {statusOfPosts ? (
-                <section key={2}>
+                <section>
                   <div style={{ marginTop: 20 }}>
-                    <Typography variant="h6">You can work</Typography>
+                    <Typography variant="h6">Recommended Jobs</Typography>
                     {modelResponse.length > 0 ? (
-                      modelResponse.map((response, index) => (
-                        <Card key={index} className="model-response-card">
-                          <CardContent>
-                            <Typography variant="body1">
-                              <b>Job Title:</b> {response["Job Title"]}
-                            </Typography>
-                            <Typography variant="body1">
+                      Array.from(
+                        new Set(
+                          modelResponse.map((response) => response["Job Title"])
+                        )
+                      ).map((jobTitle, index) => {
+                        const filteredResponses = modelResponse.filter(
+                          (response) => response["Job Title"] === jobTitle
+                        );
+
+                        return (
+                          <Card key={index} className="model-response-card">
+                            <CardContent>
+                              <Typography variant="body1">
+                                <b>Job Title:</b> {jobTitle}
+                              </Typography>
+                              {/* Example of additional details you might want to show */}
+                              {/* <Typography variant="body1">
                               <b>Skills:</b>
                             </Typography>
                             <Typography variant="body2">
-                              {response.skills}
-                            </Typography>
-                          </CardContent>
-                        </Card>
-                      ))
+                              {filteredResponses.map((response) => response.skills).join(', ')}
+                            </Typography> */}
+                            </CardContent>
+                          </Card>
+                        );
+                      })
                     ) : (
                       <Typography variant="body2">
                         No recommendations available
@@ -359,7 +374,7 @@ const RecommendationPath = () => {
             </TabPanel>
           </TabContext>
         </Box>
-      </section>
+      </section>{" "}
     </div>
   );
 };

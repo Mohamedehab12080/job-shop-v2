@@ -69,16 +69,19 @@ export default function ShowApplicationsModal({
   const [acceptStatusState, setAcceptStatusState] = React.useState(true);
   const [rejectStatusState, setRejectStatusState] = React.useState(true);
   const [progressStatusState, setProgressStatusState] = React.useState(true);
+
   const handleFilterApplications = (input) => {
     const filtered = fetchedApplications.filter((application) => {
       if (auth.user.userType !== "jobSeeker") {
         return application.jobSeekerUserName
           .toLowerCase()
-          .includes(input.toLowerCase());
+          .includes(input?.toLowerCase());
       } else {
         return (
-          application.companyName.toLowerCase().includes(input.toLowerCase()) ||
-          application.postTitle.toLowerCase().includes(input.toLowerCase())
+          application?.companyName
+            ?.toLowerCase()
+            .includes(input.toLowerCase()) ||
+          application?.postTitle?.toLowerCase().includes(input.toLowerCase())
         );
       }
     });
@@ -112,6 +115,7 @@ export default function ShowApplicationsModal({
     if (openShowApplicationsModal) {
       if (auth.user.userType !== "jobSeeker") {
         setFetchedApplications(post.applications);
+        console.log("Applications From effect : ", post.applications);
       } else {
         setFetchedApplications(jobSeeker.applications);
       }
@@ -167,17 +171,21 @@ export default function ShowApplicationsModal({
     if (value !== "progress") {
       setSelectedSearchStatus(value);
       const filtered = fetchedApplications.filter((application) => {
-        if (auth.user.userType === "jobSeeker") {
-          return application.statuseCode
-            .toLowerCase()
-            .includes(value.toLowerCase());
-        }
-        return false;
+        return application?.statuseCode
+          ?.toLowerCase()
+          .includes(value.toLowerCase());
       });
       setFilteredApplicationsStatus(filtered);
     } else {
       setSelectedSearchStatus("");
-      setFilteredApplicationsStatus([]);
+      setSelectedSearchStatus(value);
+      const filtered = fetchedApplications.filter((application) => {
+        return (
+          application.statuseCode === "" ||
+          application.statuseCode.includes("Matched")
+        );
+      });
+      setFilteredApplicationsStatus(filtered);
     }
   };
 
@@ -230,36 +238,34 @@ export default function ShowApplicationsModal({
               />
             </Grid>
 
-            {auth.user.userType === "jobSeeker" && (
-              <Grid>
-                <div className="flex items-center justify-between mt-3">
-                  <Button
-                    id="basic-button"
-                    disabled={!acceptStatusState}
-                    onClick={() => handleSearchApplications("Accepted")}
-                  >
-                    Accepted Apps
-                  </Button>
-                  <Button
-                    id="basic-button"
-                    disabled={!progressStatusState}
-                    onClick={() => handleSearchApplications("progress")}
-                  >
-                    In progress Apps
-                  </Button>
-                  <Button
-                    id="basic-button"
-                    disabled={!rejectStatusState}
-                    onClick={() => handleSearchApplications("Rejected")}
-                  >
-                    Rejected Apps
-                  </Button>
-                </div>
-              </Grid>
-            )}
+            <Grid>
+              <div className="flex items-center justify-between mt-3">
+                <Button
+                  id="basic-button"
+                  disabled={!acceptStatusState}
+                  onClick={() => handleSearchApplications("Accepted")}
+                >
+                  Accepted Apps
+                </Button>
+                <Button
+                  id="basic-button"
+                  disabled={!progressStatusState}
+                  onClick={() => handleSearchApplications("progress")}
+                >
+                  In progress Apps
+                </Button>
+                <Button
+                  id="basic-button"
+                  disabled={!rejectStatusState}
+                  onClick={() => handleSearchApplications("Rejected")}
+                >
+                  Rejected Apps
+                </Button>
+              </div>
+            </Grid>
 
             <Grid container spacing={2}>
-              {(filterInputApplicants === "" || selectedSearchStatus === ""
+              {(filterInputApplicants === "" && selectedSearchStatus === ""
                 ? fetchedApplications
                 : filteredApplicants.length > 0
                 ? filteredApplicants
@@ -402,6 +408,13 @@ export default function ShowApplicationsModal({
                                 >
                                   {app.statuseCode}
                                 </p>
+                              ) : app.statuseCode.includes("Rejected") ? (
+                                <p
+                                  className="font-semibold"
+                                  style={{ color: "red" }}
+                                >
+                                  {app.statuseCode}
+                                </p>
                               ) : null}
                             </>
                           )}
@@ -487,7 +500,7 @@ export default function ShowApplicationsModal({
                           </Typography>
                           <Typography variant="body1">
                             <strong>Post Experience:</strong>{" "}
-                            {app.postExperience}
+                            {app.postExperienc}
                           </Typography>
                           <Typography variant="body1">
                             <strong>Skills:</strong>

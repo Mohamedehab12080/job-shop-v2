@@ -31,6 +31,7 @@ import jakarta.persistence.Table;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Post extends baseEntity<Long>{
 
+	@Column(length = 1000)
 	private String Title;
 	@Column(length = 1000)
 	private String description;
